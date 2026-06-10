@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>AURA.RNG | Horizontal Diamond Edition</title>
+    <title>AURA.RNG | AAA Cinematic RPG</title>
     <style>
         * {
             margin: 0;
@@ -17,64 +17,71 @@
             font-family: 'Segoe UI', 'Poppins', 'Orbitron', monospace;
             color: #eee;
             min-height: 100vh;
-            overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap;
             padding: 1rem;
         }
 
-        /* Horizontal scroll container */
-        .horizontal-scroll {
-            display: inline-flex;
-            gap: 1.5rem;
-            padding: 0.5rem;
-            white-space: normal;
-        }
-
-        /* Each page card */
-        .page {
-            display: inline-block;
-            vertical-align: top;
-            width: 380px;
-            background: rgba(0, 0, 0, 0.75);
+        /* ===== TOP HUD ===== */
+        .top-hud {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            background: rgba(0,0,0,0.6);
             backdrop-filter: blur(12px);
             border-radius: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 1.2rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            transition: transform 0.2s, border-color 0.2s;
-            white-space: normal;
+            padding: 0.8rem 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.2);
         }
-        .page:hover { border-color: #9b6eff; }
-
-        /* Stats bar inside each page? Shared top bar */
-        .global-stats {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            background: #0a0c1ad9;
-            backdrop-filter: blur(8px);
+        .hud-stat {
             display: flex;
-            justify-content: space-between;
-            padding: 0.5rem 1.5rem;
-            z-index: 100;
+            align-items: center;
+            gap: 0.5rem;
             font-weight: bold;
-            border-bottom: 1px solid #5f4bcb;
-            flex-wrap: wrap;
-            gap: 1rem;
+            background: #01010866;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            justify-content: center;
         }
-        .global-stats span { background: #01010866; padding: 0.2rem 0.8rem; border-radius: 2rem; }
-
-        /* main container offset for fixed header */
-        .main-wrapper {
-            margin-top: 70px;
-            overflow-x: auto;
-            white-space: nowrap;
-            padding-bottom: 1rem;
+        .hud-stat span:first-child { color: #ffd966; }
+        .game-title {
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            background: linear-gradient(45deg, gold, #ff6a00);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
 
-        /* Diamond button */
+        /* ===== MAIN GRID ===== */
+        .game-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 1.2rem;
+        }
+
+        /* game card panel */
+        .game-card {
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 1.8rem;
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 1.2rem;
+            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+        }
+        .game-card:hover {
+            transform: translateY(-4px);
+            border-color: #9b6eff;
+            box-shadow: 0 10px 25px rgba(155,110,255,0.3);
+        }
+        .card-header {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            border-left: 4px solid #9b6eff;
+            padding-left: 0.6rem;
+        }
+
+        /* diamond roll button */
         .diamond-btn {
             width: 140px;
             height: 140px;
@@ -86,7 +93,7 @@
             margin: 1rem auto;
             font-size: 3.5rem;
             cursor: pointer;
-            box-shadow: 0 0 30px cyan, inset 0 0 20px white;
+            box-shadow: 0 0 30px cyan, inset 0 0 15px white;
             transition: 0.08s linear;
         }
         .diamond-btn:active { transform: scale(0.94); filter: brightness(1.2); }
@@ -97,239 +104,206 @@
             padding: 0.8rem;
             margin: 1rem 0;
             border-left: 6px solid #883eff;
+            transition: all 0.2s;
         }
-        .rare-glow { box-shadow: 0 0 18px #ffbc3e; border-left-color: gold; }
 
+        /* inventory grid */
         .inv-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
             gap: 0.6rem;
             max-height: 280px;
             overflow-y: auto;
             margin: 0.8rem 0;
         }
-        .card {
+        .inv-card {
             background: #111;
             padding: 0.5rem;
             border-radius: 1rem;
             border: 1px solid #333;
             cursor: pointer;
+            transition: 0.1s;
         }
-        .card:hover { transform: translateY(-2px); border-color: #9b6eff; }
-        .card.equipped { border: 2px solid gold; background: #1e1a2f; }
+        .inv-card:hover { transform: translateY(-2px); border-color: #9b6eff; background: #1a1a2a; }
+        .inv-card.equipped { border: 2px solid gold; background: #1e1a2f; }
 
-        button {
+        /* buttons */
+        .game-btn {
             background: linear-gradient(135deg, #2a235a, #120e2c);
             border: none;
             color: white;
             font-weight: bold;
-            padding: 0.4rem 0.8rem;
+            padding: 0.4rem 0.9rem;
             border-radius: 2rem;
             cursor: pointer;
             margin: 0.2rem;
             font-family: inherit;
             border: 1px solid #5f4bcb;
+            transition: 0.1s;
         }
-        button:active { transform: scale(0.96); }
+        .game-btn:hover { transform: scale(1.02); box-shadow: 0 0 8px #9b6eff; border-color: #9b6eff; }
+        .game-btn:active { transform: scale(0.96); }
 
-        .log, .chat-messages {
+        /* logs & chat */
+        .log-box, .chat-box {
             background: #01010880;
             border-radius: 1rem;
             padding: 0.4rem;
-            height: 130px;
+            height: 150px;
             overflow-y: auto;
             font-size: 0.7rem;
+            margin: 0.5rem 0;
         }
-        .health-bar {
-            background: #6a0e0e;
-            height: 6px;
-            border-radius: 8px;
-            overflow: hidden;
-            margin: 0.3rem 0;
-        }
+        .health-bar { background: #6a0e0e; height: 6px; border-radius: 8px; overflow: hidden; margin: 0.3rem 0; }
         .health-fill { background: #e04e4e; width: 100%; height: 100%; transition: width 0.1s; }
-        .ability-btn {
-            background: #1e2a3a;
-            margin: 2px;
-            padding: 3px 6px;
-            font-size: 0.65rem;
-        }
-        .cooldown-progress {
-            width: 100%;
-            height: 2px;
-            background: #00aaff;
-            margin-top: 2px;
-        }
-        /* floating numbers */
-        .float-number {
-            position: fixed;
-            font-weight: bold;
-            font-size: 1.1rem;
-            pointer-events: none;
-            z-index: 2000;
-            animation: floatUp 0.7s ease-out forwards;
-        }
-        @keyframes floatUp {
-            0% { opacity: 1; transform: translateY(0px); }
-            100% { opacity: 0; transform: translateY(-50px); }
-        }
-        .screen-flash {
-            position: fixed;
-            top:0; left:0; width:100%; height:100%;
-            background: white;
-            opacity: 0;
-            pointer-events: none;
-            z-index: 9999;
-            transition: opacity 0.05s;
-        }
-        /* tooltip */
-        [data-tooltip] {
-            position: relative;
-            cursor: help;
-        }
-        [data-tooltip]:before {
-            content: attr(data-tooltip);
-            position: absolute;
-            bottom: 120%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #000c;
-            color: #fff;
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-size: 0.6rem;
-            white-space: nowrap;
-            pointer-events: none;
-            opacity: 0;
-            transition: 0.1s;
-        }
-        [data-tooltip]:hover:before { opacity: 1; }
+
+        /* rarity glows (applied to aura names, cards) */
+        .tier-glow-7 { text-shadow: 0 0 6px gold; border-left-color: gold; }
+        .tier-glow-8 { text-shadow: 0 0 10px #c084fc; border-left-color: #c084fc; box-shadow: 0 0 12px #a855f7; }
+        .tier-glow-9 { text-shadow: 0 0 12px #00ffff; border-left-color: cyan; box-shadow: 0 0 15px cyan; }
+        .tier-glow-10 { text-shadow: 0 0 8px red, 0 0 12px magenta; border-left-color: red; animation: glitchPulse 0.3s infinite alternate; }
+        @keyframes glitchPulse { 0% { text-shadow: 0 0 5px red; } 100% { text-shadow: 0 0 15px magenta, 0 0 5px red; } }
+
         /* cutscene overlay */
         .cutscene-overlay {
-            position: fixed;
-            inset: 0;
-            background: black;
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.1s;
+            position: fixed; inset: 0; background: black; z-index: 10000;
+            display: flex; align-items: center; justify-content: center;
+            pointer-events: none; opacity: 0; transition: opacity 0.1s;
         }
-        .cutscene-active { opacity: 1; }
-        .cutscene-content {
-            text-align: center;
-            font-size: 1.8rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            text-transform: uppercase;
+        .cutscene-active { opacity: 1; pointer-events: none; }
+        .cutscene-text {
+            text-align: center; font-size: 1.8rem; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 2px;
         }
-        .mythic-glow { text-shadow: 0 0 20px #8a2be2; animation: mythicPulse 0.3s infinite alternate; }
-        .divine-glow { text-shadow: 0 0 30px gold; animation: divinePulse 0.2s infinite alternate; }
-        .transcendent-glow { text-shadow: 0 0 20px cyan, 0 0 50px magenta; animation: glitchText 0.08s infinite; }
-        @keyframes mythicPulse { from { text-shadow: 0 0 20px #8a2be2; } to { text-shadow: 0 0 60px #ff00ff; } }
-        @keyframes divinePulse { from { text-shadow: 0 0 30px gold; } to { text-shadow: 0 0 100px orange; } }
-        @keyframes glitchText { 0% { transform: skew(0deg); text-shadow: -2px 0 red, 2px 0 blue; } 50% { transform: skew(3deg); text-shadow: 2px 0 cyan, -2px 0 magenta; } 100% { transform: skew(0deg); } }
-        .screen-shake { animation: shakeScreen 0.05s infinite; }
-        @keyframes shakeScreen { 0% { transform: translate(1px,1px); } 100% { transform: translate(-1px,-1px); } }
-        ::-webkit-scrollbar { height: 6px; background: #1a1a2a; }
-        ::-webkit-scrollbar-thumb { background: #9b6eff; border-radius: 10px; }
+        .screen-shake { animation: shakeAnim 0.05s infinite; }
+        @keyframes shakeAnim { 0% { transform: translate(1px,1px); } 100% { transform: translate(-1px,-1px); } }
+        .screen-flash { position: fixed; inset: 0; background: white; opacity: 0; pointer-events: none; z-index: 9999; transition: opacity 0.05s; }
     </style>
 </head>
 <body>
-<div class="global-stats">
-    <span>🎲 Manual: <span id="manualCount">0</span></span>
-    <span>🌀 Total: <span id="totalCount">0</span></span>
-    <span>⭐ Auto: <span id="autoStatus">🔒 0/100</span></span>
-    <span>❤️ HP: <span id="playerHp">100</span></span>
-    <span>💪 Prestige: <span id="prestigeBonus">1.0x</span></span>
-    <span>🔇 <input type="checkbox" id="muteToggle"> Mute</span>
+<div class="top-hud">
+    <div class="hud-stat"><span>❤️ HP</span> <span id="hudHp">100</span></div>
+    <div class="hud-stat"><span>🛡️ Armor</span> <span id="hudArmor">0</span></div>
+    <div class="hud-stat"><span>💪 Prestige</span> <span id="hudPrestige">1.0x</span></div>
+    <div class="hud-stat"><span>🎲 Manual</span> <span id="hudManual">0</span></div>
+    <div class="hud-stat"><span>🌀 Total</span> <span id="hudTotal">0</span></div>
+    <div class="game-title">💎 AURA.RNG</div>
 </div>
-<div class="main-wrapper">
-    <div class="horizontal-scroll">
-        <!-- PAGE 1: ROLLING -->
-        <div class="page">
-            <h2>💎 DIAMOND ROLL</h2>
-            <div class="diamond-btn" id="rollBtn">💎</div>
-            <div id="resultCard" class="result-card">
-                <div><strong id="auraName">None</strong> <span id="auraTier">Tier ?</span></div>
-                <div id="auraMoves">Moves: --</div>
-                <div id="auraPassive">Passive: --</div>
-                <div><button id="addBtn">📦 Add</button> <button id="equipCurrentBtn">⚡ Equip</button></div>
-            </div>
-            <div><label><input type="checkbox" id="autoToggle" disabled> 🤖 Auto-Roll</label> <span id="autoMsg"></span></div>
-            <div style="margin-top:0.8rem; background:#01001580; border-radius:1rem; padding:0.5rem">
-                <div>✨ Equipped Aura</div>
-                <div id="equippedDisplay">None</div>
-            </div>
-        </div>
 
-        <!-- PAGE 2: INVENTORY & FUSION -->
-        <div class="page">
-            <h2>🎒 INVENTORY</h2>
-            <div id="inventoryGrid" class="inv-grid"></div>
-            <div style="display:flex; gap:0.4rem; flex-wrap:wrap">
-                <button id="clearInvBtn">🗑️ Clear</button>
-                <button id="equipBestBtn">🏆 Best</button>
-                <button id="fusionBtn">✨ Fusion</button>
-                <button id="prestigeBtn">🌀 Prestige</button>
-            </div>
-            <div style="font-size:0.7rem; margin-top:0.5rem;">💎 Evolution XP: <span id="evoXP">0</span>/100</div>
+<div class="game-grid">
+    <!-- ROLL PANEL -->
+    <div class="game-card">
+        <div class="card-header">💎 DIAMOND ROLL</div>
+        <div class="diamond-btn" id="rollBtn">💎</div>
+        <div id="resultCard" class="result-card">
+            <div><strong id="auraName">None</strong> <span id="auraTier">Tier ?</span></div>
+            <div id="auraMoves">Moves: --</div>
+            <div id="auraPassive">Passive: --</div>
+            <div><button class="game-btn" id="addBtn">📦 Add</button> <button class="game-btn" id="equipCurrentBtn">⚡ Equip</button></div>
         </div>
-
-        <!-- PAGE 3: ARENA COMBAT -->
-        <div class="page">
-            <h2>⚔️ ARENA</h2>
-            <div>
-                <button id="easyBtn">Easy</button>
-                <button id="mediumBtn">Medium</button>
-                <button id="hardBtn">Hard</button>
-                <button id="bossBtn">Boss</button>
-                <button id="dodgeBtn">💨 Dodge</button>
-            </div>
-            <div id="enemyDisplay">Enemy: None</div>
-            <div class="health-bar"><div id="enemyHealthFill" class="health-fill"></div></div>
-            <div id="combatLog" class="log"></div>
-            <div id="abilityButtons" style="display:flex; flex-wrap:wrap; gap:3px; margin-top:6px;"></div>
+        <div><label><input type="checkbox" id="autoToggle"> 🤖 Auto-Roll</label> <span id="autoMsg"></span></div>
+        <div style="margin-top:0.8rem; background:#01001580; border-radius:1rem; padding:0.5rem">
+            <div>✨ Equipped Aura</div>
+            <div id="equippedDisplay">None</div>
         </div>
+    </div>
 
-        <!-- PAGE 4: GLOBAL CHAT & SYSTEMS -->
-        <div class="page">
-            <h2>🌍 GLOBAL CHAT</h2>
-            <div id="globalChat" class="chat-messages" style="height:280px;"></div>
-            <div style="margin-top:0.8rem; font-size:0.7rem;">
-                <p>⭐ Tier 8+ triggers CINEMATIC cutscenes</p>
-                <p>💎 Fusion (combine 2 auras)</p>
-                <p>🌀 Prestige (reset for permanent dmg buff)</p>
-            </div>
+    <!-- INVENTORY + FUSION -->
+    <div class="game-card">
+        <div class="card-header">🎒 INVENTORY</div>
+        <div style="display:flex; gap:0.3rem; flex-wrap:wrap; margin-bottom:0.5rem;">
+            <button class="game-btn" id="sortTierBtn">⬇️ Sort by Tier</button>
+            <select id="filterTierSelect" class="game-btn" style="background:#1e2a3a;"><option value="all">All Tiers</option><option value="1">Tier1</option><option value="2">Tier2</option><option value="3">Tier3</option><option value="4">Tier4</option><option value="5">Tier5</option><option value="6">Tier6</option><option value="7">Tier7</option><option value="8">Tier8</option><option value="9">Tier9</option><option value="10">Tier10</option></select>
+        </div>
+        <div id="inventoryGrid" class="inv-grid"></div>
+        <div style="display:flex; gap:0.4rem; flex-wrap:wrap">
+            <button class="game-btn" id="clearInvBtn">🗑️ Clear</button>
+            <button class="game-btn" id="equipBestBtn">🏆 Best</button>
+            <button class="game-btn" id="fusionBtn">✨ Fusion (2 same tier)</button>
+            <button class="game-btn" id="prestigeBtn">🌀 Prestige</button>
+        </div>
+        <div style="font-size:0.7rem; margin-top:0.5rem;">💎 Evolution XP: <span id="evoXP">0</span>/100</div>
+    </div>
+
+    <!-- ARENA + COMBAT -->
+    <div class="game-card">
+        <div class="card-header">⚔️ ARENA</div>
+        <div>
+            <button class="game-btn" id="easyBtn">Easy</button>
+            <button class="game-btn" id="mediumBtn">Medium</button>
+            <button class="game-btn" id="hardBtn">Hard</button>
+            <button class="game-btn" id="bossBtn">Boss</button>
+            <button class="game-btn" id="dodgeBtn">💨 Dodge</button>
+        </div>
+        <div id="enemyDisplay">Enemy: None</div>
+        <div class="health-bar"><div id="enemyHealthFill" class="health-fill"></div></div>
+        <div id="combatLog" class="log-box"></div>
+        <div id="abilityButtons" style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;"></div>
+    </div>
+
+    <!-- CHAT & SYSTEMS -->
+    <div class="game-card">
+        <div class="card-header">🌍 WORLD & SYSTEMS</div>
+        <div id="globalChat" class="chat-box" style="height:180px;"></div>
+        <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
+            <button class="game-btn" id="dailyRewardBtn">🎁 Daily Reward</button>
+            <button class="game-btn" id="leaderboardBtn">🏆 Leaderboard</button>
+            <label style="display:flex; align-items:center; gap:0.3rem;"><input type="checkbox" id="muteToggle"> 🔇 Mute</label>
+        </div>
+        <div style="font-size:0.7rem; margin-top:0.5rem;">
+            <p>⭐ Tier 7+ triggers CUTSCENES</p>
+            <p>💎 Fusion (2 same tier → higher tier)</p>
+            <p>🌀 Prestige resets inventory for permanent buff</p>
         </div>
     </div>
 </div>
-<div id="cutsceneOverlay" class="cutscene-overlay"><div id="cutsceneText" class="cutscene-content">EVENT</div></div>
+
+<div id="cutsceneOverlay" class="cutscene-overlay"><div id="cutsceneText" class="cutscene-text">EVENT</div></div>
 <div id="screenFlash" class="screen-flash"></div>
 
 <script>
-    // ================================ ABILITY POOL ================================
+    // ======================== 1. GAME STATE (Central) ========================
+    const GameState = {
+        // Player
+        hp: 100, maxHp: 100, armor: 0,
+        prestigeBonus: 1.0,
+        manualRolls: 0, totalRolls: 0,
+        autoUnlocked: false, autoActive: false, autoInterval: null,
+        // Auras
+        inventory: [],       // array of aura objects
+        equippedAura: null,
+        currentRolled: null,
+        // Progression
+        evolutionXP: 0,
+        pityCounter: 0, streakLoss: 0,
+        // Cooldowns timestamp based
+        abilityCD: new Map(), // abilityName -> endTime (ms)
+        playerDodgeEnd: 0,
+        // Misc
+        lastDaily: 0,
+        leaderboard: [],
+        soundMuted: false,
+        audioCtx: null
+    };
+
+    // ======================== ABILITY POOL & TIERS ========================
     const ABILITY_POOL = {
-        "Light Jab":{baseDamage:15,cd:0.8,type:"basic",effect:null},
-        "Spark Tap":{baseDamage:12,cd:0.6,type:"basic",effect:"shock"},
-        "Quick Strike":{baseDamage:18,cd:0.9,type:"basic",effect:null},
-        "Flame Burst":{baseDamage:32,cd:1.7,type:"skill",effect:"burn"},
-        "Ice Spike":{baseDamage:26,cd:1.4,type:"skill",effect:"freeze"},
-        "Lightning Strike":{baseDamage:28,cd:1.5,type:"skill",effect:"shock"},
-        "Meteor Crash":{baseDamage:50,cd:2.5,type:"heavy",effect:"burn"},
-        "Judgment Beam":{baseDamage:60,cd:3.0,type:"heavy",effect:"stun"},
-        "Reality Cut":{baseDamage:90,cd:4.0,type:"ultimate",effect:"critUp"},
-        "World End":{baseDamage:120,cd:5.0,type:"ultimate",effect:"stun"},
-        "Healing Light":{baseDamage:0,cd:6.0,type:"support",effect:"heal"},
-        "Void Slash":{baseDamage:30,cd:1.6,type:"skill",effect:null}
+        "Light Jab":{base:15,cd:0.8,type:"basic",effect:null},
+        "Spark Tap":{base:12,cd:0.6,type:"basic",effect:"shock"},
+        "Quick Strike":{base:18,cd:0.9,type:"basic"},
+        "Flame Burst":{base:32,cd:1.7,type:"skill",effect:"burn"},
+        "Ice Spike":{base:26,cd:1.4,type:"skill",effect:"freeze"},
+        "Lightning Strike":{base:28,cd:1.5,type:"skill",effect:"shock"},
+        "Meteor Crash":{base:50,cd:2.5,type:"heavy",effect:"burn"},
+        "Judgment Beam":{base:60,cd:3.0,type:"heavy",effect:"stun"},
+        "Reality Cut":{base:90,cd:4.0,type:"ultimate",effect:"critUp"},
+        "World End":{base:120,cd:5.0,type:"ultimate",effect:"stun"},
+        "Healing Light":{base:0,cd:6.0,type:"support",effect:"heal"}
     };
     const TIER_MULT = {1:1.0,2:1.2,3:1.5,4:1.8,5:2.2,6:2.8,7:3.5,8:4.2,9:5.0,10:6.5};
     const RARITY_ODDS = {1:0.40,2:0.20,3:0.15,4:0.10,5:0.06,6:0.04,7:0.025,8:0.01,9:0.004,10:0.001};
-
-    // AURA DB (100+ auras)
-    let auraDatabase=[];
+    // 100+ Auras generation (same as before but compact)
+    let auraDatabase = [];
     function addAura(id,name,tier,abilities,passive=null){
         let abSet=abilities.filter(a=>ABILITY_POOL[a]).slice(0,tier>=7?3:(tier>=4?2:1));
         if(!abSet.length) abSet=["Light Jab"];
@@ -338,7 +312,7 @@
     for(let i=0;i<10;i++) addAura(i+1,["Faint Spark","Dust Aura","Weak Flow","Pale Mist","Basic Glow","Static Air","Soft Pulse","Low Spark","Dim Aura","Silent Glow"][i],1,["Light Jab"]);
     for(let i=0;i<10;i++) addAura(11+i,["Neon Flicker","Static Core","Flow Aura","Light Mist","Blue Spark","Warm Pulse","Stable Glow","Small Rift","Soft Voltage","Calm Spark"][i],2,["Spark Tap"]);
     for(let i=0;i<10;i++) addAura(21+i,["Storm Flicker","Void Spark","Ember Flow","Ice Pulse","Wind Spark","Gravity Flick","Plasma Tap","Rift Glow","Shock Core","Fire Mist"][i],3,["Quick Strike"]);
-    for(let i=0;i<20;i++) addAura(31+i,`Rare ${31+i}`,4,["Dash Step","Light Jab"]);
+    for(let i=0;i<20;i++) addAura(31+i,`Rare ${31+i}`,4,["Light Jab","Spark Tap"]);
     for(let i=0;i<10;i++) addAura(51+i,`Epic ${51+i}`,6,["Flame Burst","Ice Spike"]);
     for(let i=0;i<10;i++) addAura(61+i,`Legendary ${61+i}`,7,["Meteor Crash","Judgment Beam","Light Jab"]);
     const mythic=["Celestial Rift","Void Emperor","Star God","Flame God","Ice God","Gravity God","Thunder Emperor","Wind God","Ember Emperor","Rift Emperor"];
@@ -349,98 +323,282 @@
     for(let i=0;i<10;i++) addAura(91+i,trans[i],10,["World End","Reality Cut","Judgment Beam"],"Transcendent: double crit dmg");
     addAura(101,"Eclipse Shard",9,["Void Slash","Healing Light"],"Secret: +15% dodge");
     addAura(102,"Stardust Weaver",10,["World End","Healing Light","Lightning Strike"],"Secret: all stats +30%");
-    
-    // ================================ GLOBAL STATE ================================
-    let inventory=[], equippedAura=null, currentRolled=null;
-    let manualRolls=0,totalRolls=0, autoUnlocked=false, autoActive=false, autoInterval=null;
-    let pityCounter=0, prestigeBonus=1.0;
-    let playerHP=100, maxHP=100, playerDodgeCD=0;
-    let enemy={hp:0,maxHp:0,name:"",baseDmg:15,attackPattern:0,patternTimer:0,stunRemaining:0,status:{burn:0,freeze:0,shock:0}};
-    let abilityCooldowns=new Map(), comboCounter=0;
-    let cutscenePlaying=false;
-    let soundMuted=false;
-    let audioCtx=null;
-    function initAudio(){ if(!audioCtx && !soundMuted) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }
-    function playTone(freq,duration,type="sine",volume=0.3){
-        if(soundMuted) return;
-        try{ initAudio(); if(!audioCtx) return; const osc=audioCtx.createOscillator(), gain=audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value=freq; osc.type=type; gain.gain.value=volume; osc.start(); gain.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+duration); osc.stop(audioCtx.currentTime+duration); }catch(e){}
+
+    // ======================== 2. SYSTEMS ========================
+    // Audio System
+    const AudioSystem = {
+        init(){ if(!GameState.audioCtx && !GameState.soundMuted) GameState.audioCtx=new (window.AudioContext||window.webkitAudioContext)(); },
+        play(freq,duration,type="sine",vol=0.3){
+            if(GameState.soundMuted) return;
+            this.init();
+            if(!GameState.audioCtx) return;
+            const osc=GameState.audioCtx.createOscillator(), gain=GameState.audioCtx.createGain();
+            osc.connect(gain); gain.connect(GameState.audioCtx.destination);
+            osc.frequency.value=freq; osc.type=type; gain.gain.value=vol;
+            osc.start(); gain.gain.exponentialRampToValueAtTime(0.0001,GameState.audioCtx.currentTime+duration);
+            osc.stop(GameState.audioCtx.currentTime+duration);
+        },
+        playHit(crit=false){ this.play(crit?800:400,0.1,"triangle",0.2); if(crit) this.play(1000,0.2,"sawtooth",0.3); },
+        playHeal(){ this.play(550,0.3,"sine",0.2); },
+        playRoll(tier){ let f=300+tier*50; this.play(f,0.2,"sine",0.2); if(tier>=8){ this.play(600,0.4,"sawtooth",0.4); setTimeout(()=>this.play(800,0.5,"square",0.3),200); } },
+        playCutsceneTier(tier){ if(tier===8){ this.play(300,0.5); setTimeout(()=>this.play(500,0.4),1000); } else if(tier===9){ this.play(400,0.6); this.play(600,0.8); } else{ this.play(100,1,"sawtooth",0.5); this.play(40,0.8,"square",0.6); } }
+    };
+
+    // CombatSystem (handles damage, armor, status)
+    const CombatSystem = {
+        calculateDamage(abilityBase, auraMult, critChance){
+            let dmg = abilityBase * auraMult * GameState.prestigeBonus;
+            let crit = Math.random() < (0.1 + (GameState.equippedAura?.tier||1)*0.01);
+            if(crit) dmg *= 1.5;
+            return { dmg: Math.floor(dmg), crit };
+        },
+        applyDamageToEnemy(dmg){
+            if(!currentEnemy) return false;
+            currentEnemy.hp = Math.max(0, currentEnemy.hp - dmg);
+            return currentEnemy.hp <= 0;
+        },
+        enemyAttackDamage(baseDmg){
+            let raw = Math.floor(baseDmg * (0.8 + Math.random()*0.5));
+            let armor = GameState.armor;
+            let final = Math.max(1, raw - armor);
+            return final;
+        },
+        applyStatus(target, effect){
+            if(effect==="burn") target.burnTurns=3;
+            if(effect==="freeze") target.freezeTurns=1;
+            if(effect==="shock") target.shockTurns=2;
+        }
+    };
+
+    let currentEnemy = null;
+    let comboCounter = 0;
+
+    // UIManager (cached DOM)
+    const DOM = {
+        hudHp: document.getElementById('hudHp'), hudArmor: document.getElementById('hudArmor'), hudPrestige: document.getElementById('hudPrestige'),
+        hudManual: document.getElementById('hudManual'), hudTotal: document.getElementById('hudTotal'),
+        auraName: document.getElementById('auraName'), auraTier: document.getElementById('auraTier'),
+        auraMoves: document.getElementById('auraMoves'), auraPassive: document.getElementById('auraPassive'),
+        resultCard: document.getElementById('resultCard'), equippedDisplay: document.getElementById('equippedDisplay'),
+        invGrid: document.getElementById('inventoryGrid'), combatLog: document.getElementById('combatLog'),
+        abilityDiv: document.getElementById('abilityButtons'), enemyDisplay: document.getElementById('enemyDisplay'),
+        enemyHealthFill: document.getElementById('enemyHealthFill'), globalChat: document.getElementById('globalChat'),
+        evoXP: document.getElementById('evoXP'), autoMsg: document.getElementById('autoMsg'), autoToggle: document.getElementById('autoToggle')
+    };
+
+    function addLog(msg){ let d=DOM.combatLog; let div=document.createElement('div'); div.innerText=msg; d.appendChild(div); d.scrollTop=d.scrollHeight; if(d.children.length>30) d.removeChild(d.firstChild); }
+    function addGlobalMessage(msg,rare=false){ let d=DOM.globalChat; let div=document.createElement('div'); div.innerHTML=rare?`🌍 ${msg}`:`💬 ${msg}`; d.appendChild(div); d.scrollTop=d.scrollHeight; if(d.children.length>40) d.removeChild(d.firstChild); }
+
+    // Update UI from GameState
+    function updateUI(){
+        DOM.hudHp.innerText = GameState.hp;
+        DOM.hudArmor.innerText = GameState.armor;
+        DOM.hudPrestige.innerText = GameState.prestigeBonus.toFixed(1)+"x";
+        DOM.hudManual.innerText = GameState.manualRolls;
+        DOM.hudTotal.innerText = GameState.totalRolls;
+        DOM.evoXP.innerText = GameState.evolutionXP;
+        if(GameState.equippedAura){
+            DOM.equippedDisplay.innerHTML = `<strong>${GameState.equippedAura.name}</strong> [T${GameState.equippedAura.tier}] ${GameState.equippedAura.mult.toFixed(1)}x<br>${GameState.equippedAura.abilities.join(', ')}`;
+            GameState.armor = GameState.equippedAura.tier * 2;
+        } else { DOM.equippedDisplay.innerText="None"; GameState.armor=0; }
+        if(currentEnemy){
+            let percent = (currentEnemy.hp/currentEnemy.maxHp)*100;
+            DOM.enemyHealthFill.style.width = Math.max(0,percent)+"%";
+            DOM.enemyDisplay.innerHTML = `${currentEnemy.name} ${Math.floor(currentEnemy.hp)}/${currentEnemy.maxHp} HP`;
+            if(currentEnemy.burnTurns) DOM.enemyDisplay.innerHTML+=" 🔥";
+            if(currentEnemy.freezeTurns) DOM.enemyDisplay.innerHTML+=" ❄️";
+            if(currentEnemy.shockTurns) DOM.enemyDisplay.innerHTML+=" ⚡";
+        }
     }
-    function playRollSound(tier){ let f=300+tier*50; playTone(f,0.2,"sine",0.2); if(tier>=8){ playTone(600,0.4,"sawtooth",0.4); setTimeout(()=>playTone(800,0.5,"square",0.3),200); } }
-    function playHitSound(crit=false){ playTone(crit?800:400,0.1,"triangle",0.2); if(crit) playTone(1000,0.2,"sawtooth",0.3); }
-    function playHealSound(){ playTone(550,0.3,"sine",0.2); }
-    
-    function addGlobalMessage(msg,rare=false){ let d=document.getElementById('globalChat'); let div=document.createElement('div'); div.innerHTML=rare?`🌍 ${msg}`:`💬 ${msg}`; d.appendChild(div); d.scrollTop=d.scrollHeight; if(d.children.length>40) d.removeChild(d.firstChild); }
-    function addCombatLog(msg){ let d=document.getElementById('combatLog'); let div=document.createElement('div'); div.innerText=msg; d.appendChild(div); d.scrollTop=d.scrollHeight; if(d.children.length>30) d.removeChild(d.firstChild); }
-    function floatDamage(x,y,dmg,crit=false){ let div=document.createElement('div'); div.className='float-number'; div.innerText=Math.floor(dmg); div.style.left=x+'px'; div.style.top=y+'px'; div.style.color=crit?'#ffaa44':'#ff6666'; document.body.appendChild(div); setTimeout(()=>div.remove(),700); }
-    function screenFlash(){ let f=document.getElementById('screenFlash'); f.style.opacity=0.4; setTimeout(()=>f.style.opacity=0,100); }
-    function shake(scale=5){ document.body.classList.add('screen-shake'); setTimeout(()=>document.body.classList.remove('screen-shake'),120); }
-    
-    // Roll & cutscene
-    function rollAura(){ let r=Math.random(),acc=0,sel=1; for(let t=1;t<=10;t++){ acc+=RARITY_ODDS[t]; if(r<acc){sel=t;break;} } if(pityCounter>=80 && sel<7){ sel=7; pityCounter=0; } else if(sel>=7) pityCounter=0; else pityCounter++; let pool=auraDatabase.filter(a=>a.tier===sel); if(!pool.length) pool=auraDatabase; return structuredClone(pool[Math.floor(Math.random()*pool.length)]); }
-    async function playCutscene(tier,name){ if(cutscenePlaying) return; cutscenePlaying=true; let duration=3200,texts=[""],colorClass=""; if(tier===8){ duration=3200; texts=["🌀 MYTHIC SURGE","💜 PURPLE VORTEX","⚡ COSMIC ENERGY","🌟 MYTHIC REVEAL"]; colorClass="mythic-glow"; playTone(300,0.5,"sine",0.3); setTimeout(()=>playTone(500,0.4,"sawtooth",0.4),1000); } else if(tier===9){ duration=4500; texts=["✨ DIVINE JUDGMENT","🌅 HEAVENLY LIGHT","⏳ MOMENT OF TRUTH","💥 DIVINE EXPLOSION"]; colorClass="divine-glow"; playTone(400,0.6,"sine",0.4); playTone(600,0.8,"sawtooth",0.5); } else{ duration=6000; texts=["🕳️ COLLAPSE","💔 REALITY FRACTURE","🌀 GLITCH OVERDRIVE","🌌 WORLD BREAK","⚫ TRANSCENDENT"]; colorClass="transcendent-glow"; playTone(100,1,"sawtooth",0.5); playTone(40,0.8,"square",0.6); document.body.classList.add('screen-shake'); }
-        let overlay=document.getElementById('cutsceneOverlay'), textDiv=document.getElementById('cutsceneText'); textDiv.className=`cutscene-content ${colorClass}`; overlay.classList.add('cutscene-active');
-        for(let i=0;i<texts.length;i++){ textDiv.innerText=texts[i]; await new Promise(r=>setTimeout(r,1000)); }
-        overlay.classList.remove('cutscene-active'); document.body.classList.remove('screen-shake'); cutscenePlaying=false; addGlobalMessage(`✨ ${name} (Tier ${tier}) appeared! ✨`,true); playRollSound(tier);
+
+    // Rarity glow apply
+    function applyRarityGlow(element, tier){
+        element.classList.remove('tier-glow-7','tier-glow-8','tier-glow-9','tier-glow-10');
+        if(tier>=7) element.classList.add(`tier-glow-${tier}`);
     }
-    async function performRoll(isManual=true){ if(cutscenePlaying) return; let aura=rollAura(); currentRolled=aura; totalRolls++; if(isManual) manualRolls++; updateStats(); document.getElementById('auraName').innerText=aura.name; document.getElementById('auraTier').innerText=`Tier ${aura.tier}`; document.getElementById('auraMoves').innerText=`Moves: ${aura.abilities.join(', ')}`; document.getElementById('auraPassive').innerText=`Passive: ${aura.passive||'None'}`; let card=document.getElementById('resultCard'); if(aura.tier>=6) card.classList.add('rare-glow'); else card.classList.remove('rare-glow'); if(aura.tier>=8) await playCutscene(aura.tier,aura.name); if(!autoUnlocked && manualRolls>=100){ autoUnlocked=true; autoToggle.disabled=false; addGlobalMessage("Auto-Roll unlocked!"); } saveGame(); }
-    function updateStats(){ document.getElementById('manualCount').innerText=manualRolls; document.getElementById('totalCount').innerText=totalRolls; document.getElementById('autoStatus').innerHTML=autoUnlocked?"✅ UNLOCKED":`🔒 ${manualRolls}/100`; if(autoUnlocked) autoToggle.disabled=false; document.getElementById('prestigeBonus').innerText=prestigeBonus.toFixed(1)+"x"; document.getElementById('playerHp').innerText=playerHP; }
-    
-    // Inventory
-    function renderInventory(){ let grid=document.getElementById('inventoryGrid'); grid.innerHTML=''; if(!inventory.length){ grid.innerHTML='<div>🌀 No auras</div>'; return; } inventory.forEach((a,i)=>{ let div=document.createElement('div'); div.className='card'+(equippedAura?.id===a.id?' equipped':''); div.innerHTML=`<strong>${a.name}</strong><br>T${a.tier}<br><button class="eqInv" data-idx="${i}">Equip</button><button class="remInv" data-idx="${i}">🗑️</button>`; grid.appendChild(div); }); document.querySelectorAll('.eqInv').forEach(btn=>btn.addEventListener('click',(e)=>{ let idx=parseInt(btn.dataset.idx); if(inventory[idx]) equipAura(structuredClone(inventory[idx])); })); document.querySelectorAll('.remInv').forEach(btn=>btn.addEventListener('click',(e)=>{ let idx=parseInt(btn.dataset.idx); if(inventory[idx]){ if(equippedAura?.id===inventory[idx].id) equippedAura=null; inventory.splice(idx,1); renderInventory(); updateEquippedDisplay(); saveGame(); if(autoActive && inventory.length>=30) stopAutoFull(); } })); }
-    function equipAura(aura){ equippedAura=structuredClone(aura); abilityCooldowns.clear(); comboCounter=0; updateEquippedDisplay(); renderInventory(); updateAbilityButtons(); addCombatLog(`⚡ Equipped ${aura.name}`); saveGame(); }
-    function updateEquippedDisplay(){ let disp=document.getElementById('equippedDisplay'); if(!equippedAura){ disp.innerText="None"; return; } disp.innerHTML=`<strong>${equippedAura.name}</strong> [T${equippedAura.tier}] ${equippedAura.multiplier.toFixed(1)}x<br>${equippedAura.abilities.join(', ')}`; }
-    function addCurrent(){ if(!currentRolled) return; if(inventory.length>=30){ addGlobalMessage("Inventory full!"); return; } inventory.push(structuredClone(currentRolled)); renderInventory(); saveGame(); }
-    function equipCurrent(){ if(currentRolled) equipAura(structuredClone(currentRolled)); }
-    function clearInventory(){ inventory=[]; if(equippedAura) equippedAura=null; renderInventory(); updateEquippedDisplay(); saveGame(); }
-    function equipBest(){ if(!inventory.length) return; let best=inventory.reduce((a,b)=>a.tier>b.tier?a:b); equipAura(structuredClone(best)); }
-    function fusion(){ if(inventory.length<2){ addGlobalMessage("Need 2 auras to fuse!"); return; } let a=inventory[0],b=inventory[1]; let newTier=Math.min(10,Math.floor((a.tier+b.tier)/2)+1); let pool=auraDatabase.filter(au=>au.tier===newTier); if(!pool.length) pool=auraDatabase.filter(au=>au.tier>=newTier-1); let fused=structuredClone(pool[0]); inventory.splice(0,2); inventory.push(fused); renderInventory(); addGlobalMessage(`Fusion created ${fused.name} (T${fused.tier})!`); saveGame(); }
-    let evolutionXP=0;
-    function addEvolutionXP(amt){ evolutionXP+=amt; if(evolutionXP>=100 && equippedAura && equippedAura.tier<10){ evolutionXP-=100; let newTier=equippedAura.tier+1; let newPool=auraDatabase.filter(a=>a.tier===newTier); if(newPool.length){ let evolved=structuredClone(newPool[0]); equipAura(evolved); addGlobalMessage(`✨ ${equippedAura.name} evolved to Tier ${newTier}! ✨`); } } document.getElementById('evoXP').innerText=evolutionXP; saveGame(); }
-    function prestige(){ if(manualRolls<200){ addGlobalMessage("Need 200 manual rolls to prestige."); return; } prestigeBonus+=0.1; manualRolls=0; totalRolls=0; inventory=[]; equippedAura=null; autoUnlocked=false; autoToggle.checked=false; autoActive=false; if(autoInterval) clearInterval(autoInterval); updateStats(); renderInventory(); updateEquippedDisplay(); addGlobalMessage(`🌀 Prestige! Permanent damage bonus: ${prestigeBonus.toFixed(1)}x`); saveGame(); }
-    
-    // Combat
-    function applyStatus(target,effect,duration=3){ if(effect==="burn") target.status.burn=duration; if(effect==="freeze") target.status.freeze=duration; if(effect==="shock") target.status.shock=duration; }
-    function updateEnemyStatus(){ if(enemy.hp<=0) return; if(enemy.status.burn>0){ let dmg=Math.floor(enemy.maxHp*0.03); enemy.hp=Math.max(0,enemy.hp-dmg); addCombatLog(`🔥 Burn deals ${dmg} damage!`); enemy.status.burn--; } if(enemy.status.freeze>0){ enemy.status.freeze--; } if(enemy.status.shock>0){ enemy.status.shock--; } updateEnemyBar(); if(enemy.hp<=0) addCombatLog(`💀 Enemy defeated!`); }
-    function useAbility(abName){ if(!equippedAura) return; if(enemy.hp<=0){ addCombatLog("No enemy alive. Spawn one."); return; } let ab=ABILITY_POOL[abName]; if(!ab) return; let cd=abilityCooldowns.get(abName)||0; if(cd>0){ addCombatLog(`${abName} on cooldown`); return; } if(enemy.status.freeze>0){ addCombatLog("Enemy is frozen!"); return; } let dmg=ab.baseDamage*equippedAura.multiplier*prestigeBonus; let crit=false; if(Math.random()<0.1+(equippedAura.tier*0.01)){ dmg*=1.5; crit=true; playHitSound(true); screenFlash(); } else playHitSound(false); if(ab.effect==="heal"){ playerHP=Math.min(maxHP,playerHP+30); addCombatLog(`💚 Healed 30 HP!`); playHealSound(); } else{ enemy.hp=Math.max(0,enemy.hp-dmg); let x=Math.random()*window.innerWidth*0.5+window.innerWidth*0.2; let y=window.innerHeight*0.6; floatDamage(x,y,dmg,crit); if(crit) shake(8); else shake(3); addCombatLog(`${abName} deals ${Math.floor(dmg)} damage${crit?" CRIT!":""}`); if(ab.effect && ab.effect!=="heal") applyStatus(enemy,ab.effect,3); addEvolutionXP(Math.floor(dmg/10)); } abilityCooldowns.set(abName,ab.cd); updateAbilityButtons(); updateEnemyBar(); if(enemy.hp<=0){ addCombatLog(`🏆 Victory!`); return; } updateEnemyStatus(); startCooldownTimer(); comboCounter++; if(comboCounter>=3){ let bonus=Math.floor(dmg*0.3); addCombatLog(`🔥 ${comboCounter} combo! +${bonus} bonus!`); enemy.hp=Math.max(0,enemy.hp-bonus); updateEnemyBar(); comboCounter=0; } setTimeout(()=>enemyTurn(),500); }
-    function enemyTurn(){ if(enemy.hp<=0 || playerHP<=0) return; if(enemy.status.freeze>0){ addCombatLog("Enemy frozen, skips turn"); updateEnemyStatus(); return; } let dmg=Math.floor(enemy.baseDmg*(Math.random()*0.5+0.8)); if(Math.random()<0.2){ dmg*=1.5; addCombatLog(`⚠️ Enemy CRITICAL hit!`); shake(6); } else shake(2); playerHP=Math.max(0,playerHP-dmg); addCombatLog(`🤖 ${enemy.name} attacks for ${dmg} damage!`); updatePlayerHP(); if(playerHP<=0){ addCombatLog("💀 You died! Resurrect with heal item? (Fusion restore 50%)"); playerHP=Math.floor(maxHP*0.5); addCombatLog("Revived with 50% HP."); } updateEnemyStatus(); }
-    function updatePlayerHP(){ document.getElementById('playerHp').innerText=playerHP; }
-    function updateEnemyBar(){ let percent=(enemy.hp/enemy.maxHp)*100; document.getElementById('enemyHealthFill').style.width=Math.max(0,percent)+"%"; document.getElementById('enemyDisplay').innerHTML=`${enemy.name} ${Math.floor(enemy.hp)}/${enemy.maxHp} HP`; if(enemy.status.burn>0) document.getElementById('enemyDisplay').innerHTML+=" 🔥"; if(enemy.status.freeze>0) document.getElementById('enemyDisplay').innerHTML+=" ❄️"; if(enemy.status.shock>0) document.getElementById('enemyDisplay').innerHTML+=" ⚡"; }
-    function spawnEnemy(hp,dmg,name){ enemy={hp,maxHp:hp,hp:hp,name,baseDmg:dmg,attackPattern:0,patternTimer:0,stunRemaining:0,status:{burn:0,freeze:0,shock:0}}; updateEnemyBar(); addCombatLog(`⚔️ ${name} appears!`); }
-    function dodge(){ if(playerDodgeCD>0){ addCombatLog(`Dodge on cooldown!`); return; } playerDodgeCD=2; addCombatLog(`💨 Dodge! Next enemy attack misses.`); let originalTurn=enemyTurn; enemyTurn=function(){ if(playerDodgeCD>0){ addCombatLog("Dodged!"); playerDodgeCD=0; enemyTurn=originalTurn; return; } originalTurn(); }; setTimeout(()=>{ if(enemyTurn===dodgeDummy) enemyTurn=originalTurn; },2000); }
-    let dodgeDummy=enemyTurn;
-    function startCooldownTimer(){ let interval=setInterval(()=>{ let any=false; for(let [k,v] of abilityCooldowns){ if(v>0){ abilityCooldowns.set(k,v-0.1); any=true; } } if(!any){ clearInterval(interval); updateAbilityButtons(); return; } updateAbilityButtons(); },100); }
-    function updateAbilityButtons(){ let div=document.getElementById('abilityButtons'); div.innerHTML=''; if(!equippedAura) return; for(let ab of equippedAura.abilities){ let btn=document.createElement('button'); btn.innerText=ab; let cd=abilityCooldowns.get(ab)||0; if(cd>0){ btn.style.opacity=0.5; btn.disabled=true; btn.innerText+=` (${cd.toFixed(1)}s)`; let prog=document.createElement('div'); prog.className='cooldown-progress'; prog.style.width=(1-cd/ABILITY_POOL[ab].cd)*100+'%'; btn.appendChild(prog); } btn.onclick=()=>useAbility(ab); div.appendChild(btn); } }
-    
-    // Auto roll
-    function startAuto(){ if(autoInterval) clearInterval(autoInterval); autoInterval=setInterval(async()=>{ if(!autoActive || cutscenePlaying || inventory.length>=30) return; let aura=rollAura(); currentRolled=aura; totalRolls++; updateStats(); document.getElementById('auraName').innerText=aura.name; document.getElementById('auraTier').innerText=`Tier ${aura.tier}`; document.getElementById('auraMoves').innerText=`Moves: ${aura.abilities.join(', ')}`; document.getElementById('auraPassive').innerText=`Passive: ${aura.passive||'None'}`; if(aura.tier>=6) document.getElementById('resultCard').classList.add('rare-glow'); else document.getElementById('resultCard').classList.remove('rare-glow'); if(aura.tier>=8) await playCutscene(aura.tier,aura.name); if(inventory.length<30) inventory.push(structuredClone(aura)); renderInventory(); saveGame(); },1600); }
-    function stopAutoFull(){ if(autoActive){ autoActive=false; autoToggle.checked=false; if(autoInterval) clearInterval(autoInterval); addGlobalMessage("Auto stopped: inventory full"); } }
-    function toggleAuto(e){ if(!autoUnlocked){ autoToggle.checked=false; return; } if(e.target.checked){ if(inventory.length>=30){ alert("Inventory full"); autoToggle.checked=false; return; } autoActive=true; startAuto(); }else{ autoActive=false; if(autoInterval) clearInterval(autoInterval); } }
-    
+
+    // Roll with pity
+    function rollAura(){
+        let r=Math.random(), acc=0, sel=1;
+        for(let t=1;t<=10;t++){ acc+=RARITY_ODDS[t]; if(r<acc){sel=t;break;} }
+        // soft/hard pity
+        if(GameState.pityCounter>=80 && sel<7){ sel=7; GameState.pityCounter=0; }
+        else if(sel>=7){ GameState.pityCounter=0; GameState.streakLoss=0; }
+        else{ GameState.pityCounter++; GameState.streakLoss++; if(GameState.streakLoss>5){ sel=Math.min(10,sel+1); GameState.streakLoss=0; } }
+        let pool=auraDatabase.filter(a=>a.tier===sel);
+        if(!pool.length) pool=auraDatabase;
+        return structuredClone(pool[Math.floor(Math.random()*pool.length)]);
+    }
+
+    // Cutscene Engine (timeline)
+    async function playCutscene(tier, name){
+        let overlay=document.getElementById('cutsceneOverlay'), textDiv=document.getElementById('cutsceneText');
+        let phases=[];
+        if(tier===8) phases=["🌀 MYTHIC SURGE","💜 PURPLE VORTEX","⚡ COSMIC ENERGY","🌟 MYTHIC REVEAL"];
+        else if(tier===9) phases=["✨ DIVINE JUDGMENT","🌅 HEAVENLY LIGHT","⏳ MOMENT OF TRUTH","💥 DIVINE EXPLOSION"];
+        else phases=["🕳️ COLLAPSE","💔 REALITY FRACTURE","🌀 GLITCH OVERDRIVE","🌌 WORLD BREAK","⚫ TRANSCENDENT"];
+        overlay.classList.add('cutscene-active');
+        AudioSystem.playCutsceneTier(tier);
+        for(let phrase of phases){
+            textDiv.innerText=phrase;
+            await new Promise(r=>setTimeout(r,900));
+            if(tier===10) document.body.classList.add('screen-shake');
+        }
+        overlay.classList.remove('cutscene-active');
+        document.body.classList.remove('screen-shake');
+        addGlobalMessage(`✨ ${name} (Tier ${tier}) appeared! ✨`,true);
+        AudioSystem.playRoll(tier);
+    }
+
+    async function performRoll(isManual=true){
+        let aura=rollAura();
+        GameState.currentRolled=aura;
+        GameState.totalRolls++;
+        if(isManual) GameState.manualRolls++;
+        updateUI();
+        DOM.auraName.innerText=aura.name;
+        DOM.auraTier.innerText=`Tier ${aura.tier}`;
+        DOM.auraMoves.innerText=`Moves: ${aura.abilities.join(', ')}`;
+        DOM.auraPassive.innerText=`Passive: ${aura.passive||'None'}`;
+        applyRarityGlow(DOM.resultCard, aura.tier);
+        if(aura.tier>=7) await playCutscene(aura.tier, aura.name);
+        if(!GameState.autoUnlocked && GameState.manualRolls>=100){
+            GameState.autoUnlocked=true;
+            DOM.autoToggle.disabled=false;
+            addGlobalMessage("Auto-Roll unlocked!");
+        }
+        SaveSystem.save();
+    }
+
+    // Inventory render with sorting/filter
+    let currentSort="none", currentFilter="all";
+    function renderInventory(){
+        let filtered = [...GameState.inventory];
+        if(currentFilter!=="all") filtered = filtered.filter(a=>a.tier==parseInt(currentFilter));
+        if(currentSort==="tier") filtered.sort((a,b)=>b.tier-a.tier);
+        DOM.invGrid.innerHTML='';
+        if(!filtered.length){ DOM.invGrid.innerHTML='<div>🌀 No auras</div>'; return; }
+        filtered.forEach((a,i)=>{
+            let idx=GameState.inventory.findIndex(orig=>orig.id===a.id);
+            let div=document.createElement('div'); div.className='inv-card';
+            if(GameState.equippedAura && GameState.equippedAura.id===a.id) div.classList.add('equipped');
+            div.innerHTML=`<strong>${a.name}</strong><br>T${a.tier}<br><button class="game-btn eqInv" data-idx="${idx}">Equip</button><button class="game-btn remInv" data-idx="${idx}">🗑️</button>`;
+            DOM.invGrid.appendChild(div);
+        });
+        document.querySelectorAll('.eqInv').forEach(btn=>btn.addEventListener('click',(e)=>{ let idx=parseInt(btn.dataset.idx); if(GameState.inventory[idx]) equipAura(structuredClone(GameState.inventory[idx])); }));
+        document.querySelectorAll('.remInv').forEach(btn=>btn.addEventListener('click',(e)=>{ let idx=parseInt(btn.dataset.idx); if(GameState.inventory[idx]){ if(GameState.equippedAura?.id===GameState.inventory[idx].id) GameState.equippedAura=null; GameState.inventory.splice(idx,1); renderInventory(); updateUI(); SaveSystem.save(); if(GameState.autoActive && GameState.inventory.length>=30) stopAutoFull(); } }));
+    }
+    function equipAura(aura){ GameState.equippedAura=structuredClone(aura); GameState.abilityCD.clear(); comboCounter=0; updateUI(); renderInventory(); updateAbilityButtons(); addLog(`⚡ Equipped ${aura.name}`); SaveSystem.save(); }
+    function addCurrent(){ if(GameState.currentRolled && GameState.inventory.length<30){ GameState.inventory.push(structuredClone(GameState.currentRolled)); renderInventory(); SaveSystem.save(); } else addGlobalMessage("Inventory full!"); }
+    function equipBest(){ if(!GameState.inventory.length) return; let best=GameState.inventory.reduce((a,b)=>a.tier>b.tier?a:b); equipAura(structuredClone(best)); }
+    function fusion(){ let sameTier={}; for(let a of GameState.inventory){ sameTier[a.tier]=sameTier[a.tier]||[]; sameTier[a.tier].push(a); } for(let t=10;t>=1;t--){ if(sameTier[t] && sameTier[t].length>=2){ let idx1=GameState.inventory.findIndex(a=>a.id===sameTier[t][0].id); let idx2=GameState.inventory.findIndex(a=>a.id===sameTier[t][1].id); if(idx1!==-1 && idx2!==-1){ let newTier=Math.min(10,t+1); let pool=auraDatabase.filter(a=>a.tier===newTier); let fused=structuredClone(pool[Math.floor(Math.random()*pool.length)]); GameState.inventory.splice(Math.max(idx1,idx2),1); GameState.inventory.splice(Math.min(idx1,idx2),1); GameState.inventory.push(fused); renderInventory(); addGlobalMessage(`Fusion: ${fused.name} created!`); SaveSystem.save(); return; } } } addGlobalMessage("Need 2 same-tier auras to fuse!"); }
+    function prestige(){ if(GameState.manualRolls<200){ addGlobalMessage("Need 200 manual rolls to prestige."); return; } GameState.prestigeBonus+=0.1; GameState.manualRolls=0; GameState.totalRolls=0; GameState.inventory=[]; GameState.equippedAura=null; GameState.autoUnlocked=false; GameState.autoActive=false; if(GameState.autoInterval) clearInterval(GameState.autoInterval); updateUI(); renderInventory(); addGlobalMessage(`🌀 Prestige! Permanent damage bonus: ${GameState.prestigeBonus.toFixed(1)}x`); SaveSystem.save(); }
+
+    // Ability buttons with timestamp cooldowns
+    function updateAbilityButtons(){
+        DOM.abilityDiv.innerHTML='';
+        if(!GameState.equippedAura) return;
+        let now=Date.now();
+        for(let ab of GameState.equippedAura.abilities){
+            let btn=document.createElement('button'); btn.className='game-btn'; btn.innerText=ab;
+            let end=GameState.abilityCD.get(ab)||0;
+            if(now<end){ btn.disabled=true; btn.innerText+=` (${((end-now)/1000).toFixed(1)}s)`; }
+            btn.onclick=()=>useAbility(ab);
+            DOM.abilityDiv.appendChild(btn);
+        }
+    }
+    function startCooldown(abName, seconds){ GameState.abilityCD.set(abName, Date.now()+seconds*1000); updateAbilityButtons(); setTimeout(()=>updateAbilityButtons(), seconds*1000); }
+    async function useAbility(abName){
+        if(!GameState.equippedAura) return;
+        if(!currentEnemy || currentEnemy.hp<=0){ addLog("No enemy alive."); return; }
+        let now=Date.now();
+        if(GameState.abilityCD.get(abName) > now){ addLog(`${abName} on cooldown`); return; }
+        let ab=ABILITY_POOL[abName];
+        if(!ab) return;
+        if(currentEnemy.freezeTurns>0){ addLog("Enemy frozen!"); currentEnemy.freezeTurns--; return; }
+        let {dmg, crit}=CombatSystem.calculateDamage(ab.base, GameState.equippedAura.mult, 0.1+GameState.equippedAura.tier*0.01);
+        if(ab.effect==="heal"){ GameState.hp=Math.min(GameState.maxHp, GameState.hp+30); AudioSystem.playHeal(); addLog(`💚 Healed 30 HP`); updateUI(); }
+        else{
+            let shockMult = currentEnemy.shockTurns>0 ? 1.3 : 1;
+            dmg = Math.floor(dmg * shockMult);
+            currentEnemy.hp = Math.max(0, currentEnemy.hp - dmg);
+            addLog(`${abName} deals ${dmg} damage${crit?" CRIT!":""}${shockMult>1?" (shock amp)":""}`);
+            AudioSystem.playHit(crit);
+            if(ab.effect && ab.effect!=="heal") CombatSystem.applyStatus(currentEnemy, ab.effect);
+            if(currentEnemy.hp<=0) addLog(`🏆 Victory!`);
+            comboCounter++;
+            if(comboCounter>=3){ let bonus=Math.floor(dmg*0.2); currentEnemy.hp=Math.max(0,currentEnemy.hp-bonus); addLog(`🔥 ${comboCounter} combo! +${bonus} bonus!`); comboCounter=0; }
+        }
+        startCooldown(abName, ab.cd);
+        updateUI();
+        if(currentEnemy.hp>0) setTimeout(()=>enemyTurn(), 400);
+    }
+    function enemyTurn(){
+        if(!currentEnemy || currentEnemy.hp<=0) return;
+        if(currentEnemy.freezeTurns>0){ addLog("Enemy frozen, skips turn"); currentEnemy.freezeTurns--; updateUI(); return; }
+        let dmg = CombatSystem.enemyAttackDamage(currentEnemy.baseDmg);
+        GameState.hp = Math.max(0, GameState.hp - dmg);
+        addLog(`🤖 ${currentEnemy.name} attacks for ${dmg} damage!`);
+        if(currentEnemy.burnTurns>0){ let burnDmg=Math.floor(currentEnemy.maxHp*0.03); currentEnemy.hp=Math.max(0,currentEnemy.hp-burnDmg); addLog(`🔥 Burn deals ${burnDmg} damage!`); currentEnemy.burnTurns--; }
+        if(currentEnemy.shockTurns>0) currentEnemy.shockTurns--;
+        updateUI();
+        if(GameState.hp<=0){ addLog("💀 You died! Revived with 50% HP."); GameState.hp=Math.floor(GameState.maxHp*0.5); updateUI(); }
+        if(currentEnemy.hp<=0) addLog(`Enemy defeated.`);
+    }
+    function spawnEnemy(hp,dmg,name){ currentEnemy={hp,maxHp:hp,hp: hp, name, baseDmg:dmg, burnTurns:0, freezeTurns:0, shockTurns:0}; updateUI(); addLog(`⚔️ ${name} appears!`); }
+    function dodge(){ let now=Date.now(); if(GameState.playerDodgeEnd>now){ addLog("Dodge on cooldown"); return; } GameState.playerDodgeEnd=now+2000; addLog("💨 Next enemy attack dodged!"); let original=enemyTurn; window.enemyTurnWrapper=function(){ if(Date.now()<GameState.playerDodgeEnd){ addLog("Dodged!"); GameState.playerDodgeEnd=0; enemyTurn=original; return; } original(); }; enemyTurn=window.enemyTurnWrapper; setTimeout(()=>{ if(enemyTurn===window.enemyTurnWrapper) enemyTurn=original; },2000); }
+
+    // Auto-roll
+    function startAuto(){ if(GameState.autoInterval) clearInterval(GameState.autoInterval); GameState.autoInterval=setInterval(async()=>{ if(!GameState.autoActive || GameState.inventory.length>=30) return; let aura=rollAura(); GameState.currentRolled=aura; GameState.totalRolls++; updateUI(); DOM.auraName.innerText=aura.name; DOM.auraTier.innerText=`Tier ${aura.tier}`; DOM.auraMoves.innerText=`Moves: ${aura.abilities.join(', ')}`; DOM.auraPassive.innerText=`Passive: ${aura.passive||'None'}`; applyRarityGlow(DOM.resultCard, aura.tier); if(aura.tier>=7) await playCutscene(aura.tier, aura.name); if(GameState.inventory.length<30) GameState.inventory.push(structuredClone(aura)); renderInventory(); SaveSystem.save(); },1600); }
+    function stopAutoFull(){ if(GameState.autoActive){ GameState.autoActive=false; DOM.autoToggle.checked=false; if(GameState.autoInterval) clearInterval(GameState.autoInterval); addGlobalMessage("Auto stopped: inventory full"); } }
+    function toggleAuto(e){ if(!GameState.autoUnlocked){ DOM.autoToggle.checked=false; return; } if(e.target.checked){ if(GameState.inventory.length>=30){ alert("Inventory full"); DOM.autoToggle.checked=false; return; } GameState.autoActive=true; startAuto(); DOM.autoMsg.innerText="🌀 AUTO"; }else{ GameState.autoActive=false; if(GameState.autoInterval) clearInterval(GameState.autoInterval); DOM.autoMsg.innerText=""; } }
+
+    // Daily reward & leaderboard
+    function dailyReward(){ let now=Math.floor(Date.now()/86400000); if(GameState.lastDaily===now){ addGlobalMessage("Already claimed today!"); return; } GameState.lastDaily=now; let reward=Math.floor(Math.random()*50)+20; GameState.hp=Math.min(GameState.maxHp, GameState.hp+reward); updateUI(); addGlobalMessage(`🎁 Daily reward: +${reward} HP!`); SaveSystem.save(); }
+    function updateLeaderboard(){ let score=GameState.totalRolls; let entry={name:"Player",score}; let lb=JSON.parse(localStorage.getItem("auraLeaderboard")||"[]"); lb.unshift(entry); lb=lb.slice(0,10); localStorage.setItem("auraLeaderboard",JSON.stringify(lb)); addGlobalMessage("🏆 Leaderboard updated!"); }
+
     // Save/Load
-    function saveGame(){ let data={inventoryIds:inventory.map(a=>a.id),equippedId:equippedAura?.id,manualRolls,totalRolls,autoUnlocked,pityCounter,prestigeBonus,evolutionXP}; localStorage.setItem("AuraRngSave",JSON.stringify(data)); }
-    function loadGame(){ let raw=localStorage.getItem("AuraRngSave"); if(!raw) return; try{ let d=JSON.parse(raw); manualRolls=d.manualRolls||0; totalRolls=d.totalRolls||0; autoUnlocked=d.autoUnlocked||false; pityCounter=d.pityCounter||0; prestigeBonus=d.prestigeBonus||1; evolutionXP=d.evolutionXP||0; if(d.inventoryIds){ inventory=[]; for(let id of d.inventoryIds){ let f=auraDatabase.find(a=>a.id===id); if(f) inventory.push(structuredClone(f)); } } if(d.equippedId){ let e=auraDatabase.find(a=>a.id===d.equippedId); if(e) equippedAura=structuredClone(e); } renderInventory(); updateEquippedDisplay(); updateStats(); if(autoUnlocked) autoToggle.disabled=false; document.getElementById('evoXP').innerText=evolutionXP; }catch(e){} }
-    
+    const SaveSystem = {
+        save(){
+            let data={ inventoryIds:GameState.inventory.map(a=>a.id), equippedId:GameState.equippedAura?.id, manualRolls:GameState.manualRolls, totalRolls:GameState.totalRolls, autoUnlocked:GameState.autoUnlocked, pityCounter:GameState.pityCounter, prestigeBonus:GameState.prestigeBonus, evolutionXP:GameState.evolutionXP, lastDaily:GameState.lastDaily, hp:GameState.hp };
+            localStorage.setItem("AuraRngSave",JSON.stringify(data));
+        },
+        load(){
+            let raw=localStorage.getItem("AuraRngSave"); if(!raw) return;
+            try{ let d=JSON.parse(raw);
+                GameState.manualRolls=d.manualRolls||0; GameState.totalRolls=d.totalRolls||0; GameState.autoUnlocked=d.autoUnlocked||false; GameState.pityCounter=d.pityCounter||0; GameState.prestigeBonus=d.prestigeBonus||1; GameState.evolutionXP=d.evolutionXP||0; GameState.lastDaily=d.lastDaily||0; GameState.hp=d.hp||100;
+                if(d.inventoryIds){ GameState.inventory=[]; for(let id of d.inventoryIds){ let f=auraDatabase.find(a=>a.id===id); if(f) GameState.inventory.push(structuredClone(f)); } }
+                if(d.equippedId){ let e=auraDatabase.find(a=>a.id===d.equippedId); if(e) GameState.equippedAura=structuredClone(e); }
+                renderInventory(); updateUI(); if(GameState.autoUnlocked) DOM.autoToggle.disabled=false;
+            }catch(e){}
+        }
+    };
+
     // Event binding
     document.getElementById('rollBtn').onclick=()=>performRoll(true);
     document.getElementById('addBtn').onclick=addCurrent;
-    document.getElementById('equipCurrentBtn').onclick=equipCurrent;
-    document.getElementById('clearInvBtn').onclick=clearInventory;
+    document.getElementById('equipCurrentBtn').onclick=()=>{ if(GameState.currentRolled) equipAura(structuredClone(GameState.currentRolled)); };
+    document.getElementById('clearInvBtn').onclick=()=>{ GameState.inventory=[]; GameState.equippedAura=null; renderInventory(); updateUI(); SaveSystem.save(); };
     document.getElementById('equipBestBtn').onclick=equipBest;
     document.getElementById('fusionBtn').onclick=fusion;
     document.getElementById('prestigeBtn').onclick=prestige;
-    document.getElementById('autoToggle').onchange=toggleAuto;
-    document.getElementById('muteToggle').onchange=e=>{soundMuted=e.target.checked; if(audioCtx && !soundMuted) audioCtx.resume();};
+    DOM.autoToggle.onchange=toggleAuto;
+    document.getElementById('muteToggle').onchange=e=>{ GameState.soundMuted=e.target.checked; if(GameState.audioCtx && !GameState.soundMuted) GameState.audioCtx.resume(); };
     document.getElementById('dodgeBtn').onclick=dodge;
     document.getElementById('easyBtn').onclick=()=>spawnEnemy(200,18,"Easy Grunt");
     document.getElementById('mediumBtn').onclick=()=>spawnEnemy(400,28,"Medium Warrior");
     document.getElementById('hardBtn').onclick=()=>spawnEnemy(650,40,"Hard Berserker");
     document.getElementById('bossBtn').onclick=()=>spawnEnemy(1200,55,"Boss Titan");
-    
-    loadGame();
+    document.getElementById('dailyRewardBtn').onclick=dailyReward;
+    document.getElementById('leaderboardBtn').onclick=updateLeaderboard;
+    document.getElementById('sortTierBtn').onclick=()=>{ currentSort="tier"; renderInventory(); };
+    document.getElementById('filterTierSelect').onchange=e=>{ currentFilter=e.target.value; renderInventory(); };
+
+    SaveSystem.load();
     spawnEnemy(200,18,"Easy Grunt");
-    addGlobalMessage("💎 AURA.RNG Diamond Edition ready! Roll the diamond! 🌌");
     updateAbilityButtons();
-    setInterval(()=>{ if(playerDodgeCD>0) playerDodgeCD=Math.max(0,playerDodgeCD-0.1); },200);
+    addGlobalMessage("💎 AURA.RNG AAA EDITION ready! Roll the diamond! 🌌");
+    setInterval(()=>updateAbilityButtons(), 500);
 </script>
 </body>
 </html>
