@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AURA.RNG | Mythic+ Cinematic Cutscenes</title>
+    <title>AURA.RNG | Cinematic Action RPG</title>
     <style>
         * {
             margin: 0;
@@ -17,100 +17,93 @@
             font-family: 'Segoe UI', 'Poppins', 'Orbitron', monospace;
             color: #eee;
             min-height: 100vh;
-            padding: 1.5rem;
+            padding: 1rem;
             overflow-x: hidden;
+            transition: background 0.3s;
         }
+        body.tier-glow-8 { background: radial-gradient(circle at 20% 30%, #2a0a3a, #000); }
+        body.tier-glow-9 { background: radial-gradient(circle at 20% 30%, #3a2a0a, #000); }
+        body.tier-glow-10 { background: radial-gradient(circle at 20% 30%, #0a2a3a, #000); }
 
         .game-container {
             max-width: 1800px;
             margin: 0 auto;
             display: flex;
             flex-wrap: wrap;
-            gap: 1.5rem;
+            gap: 1rem;
         }
 
         /* panels */
         .panel {
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.75);
             backdrop-filter: blur(12px);
-            border-radius: 2rem;
-            padding: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.5);
-            flex: 1;
-            min-width: 280px;
+            border-radius: 1.8rem;
+            padding: 1.2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            transition: transform 0.2s, border-color 0.2s;
         }
+        .panel:hover { border-color: #9b6eff; }
 
         .stats-bar {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 1rem;
             background: #0a0c1ad9;
             border-radius: 2rem;
             padding: 0.5rem 1rem;
+            margin-bottom: 1rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
         }
-
         .blackhole-btn {
-            width: 180px;
-            height: 180px;
+            width: 160px;
+            height: 160px;
             border-radius: 50%;
-            margin: 1rem auto;
-            background: radial-gradient(circle at 30% 20%, #1a0b2e, #000000);
+            margin: 0.5rem auto;
+            background: radial-gradient(circle at 30% 20%, #1a0b2e, #000);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3.5rem;
+            font-size: 3rem;
             cursor: pointer;
             border: 2px solid #6f3eff;
-            box-shadow: 0 0 30px rgba(156, 0, 210, 0.6);
-            transition: transform 0.05s;
+            box-shadow: 0 0 20px rgba(156,0,210,0.6);
+            transition: 0.05s linear;
         }
         .blackhole-btn:active { transform: scale(0.96); }
-
         .result-card {
             background: #0b0e1ae0;
             border-radius: 1.5rem;
-            padding: 1rem;
+            padding: 0.8rem;
             margin: 1rem 0;
             border-left: 6px solid #883eff;
+            transition: 0.1s;
         }
-        .rare-glow {
-            box-shadow: 0 0 18px #ffbc3e;
-            border-left-color: gold;
-        }
-
+        .rare-glow { box-shadow: 0 0 18px #ffbc3e; border-left-color: gold; }
         .inv-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-            gap: 0.8rem;
-            max-height: 320px;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 0.6rem;
+            max-height: 280px;
             overflow-y: auto;
             margin: 1rem 0;
         }
         .card {
             background: #111;
-            padding: 0.6rem;
+            padding: 0.5rem;
             border-radius: 1rem;
             border: 1px solid #333;
+            transition: 0.1s;
+            cursor: pointer;
         }
+        .card:hover { transform: translateY(-3px); border-color: #9b6eff; background: #1a1a2a; }
         .card.equipped { border: 2px solid gold; background: #1e1a2f; }
-
-        .log {
-            background: #01010880;
-            border-radius: 1rem;
-            padding: 0.5rem;
-            height: 160px;
-            overflow-y: auto;
-            font-size: 0.8rem;
-            margin: 0.5rem 0;
-        }
-
         button {
             background: linear-gradient(135deg, #2a235a, #120e2c);
             border: none;
             color: white;
             font-weight: bold;
-            padding: 0.5rem 1rem;
+            padding: 0.4rem 0.8rem;
             border-radius: 2rem;
             cursor: pointer;
             margin: 0.2rem;
@@ -118,15 +111,87 @@
             border: 1px solid #5f4bcb;
             transition: 0.05s linear;
         }
-        button:active { transform: scale(0.97); }
-
-        /* CUTSCENE OVERLAY (spectacular) */
+        button:active { transform: scale(0.96); }
+        .log, .chat-messages {
+            background: #01010880;
+            border-radius: 1rem;
+            padding: 0.4rem;
+            height: 140px;
+            overflow-y: auto;
+            font-size: 0.75rem;
+        }
+        .health-bar {
+            background: #6a0e0e;
+            height: 8px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 0.3rem 0;
+        }
+        .health-fill { background: #e04e4e; width: 100%; height: 100%; transition: width 0.1s; }
+        .ability-btn {
+            background: #1e2a3a;
+            margin: 3px;
+            padding: 4px 8px;
+            font-size: 0.7rem;
+        }
+        .cooldown { opacity: 0.5; pointer-events: none; background: #3a2a3a; }
+        .cooldown-progress {
+            width: 100%;
+            height: 3px;
+            background: #00aaff;
+            margin-top: 2px;
+            transition: width 0.05s linear;
+        }
+        /* floating numbers */
+        .float-number {
+            position: fixed;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 0 0 5px black;
+            pointer-events: none;
+            z-index: 1000;
+            animation: floatUp 0.8s ease-out forwards;
+        }
+        @keyframes floatUp {
+            0% { opacity: 1; transform: translateY(0px); }
+            100% { opacity: 0; transform: translateY(-60px); }
+        }
+        .screen-flash {
+            position: fixed;
+            top:0; left:0; width:100%; height:100%;
+            background: white;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transition: opacity 0.05s;
+        }
+        /* tooltip */
+        [data-tooltip] {
+            position: relative;
+            cursor: help;
+        }
+        [data-tooltip]:before {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000c;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            pointer-events: none;
+            opacity: 0;
+            transition: 0.1s;
+            z-index: 100;
+        }
+        [data-tooltip]:hover:before { opacity: 1; }
+        /* cutscene overlay */
         .cutscene-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             background: black;
             z-index: 10000;
             display: flex;
@@ -136,618 +201,224 @@
             opacity: 0;
             transition: opacity 0.1s;
         }
-        .cutscene-active {
-            opacity: 1;
-            pointer-events: none;
-        }
+        .cutscene-active { opacity: 1; }
         .cutscene-content {
             text-align: center;
-            font-size: 2.2rem;
+            font-size: 2rem;
             font-weight: bold;
             letter-spacing: 4px;
-            color: white;
-            z-index: 10001;
             text-transform: uppercase;
         }
-        /* Tier-specific animations */
-        .mythic-glow {
-            text-shadow: 0 0 20px #8a2be2, 0 0 40px blueviolet;
-            animation: mythicPulse 0.4s infinite alternate;
-        }
-        .divine-glow {
-            text-shadow: 0 0 30px gold, 0 0 60px #ffd700;
-            animation: divinePulse 0.3s infinite alternate;
-        }
-        .transcendent-glow {
-            text-shadow: 0 0 20px cyan, 0 0 50px magenta, 0 0 80px white;
-            animation: glitchText 0.08s infinite;
-        }
-        .screen-shake {
-            animation: shakeScreen 0.06s infinite;
-        }
-        .glitch-overlay {
-            animation: glitchBg 0.1s infinite;
-            background: repeating-linear-gradient(0deg, rgba(255,0,255,0.2) 0px, rgba(0,255,255,0.2) 2px, transparent 2px, transparent 6px);
-        }
-        @keyframes mythicPulse {
-            from { text-shadow: 0 0 20px #8a2be2; }
-            to { text-shadow: 0 0 60px #ff00ff; }
-        }
-        @keyframes divinePulse {
-            from { text-shadow: 0 0 30px gold; }
-            to { text-shadow: 0 0 100px orange; }
-        }
-        @keyframes glitchText {
-            0% { transform: skew(0deg); opacity:1; text-shadow: -3px 0 red, 3px 0 blue; }
-            50% { transform: skew(5deg); text-shadow: 3px 0 cyan, -3px 0 magenta; }
-            100% { transform: skew(0deg); text-shadow: 0 0 20px white; }
-        }
-        @keyframes shakeScreen {
-            0% { transform: translate(2px, 1px); }
-            100% { transform: translate(-2px, -1px); }
-        }
-        @keyframes glitchBg {
-            0% { opacity: 0.3; }
-            100% { opacity: 0.7; }
-        }
-
-        .global-chat {
-            background: #01010880;
-            border-radius: 1rem;
-            padding: 0.5rem;
-            height: 240px;
-            overflow-y: auto;
-            font-size: 0.8rem;
-            margin-top: 1rem;
-        }
-        .global-announce {
-            color: gold;
-            text-shadow: 0 0 4px orange;
-            font-weight: bold;
-        }
-        .health-bar {
-            background: #6a0e0e;
-            height: 10px;
-            border-radius: 8px;
-            overflow: hidden;
-            margin: 0.5rem 0;
-        }
-        .health-fill {
-            background: #e04e4e;
-            width: 100%;
-            height: 100%;
-            transition: width 0.1s;
-        }
+        .mythic-glow { text-shadow: 0 0 20px #8a2be2, 0 0 40px blueviolet; animation: mythicPulse 0.3s infinite alternate; }
+        .divine-glow { text-shadow: 0 0 30px gold, 0 0 60px #ffd700; animation: divinePulse 0.2s infinite alternate; }
+        .transcendent-glow { text-shadow: 0 0 20px cyan, 0 0 50px magenta; animation: glitchText 0.08s infinite; }
+        @keyframes mythicPulse { from { text-shadow: 0 0 20px #8a2be2; } to { text-shadow: 0 0 60px #ff00ff; } }
+        @keyframes divinePulse { from { text-shadow: 0 0 30px gold; } to { text-shadow: 0 0 100px orange; } }
+        @keyframes glitchText { 0% { transform: skew(0deg); text-shadow: -3px 0 red, 3px 0 blue; } 50% { transform: skew(5deg); text-shadow: 3px 0 cyan, -3px 0 magenta; } 100% { transform: skew(0deg); } }
+        .screen-shake { animation: shakeScreen 0.05s infinite; }
+        @keyframes shakeScreen { 0% { transform: translate(2px,1px); } 100% { transform: translate(-2px,-1px); } }
     </style>
 </head>
 <body>
-
 <div class="game-container">
     <!-- ROLL PANEL -->
-    <div class="panel">
+    <div class="panel" style="flex:1.2; min-width:280px">
         <div class="stats-bar">
             <span>🎲 Manual: <span id="manualCount">0</span></span>
             <span>🌀 Total: <span id="totalCount">0</span></span>
             <span>⭐ Auto: <span id="autoStatus">🔒 0/100</span></span>
+            <span>❤️ HP: <span id="playerHp">100</span></span>
+            <span>💪 Prestige: <span id="prestigeBonus">1.0x</span></span>
         </div>
         <div class="blackhole-btn" id="rollBtn">🕳️</div>
         <div id="resultCard" class="result-card">
             <div><strong id="auraName">None</strong> <span id="auraTier">Tier ?</span></div>
             <div id="auraMoves">Moves: --</div>
             <div id="auraPassive">Passive: --</div>
-            <div style="margin-top: 8px;">
-                <button id="addBtn">📦 Add</button>
-                <button id="equipCurrentBtn">⚡ Equip</button>
-            </div>
+            <div><button id="addBtn">📦 Add</button> <button id="equipCurrentBtn">⚡ Equip</button></div>
         </div>
-        <div>
-            <label><input type="checkbox" id="autoToggle" disabled> 🤖 Auto-Roll</label>
-            <span id="autoMsg" style="font-size:12px; margin-left:8px;"></span>
-        </div>
-        <div style="margin-top: 1rem; background:#01001580; border-radius:1rem; padding:0.6rem;">
+        <div><label><input type="checkbox" id="autoToggle" disabled> 🤖 Auto-Roll</label> <span id="autoMsg"></span></div>
+        <div><label><input type="checkbox" id="muteToggle"> 🔇 Mute SFX</label></div>
+        <div style="margin-top:0.8rem; background:#01001580; border-radius:1rem; padding:0.5rem">
             <div>✨ Equipped Aura</div>
             <div id="equippedDisplay">None</div>
         </div>
     </div>
 
-    <!-- INVENTORY PANEL -->
-    <div class="panel">
+    <!-- INVENTORY + FUSION -->
+    <div class="panel" style="flex:1.8; min-width:320px">
         <h2>🎒 Inventory</h2>
         <div id="inventoryGrid" class="inv-grid"></div>
-        <button id="clearInvBtn">🗑️ Clear</button>
-        <button id="equipBestBtn">🏆 Equip Best</button>
+        <div style="display:flex; gap:0.5rem; flex-wrap:wrap">
+            <button id="clearInvBtn">🗑️ Clear</button>
+            <button id="equipBestBtn">🏆 Equip Best</button>
+            <button id="fusionBtn">✨ Fusion (2 auras)</button>
+            <button id="prestigeBtn">🌀 Prestige (reset for buff)</button>
+        </div>
+        <div id="evolutionInfo" style="font-size:0.7rem; margin-top:0.5rem;">💎 Evolution XP: <span id="evoXP">0</span>/100</div>
     </div>
 
-    <!-- ARENA + GLOBAL CHAT -->
-    <div class="panel">
+    <!-- ARENA + CHAT -->
+    <div class="panel" style="flex:1.4; min-width:280px">
         <h2>⚔️ Arena</h2>
         <div>
             <button id="easyBtn">Easy</button>
             <button id="mediumBtn">Medium</button>
             <button id="hardBtn">Hard</button>
             <button id="bossBtn">Boss</button>
+            <button id="dodgeBtn">💨 Dodge (2s cd)</button>
         </div>
         <div id="enemyDisplay">Enemy: None</div>
-        <div class="health-bar"><div id="enemyHealthFill" class="health-fill" style="width:0%"></div></div>
+        <div class="health-bar"><div id="enemyHealthFill" class="health-fill"></div></div>
         <div id="combatLog" class="log"></div>
-        <div id="abilityButtons" style="display: flex; flex-wrap: wrap; gap: 5px;"></div>
-
-        <h3 style="margin-top: 1rem;">🌍 Global Chat</h3>
-        <div id="globalChat" class="global-chat"></div>
+        <div id="abilityButtons" style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;"></div>
+        <div style="margin-top:1rem"><h3>🌍 Chat</h3><div id="globalChat" class="chat-messages"></div></div>
     </div>
 </div>
-
-<!-- CUTSCENE OVERLAY -->
-<div id="cutsceneOverlay" class="cutscene-overlay">
-    <div id="cutsceneText" class="cutscene-content">⚡ EVENT ⚡</div>
-</div>
+<div id="cutsceneOverlay" class="cutscene-overlay"><div id="cutsceneText" class="cutscene-content">EVENT</div></div>
+<div id="screenFlash" class="screen-flash"></div>
 
 <script>
-    // ======================== 1. ABILITY POOL (200 moves via template) ========================
+    // ================================ ABILITY POOL ================================
     const ABILITY_POOL = {
-        "Light Jab": { baseDamage: 15, cooldown: 0.8, type: "basic" },
-        "Spark Tap": { baseDamage: 12, cooldown: 0.6, type: "basic" },
-        "Quick Strike": { baseDamage: 18, cooldown: 0.9, type: "basic" },
-        "Energy Flick": { baseDamage: 14, cooldown: 0.7, type: "basic" },
-        "Basic Slash": { baseDamage: 16, cooldown: 0.8, type: "basic" },
-        "Dash Step": { baseDamage: 10, cooldown: 1.2, type: "mobility" },
-        "Blink": { baseDamage: 8, cooldown: 1.5, type: "mobility" },
-        "Lightning Strike": { baseDamage: 28, cooldown: 1.5, type: "skill" },
-        "Void Slash": { baseDamage: 30, cooldown: 1.6, type: "skill" },
-        "Flame Burst": { baseDamage: 32, cooldown: 1.7, type: "skill" },
-        "Ice Spike": { baseDamage: 26, cooldown: 1.4, type: "skill" },
-        "Energy Wave": { baseDamage: 30, cooldown: 1.5, type: "skill" },
-        "Meteor Crash": { baseDamage: 50, cooldown: 2.5, type: "heavy" },
-        "Black Hole Hit": { baseDamage: 55, cooldown: 2.8, type: "heavy" },
-        "Judgment Beam": { baseDamage: 60, cooldown: 3.0, type: "heavy" },
-        "Reality Cut": { baseDamage: 90, cooldown: 4.0, type: "ultimate" },
-        "Supernova": { baseDamage: 100, cooldown: 4.5, type: "ultimate" },
-        "World End": { baseDamage: 120, cooldown: 5.0, type: "ultimate" },
-        "Time Freeze": { baseDamage: 85, cooldown: 4.2, type: "ultimate" }
+        "Light Jab":{baseDamage:15,cd:0.8,type:"basic",effect:null},
+        "Spark Tap":{baseDamage:12,cd:0.6,type:"basic",effect:"shock"},
+        "Quick Strike":{baseDamage:18,cd:0.9,type:"basic",effect:null},
+        "Flame Burst":{baseDamage:32,cd:1.7,type:"skill",effect:"burn"},
+        "Ice Spike":{baseDamage:26,cd:1.4,type:"skill",effect:"freeze"},
+        "Lightning Strike":{baseDamage:28,cd:1.5,type:"skill",effect:"shock"},
+        "Meteor Crash":{baseDamage:50,cd:2.5,type:"heavy",effect:"burn"},
+        "Judgment Beam":{baseDamage:60,cd:3.0,type:"heavy",effect:"stun"},
+        "Reality Cut":{baseDamage:90,cd:4.0,type:"ultimate",effect:"critUp"},
+        "World End":{baseDamage:120,cd:5.0,type:"ultimate",effect:"stun"},
+        "Healing Light":{baseDamage:0,cd:6.0,type:"support",effect:"heal"},
+        "Void Slash":{baseDamage:30,cd:1.6,type:"skill",effect:null}
     };
-    const ABILITY_NAMES = Object.keys(ABILITY_POOL);
-
-    // ======================== 2. TIER MULTIPLIERS & ODDS ========================
     const TIER_MULT = {1:1.0,2:1.2,3:1.5,4:1.8,5:2.2,6:2.8,7:3.5,8:4.2,9:5.0,10:6.5};
     const RARITY_ODDS = {1:0.40,2:0.20,3:0.15,4:0.10,5:0.06,6:0.04,7:0.025,8:0.01,9:0.004,10:0.001};
 
-    // ======================== 3. AURA DATABASE (100 auras) ========================
-    let auraDatabase = [];
-    function addAura(id, name, tier, abilityNames, passive = null) {
-        let abilities = abilityNames.filter(an => ABILITY_POOL[an]).slice(0, tier >= 7 ? 3 : (tier >= 4 ? 2 : 1));
-        if (abilities.length === 0) abilities = ["Light Jab"];
-        auraDatabase.push({ id, name, tier, abilities, passive, multiplier: TIER_MULT[tier] });
+    // AURA DB (100 auras)
+    let auraDatabase=[];
+    function addAura(id,name,tier,abilities,passive=null){
+        let abSet=abilities.filter(a=>ABILITY_POOL[a]).slice(0,tier>=7?3:(tier>=4?2:1));
+        if(!abSet.length) abSet=["Light Jab"];
+        auraDatabase.push({id,name,tier,abilities:abSet,passive,mult:TIER_MULT[tier]});
     }
-    // Generate 100 auras with distinct names
-    const tier1Names = ["Faint Spark","Dust Aura","Weak Flow","Pale Mist","Basic Glow","Static Air","Soft Pulse","Low Spark","Dim Aura","Silent Glow"];
-    for (let i=0;i<10;i++) addAura(i+1, tier1Names[i], 1, ["Light Jab"]);
-    const tier2Names = ["Neon Flicker","Static Core","Flow Aura","Light Mist","Blue Spark","Warm Pulse","Stable Glow","Small Rift","Soft Voltage","Calm Spark"];
-    for (let i=0;i<10;i++) addAura(11+i, tier2Names[i], 2, ["Spark Tap"]);
-    const tier3Names = ["Storm Flicker","Void Spark","Ember Flow","Ice Pulse","Wind Spark","Gravity Flick","Plasma Tap","Rift Glow","Shock Core","Fire Mist"];
-    for (let i=0;i<10;i++) addAura(21+i, tier3Names[i], 3, ["Quick Strike"]);
-    // Tier 4-7
-    for (let i=0;i<10;i++) addAura(31+i, `Rare Aura ${31+i}`, 4, ["Dash Step","Light Jab"]);
-    for (let i=0;i<10;i++) addAura(41+i, `Elite Aura ${41+i}`, 5, ["Void Slash","Blink"]);
-    for (let i=0;i<10;i++) addAura(51+i, `Epic Aura ${51+i}`, 6, ["Flame Burst","Energy Wave"]);
-    for (let i=0;i<10;i++) addAura(61+i, `Legendary Aura ${61+i}`, 7, ["Meteor Crash","Dash Step","Light Jab"]);
-    // Tier 8-10 (Mythic, Divine, Transcendent)
-    const mythicNames = ["Celestial Rift","Void Emperor","Star God","Flame God","Ice God","Gravity God","Thunder Emperor","Wind God","Ember Emperor","Rift Emperor"];
-    for (let i=0;i<10;i++) addAura(71+i, mythicNames[i], 8, ["Judgment Beam","Dash Step","Blink"], "Mythic: 10% lifesteal");
-    const divineNames = ["Divine Light","Void Angel","Celestial King","Flame Archon","Ice Archon","Gravity Archon","Thunder Archon","Wind Archon","Ember Archon","Rift Archon"];
-    for (let i=0;i<10;i++) addAura(81+i, divineNames[i], 9, ["Reality Cut","Time Freeze","Supernova"], "Divine: +25% damage");
-    const transNames = ["Absolute Zero","Void Overlord","Star Destroyer","Flame Sovereign","Ice Sovereign","Gravity Sovereign","Thunder Sovereign","Wind Sovereign","Reality Breaker","Omniverse Aura"];
-    for (let i=0;i<10;i++) addAura(91+i, transNames[i], 10, ["World End","Time Freeze","Black Hole Hit"], "Transcendent: Double damage on crit");
-
-    // ======================== 4. GLOBAL STATE ========================
-    let inventory = [];
-    let equippedAura = null;
-    let currentRolled = null;
-    let manualRolls = 0, totalRolls = 0;
-    let autoUnlocked = false, autoActive = false, autoInterval = null;
-    let pityCounter = 0;
-    let isCutscenePlaying = false;
-    const MAX_INV = 30;
-
-    // Combat state
-    let enemyHP = 0, enemyMaxHP = 0, enemyBaseDmg = 15;
-    let abilityCooldowns = new Map();
-    let botCooldown = 0;
-
-    // DOM elements
-    const rollBtn = document.getElementById('rollBtn');
-    const auraNameSpan = document.getElementById('auraName');
-    const auraTierSpan = document.getElementById('auraTier');
-    const auraMovesSpan = document.getElementById('auraMoves');
-    const auraPassiveSpan = document.getElementById('auraPassive');
-    const resultCardDiv = document.getElementById('resultCard');
-    const manualSpan = document.getElementById('manualCount');
-    const totalSpan = document.getElementById('totalCount');
-    const autoStatusSpan = document.getElementById('autoStatus');
-    const autoToggle = document.getElementById('autoToggle');
-    const autoMsgSpan = document.getElementById('autoMsg');
-    const invGrid = document.getElementById('inventoryGrid');
-    const equippedDisplaySpan = document.getElementById('equippedDisplay');
-    const enemyDisplay = document.getElementById('enemyDisplay');
-    const enemyHealthFill = document.getElementById('enemyHealthFill');
-    const combatLogDiv = document.getElementById('combatLog');
-    const abilityBtnsDiv = document.getElementById('abilityButtons');
-    const globalChatDiv = document.getElementById('globalChat');
-
-    // Cutscene overlay
-    const cutsceneOverlay = document.getElementById('cutsceneOverlay');
-    const cutsceneTextElem = document.getElementById('cutsceneText');
-
-    // Helper: global message
-    function addGlobalMessage(msg, isRare = false) {
-        const div = document.createElement('div');
-        div.innerHTML = isRare ? `<span class="global-announce">🌍 ${msg}</span>` : `💬 ${msg}`;
-        globalChatDiv.appendChild(div);
-        globalChatDiv.scrollTop = globalChatDiv.scrollHeight;
-        if (globalChatDiv.children.length > 40) globalChatDiv.removeChild(globalChatDiv.firstChild);
+    for(let i=0;i<10;i++) addAura(i+1,["Faint Spark","Dust Aura","Weak Flow","Pale Mist","Basic Glow","Static Air","Soft Pulse","Low Spark","Dim Aura","Silent Glow"][i],1,["Light Jab"]);
+    for(let i=0;i<10;i++) addAura(11+i,["Neon Flicker","Static Core","Flow Aura","Light Mist","Blue Spark","Warm Pulse","Stable Glow","Small Rift","Soft Voltage","Calm Spark"][i],2,["Spark Tap"]);
+    for(let i=0;i<10;i++) addAura(21+i,["Storm Flicker","Void Spark","Ember Flow","Ice Pulse","Wind Spark","Gravity Flick","Plasma Tap","Rift Glow","Shock Core","Fire Mist"][i],3,["Quick Strike"]);
+    for(let i=0;i<20;i++) addAura(31+i,`Rare ${31+i}`,4,["Dash Step","Light Jab"]);
+    for(let i=0;i<10;i++) addAura(51+i,`Epic ${51+i}`,6,["Flame Burst","Ice Spike"]);
+    for(let i=0;i<10;i++) addAura(61+i,`Legendary ${61+i}`,7,["Meteor Crash","Judgment Beam","Light Jab"]);
+    const mythic=["Celestial Rift","Void Emperor","Star God","Flame God","Ice God","Gravity God","Thunder Emperor","Wind God","Ember Emperor","Rift Emperor"];
+    for(let i=0;i<10;i++) addAura(71+i,mythic[i],8,["Judgment Beam","Lightning Strike","Reality Cut"],"Mythic: 10% lifesteal");
+    const divine=["Divine Light","Void Angel","Celestial King","Flame Archon","Ice Archon","Gravity Archon","Thunder Archon","Wind Archon","Ember Archon","Rift Archon"];
+    for(let i=0;i<10;i++) addAura(81+i,divine[i],9,["Reality Cut","World End","Healing Light"],"Divine: +25% dmg");
+    const trans=["Absolute Zero","Void Overlord","Star Destroyer","Flame Sovereign","Ice Sovereign","Gravity Sovereign","Thunder Sovereign","Wind Sovereign","Reality Breaker","Omniverse Aura"];
+    for(let i=0;i<10;i++) addAura(91+i,trans[i],10,["World End","Reality Cut","Judgment Beam"],"Transcendent: double crit dmg");
+    // secret auras (hidden)
+    addAura(101,"Eclipse Shard",9,["Void Slash","Healing Light"],"Secret: +15% dodge");
+    addAura(102,"Stardust Weaver",10,["World End","Healing Light","Lightning Strike"],"Secret: all stats +30%");
+    
+    // ================================ GLOBAL STATE ================================
+    let inventory=[], equippedAura=null, currentRolled=null;
+    let manualRolls=0,totalRolls=0, autoUnlocked=false, autoActive=false, autoInterval=null;
+    let pityCounter=0, prestigeBonus=1.0;
+    let playerHP=100, maxHP=100, playerDodgeCD=0;
+    let enemy={hp:0,maxHp:0,name:"",baseDmg:15,attackPattern:0,patternTimer:0,stunRemaining:0,status:{burn:0,freeze:0,shock:0}};
+    let abilityCooldowns=new Map(), comboCounter=0, comboExpire=0;
+    let cutscenePlaying=false;
+    let soundMuted=false;
+    // Audio context for synth
+    let audioCtx=null;
+    function initAudio(){ if(!audioCtx && !soundMuted) audioCtx=new (window.AudioContext||window.webkitAudioContext)(); }
+    function playTone(freq,duration,type="sine",volume=0.3){
+        if(soundMuted) return;
+        try{ initAudio(); if(!audioCtx) return; const osc=audioCtx.createOscillator(), gain=audioCtx.createGain(); osc.connect(gain); gain.connect(audioCtx.destination); osc.frequency.value=freq; osc.type=type; gain.gain.value=volume; osc.start(); gain.gain.exponentialRampToValueAtTime(0.0001,audioCtx.currentTime+duration); osc.stop(audioCtx.currentTime+duration); }catch(e){}
     }
-
-    function addCombatLog(msg) {
-        const div = document.createElement('div');
-        div.textContent = msg;
-        combatLogDiv.appendChild(div);
-        combatLogDiv.scrollTop = combatLogDiv.scrollHeight;
-        if (combatLogDiv.children.length > 30) combatLogDiv.removeChild(combatLogDiv.firstChild);
+    function playRollSound(tier){ let f=300+tier*50; playTone(f,0.2,"sine",0.2); if(tier>=8){ playTone(600,0.4,"sawtooth",0.4); setTimeout(()=>playTone(800,0.5,"square",0.3),200); } }
+    function playHitSound(crit=false){ playTone(crit?800:400,0.1,"triangle",0.2); if(crit) playTone(1000,0.2,"sawtooth",0.3); }
+    function playHealSound(){ playTone(550,0.3,"sine",0.2); }
+    
+    // UI elements
+    const rollBtn=document.getElementById('rollBtn'), addBtn=document.getElementById('addBtn'), equipCurrentBtn=document.getElementById('equipCurrentBtn');
+    const clearInvBtn=document.getElementById('clearInvBtn'), equipBestBtn=document.getElementById('equipBestBtn'), fusionBtn=document.getElementById('fusionBtn'), prestigeBtn=document.getElementById('prestigeBtn');
+    const autoToggle=document.getElementById('autoToggle'), muteToggle=document.getElementById('muteToggle'), dodgeBtn=document.getElementById('dodgeBtn');
+    const easyBtn=document.getElementById('easyBtn'), mediumBtn=document.getElementById('mediumBtn'), hardBtn=document.getElementById('hardBtn'), bossBtn=document.getElementById('bossBtn');
+    
+    function addGlobalMessage(msg,rare=false){ let d=document.getElementById('globalChat'); let div=document.createElement('div'); div.innerHTML=rare?`🌍 ${msg}`:`💬 ${msg}`; d.appendChild(div); d.scrollTop=d.scrollHeight; if(d.children.length>40) d.removeChild(d.firstChild); }
+    function addCombatLog(msg){ let d=document.getElementById('combatLog'); let div=document.createElement('div'); div.innerText=msg; d.appendChild(div); d.scrollTop=d.scrollHeight; if(d.children.length>30) d.removeChild(d.firstChild); }
+    function floatDamage(x,y,dmg,crit=false){ let div=document.createElement('div'); div.className='float-number'; div.innerText=Math.floor(dmg); div.style.left=x+'px'; div.style.top=y+'px'; div.style.color=crit?'#ffaa44':'#ff6666'; div.style.fontSize=crit?'1.5rem':'1.2rem'; document.body.appendChild(div); setTimeout(()=>div.remove(),800); }
+    function screenFlash(){ let f=document.getElementById('screenFlash'); f.style.opacity=0.4; setTimeout(()=>f.style.opacity=0,100); }
+    function shake(scale=5){ document.body.classList.add('screen-shake'); setTimeout(()=>document.body.classList.remove('screen-shake'),150); }
+    
+    // Roll & cutscene
+    function rollAura(){ let r=Math.random(),acc=0,sel=1; for(let t=1;t<=10;t++){ acc+=RARITY_ODDS[t]; if(r<acc){sel=t;break;} } if(pityCounter>=80 && sel<7){ sel=7; pityCounter=0; } else if(sel>=7) pityCounter=0; else pityCounter++; let pool=auraDatabase.filter(a=>a.tier===sel); if(!pool.length) pool=auraDatabase; return structuredClone(pool[Math.floor(Math.random()*pool.length)]); }
+    async function playCutscene(tier,name){ if(cutscenePlaying) return; cutscenePlaying=true; let duration=3200,texts=["",""],colorClass=""; if(tier===8){ duration=3200; texts=["🌀 MYTHIC SURGE","💜 PURPLE VORTEX","⚡ COSMIC ENERGY","🌟 MYTHIC REVEAL"]; colorClass="mythic-glow"; playTone(300,0.5,"sine",0.3); setTimeout(()=>playTone(500,0.4,"sawtooth",0.4),1000); } else if(tier===9){ duration=4500; texts=["✨ DIVINE JUDGMENT","🌅 HEAVENLY LIGHT","⏳ MOMENT OF TRUTH","💥 DIVINE EXPLOSION"]; colorClass="divine-glow"; playTone(400,0.6,"sine",0.4); playTone(600,0.8,"sawtooth",0.5); } else{ duration=6000; texts=["🕳️ COLLAPSE","💔 REALITY FRACTURE","🌀 GLITCH OVERDRIVE","🌌 WORLD BREAK","⚫ TRANSCENDENT"]; colorClass="transcendent-glow"; playTone(100,1,"sawtooth",0.5); playTone(40,0.8,"square",0.6); document.body.classList.add('screen-shake'); }
+        let overlay=document.getElementById('cutsceneOverlay'), textDiv=document.getElementById('cutsceneText'); textDiv.className=`cutscene-content ${colorClass}`; overlay.classList.add('cutscene-active');
+        for(let i=0;i<texts.length;i++){ textDiv.innerText=texts[i]; await new Promise(r=>setTimeout(r,1000)); }
+        overlay.classList.remove('cutscene-active'); document.body.classList.remove('screen-shake'); cutscenePlaying=false; addGlobalMessage(`✨ ${name} (Tier ${tier}) appeared! ✨`,true); playRollSound(tier);
     }
-
-    // ======================== SPECTACULAR CUTSCENES ========================
-    function playCutscene(tier, auraName) {
-        return new Promise((resolve) => {
-            if (isCutscenePlaying) { resolve(); return; }
-            isCutscenePlaying = true;
-            let duration = 0, theme = "", colorClass = "";
-            if (tier === 8) {
-                duration = 3200;
-                theme = "🌀 MYTHIC SURGE 🌀";
-                colorClass = "mythic-glow";
-                cutsceneTextElem.className = `cutscene-content ${colorClass}`;
-                cutsceneOverlay.classList.add('cutscene-active');
-                // Purple vortex effect
-                let step = 0;
-                const interval = setInterval(() => {
-                    const texts = ["💜 PURPLE VORTEX", "⚡ COSMIC ENERGY", "🌟 MYTHIC REVEAL"];
-                    cutsceneTextElem.innerHTML = texts[step % 3];
-                    step++;
-                }, 800);
-                setTimeout(() => {
-                    clearInterval(interval);
-                    cutsceneOverlay.classList.remove('cutscene-active');
-                    isCutscenePlaying = false;
-                    addGlobalMessage(`✨ ${auraName} (TIER ${tier} MYTHIC) materialized! ✨`, true);
-                    resolve();
-                }, duration);
-            } else if (tier === 9) {
-                duration = 4500;
-                theme = "✨ DIVINE JUDGMENT ✨";
-                colorClass = "divine-glow";
-                cutsceneTextElem.className = `cutscene-content ${colorClass}`;
-                cutsceneOverlay.classList.add('cutscene-active');
-                let step = 0;
-                const interval = setInterval(() => {
-                    const texts = ["🌅 HEAVENLY LIGHT", "✨ GOLDEN DESCENT", "⏳ MOMENT OF TRUTH", "💥 DIVINE EXPLOSION"];
-                    cutsceneTextElem.innerHTML = texts[step % 4];
-                    step++;
-                }, 1000);
-                setTimeout(() => {
-                    clearInterval(interval);
-                    cutsceneOverlay.classList.remove('cutscene-active');
-                    isCutscenePlaying = false;
-                    addGlobalMessage(`⭐ ${auraName} (TIER ${tier} DIVINE) has arrived! ⭐`, true);
-                    resolve();
-                }, duration);
-            } else if (tier === 10) {
-                duration = 6000;
-                theme = "🌀 REALITY BREAK 🌀";
-                colorClass = "transcendent-glow";
-                cutsceneTextElem.className = `cutscene-content ${colorClass}`;
-                cutsceneOverlay.classList.add('cutscene-active');
-                document.body.classList.add('screen-shake');
-                cutsceneOverlay.classList.add('glitch-overlay');
-                let step = 0;
-                const interval = setInterval(() => {
-                    const texts = ["🕳️ BLACK HOLE COLLAPSE", "💔 REALITY FRACTURE", "🌀 GLITCH OVERDRIVE", "🌌 WORLD BREAK", "⚫ TRANSCENDENT AWAKENING"];
-                    cutsceneTextElem.innerHTML = texts[step % 5];
-                    step++;
-                }, 1000);
-                setTimeout(() => {
-                    clearInterval(interval);
-                    cutsceneOverlay.classList.remove('cutscene-active');
-                    document.body.classList.remove('screen-shake');
-                    cutsceneOverlay.classList.remove('glitch-overlay');
-                    isCutscenePlaying = false;
-                    addGlobalMessage(`🌠 ${auraName} (TIER ${tier} TRANSCENDENT) shattered reality! 🌠`, true);
-                    resolve();
-                }, duration);
-            } else {
-                resolve();
-            }
-        });
-    }
-
-    // ======================== ROLL SYSTEM ========================
-    function rollAura() {
-        let rand = Math.random();
-        let acc = 0;
-        let selectedTier = 1;
-        for (let t = 1; t <= 10; t++) {
-            acc += RARITY_ODDS[t];
-            if (rand <= acc) { selectedTier = t; break; }
-        }
-        // Pity: after 80 rolls no tier>=7, force tier7
-        if (pityCounter >= 80 && selectedTier < 7) {
-            selectedTier = 7;
-            pityCounter = 0;
-        } else if (selectedTier >= 7) {
-            pityCounter = 0;
-        } else {
-            pityCounter++;
-        }
-        const pool = auraDatabase.filter(a => a.tier === selectedTier);
-        if (pool.length === 0) return structuredClone(auraDatabase[0]);
-        return structuredClone(pool[Math.floor(Math.random() * pool.length)]);
-    }
-
-    async function performRoll(isManual = true) {
-        if (isCutscenePlaying) {
-            addGlobalMessage("Cutscene in progress, wait a moment...");
-            return;
-        }
-        const newAura = rollAura();
-        currentRolled = newAura;
-        totalRolls++;
-        if (isManual) manualRolls++;
-        updateStatsUI();
-
-        // Update display (placeholder until cutscene finishes)
-        auraNameSpan.innerText = newAura.name;
-        auraTierSpan.innerText = `Tier ${newAura.tier}`;
-        auraMovesSpan.innerText = `Moves: ${newAura.abilities.join(', ')}`;
-        auraPassiveSpan.innerText = `Passive: ${newAura.passive || 'None'}`;
-        if (newAura.tier >= 6) resultCardDiv.classList.add('rare-glow');
-        else resultCardDiv.classList.remove('rare-glow');
-
-        if (newAura.tier >= 8) {
-            await playCutscene(newAura.tier, newAura.name);
-        }
-        // after cutscene, ensure display is final
-        updateStatsUI();
-        if (!autoUnlocked && manualRolls >= 100) {
-            autoUnlocked = true;
-            autoToggle.disabled = false;
-            autoMsgSpan.innerText = "✅ Auto unlocked!";
-            addGlobalMessage("🎉 Auto-Roll unlocked after 100 manual rolls!");
-        }
-        saveGame();
-    }
-
-    function updateStatsUI() {
-        manualSpan.innerText = manualRolls;
-        totalSpan.innerText = totalRolls;
-        autoStatusSpan.innerText = autoUnlocked ? "✅ UNLOCKED" : `🔒 ${manualRolls}/100`;
-        if (autoUnlocked) autoToggle.disabled = false;
-    }
-
-    // ======================== INVENTORY & EQUIP ========================
-    function renderInventory() {
-        invGrid.innerHTML = '';
-        if (inventory.length === 0) {
-            invGrid.innerHTML = '<div style="text-align:center;">🌀 No auras yet</div>';
-            return;
-        }
-        inventory.forEach((aura, idx) => {
-            const card = document.createElement('div');
-            card.className = 'card';
-            if (equippedAura && equippedAura.id === aura.id) card.classList.add('equipped');
-            card.innerHTML = `
-                <strong>${aura.name}</strong><br>
-                T${aura.tier} (${aura.multiplier}x)<br>
-                <button class="equipInvBtn" data-idx="${idx}">⚡ Equip</button>
-                <button class="removeInvBtn" data-idx="${idx}">🗑️</button>
-            `;
-            invGrid.appendChild(card);
-        });
-        document.querySelectorAll('.equipInvBtn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idx = parseInt(btn.getAttribute('data-idx'));
-                if (!isNaN(idx) && inventory[idx]) equipAura(structuredClone(inventory[idx]));
-            });
-        });
-        document.querySelectorAll('.removeInvBtn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                const idx = parseInt(btn.getAttribute('data-idx'));
-                if (!isNaN(idx) && inventory[idx]) {
-                    if (equippedAura && equippedAura.id === inventory[idx].id) equippedAura = null;
-                    inventory.splice(idx, 1);
-                    renderInventory();
-                    updateEquippedDisplay();
-                    saveGame();
-                    if (autoActive && inventory.length >= MAX_INV) stopAutoDueToFull();
-                }
-            });
-        });
-    }
-
-    function equipAura(aura) {
-        equippedAura = structuredClone(aura);
-        abilityCooldowns.clear();
-        updateEquippedDisplay();
-        renderInventory();
-        updateAbilityButtons();
-        saveGame();
-        addCombatLog(`⚡ Equipped ${aura.name} (Tier ${aura.tier})`);
-    }
-
-    function updateEquippedDisplay() {
-        if (!equippedAura) {
-            equippedDisplaySpan.innerHTML = "None";
-            return;
-        }
-        equippedDisplaySpan.innerHTML = `<strong>${equippedAura.name}</strong> [T${equippedAura.tier}] ${equippedAura.multiplier}x<br>${equippedAura.abilities.join(', ')}`;
-    }
-
-    function addCurrentToInventory() {
-        if (!currentRolled) return;
-        if (inventory.length >= MAX_INV) { addGlobalMessage("Inventory full! Remove some auras."); return; }
-        inventory.push(structuredClone(currentRolled));
-        renderInventory();
-        saveGame();
-    }
-
-    function equipCurrent() { if (currentRolled) equipAura(structuredClone(currentRolled)); }
-    function clearInventory() { inventory = []; if (equippedAura) equippedAura = null; renderInventory(); updateEquippedDisplay(); saveGame(); if (autoActive && inventory.length >= MAX_INV) stopAutoDueToFull(); addGlobalMessage("Inventory cleared."); }
-    function equipBestTier() { if (inventory.length === 0) return; let best = inventory.reduce((a,b) => a.tier > b.tier ? a : b); equipAura(structuredClone(best)); }
-
-    // ======================== AUTO ROLL ========================
-    function startAutoRoll() {
-        if (autoInterval) clearInterval(autoInterval);
-        autoInterval = setInterval(async () => {
-            if (!autoActive || isCutscenePlaying) return;
-            if (inventory.length >= MAX_INV) { stopAutoDueToFull(); return; }
-            const newAura = rollAura();
-            currentRolled = newAura;
-            totalRolls++;
-            updateStatsUI();
-            auraNameSpan.innerText = newAura.name;
-            auraTierSpan.innerText = `Tier ${newAura.tier}`;
-            auraMovesSpan.innerText = `Moves: ${newAura.abilities.join(', ')}`;
-            auraPassiveSpan.innerText = `Passive: ${newAura.passive || 'None'}`;
-            if (newAura.tier >= 6) resultCardDiv.classList.add('rare-glow'); else resultCardDiv.classList.remove('rare-glow');
-            if (newAura.tier >= 8) await playCutscene(newAura.tier, newAura.name);
-            if (inventory.length < MAX_INV) inventory.push(structuredClone(newAura));
-            renderInventory();
-            saveGame();
-        }, 1600);
-    }
-    function stopAutoDueToFull() { if (autoActive) { autoActive = false; autoToggle.checked = false; if (autoInterval) clearInterval(autoInterval); autoInterval = null; autoMsgSpan.innerText = "Inventory full - stopped"; addGlobalMessage("Auto-roll stopped: inventory full."); } }
-    function toggleAuto(e) { if (!autoUnlocked) { autoToggle.checked = false; return; } if (e.target.checked) { if (inventory.length >= MAX_INV) { alert("Full inventory"); autoToggle.checked = false; return; } autoActive = true; startAutoRoll(); autoMsgSpan.innerText = "🌀 AUTO active"; addGlobalMessage("Auto-roll engaged."); } else { autoActive = false; if (autoInterval) clearInterval(autoInterval); autoInterval = null; autoMsgSpan.innerText = "Auto paused"; } }
-
-    // ======================== ARENA COMBAT ========================
-    function spawnEnemy(hp, dmg, name) {
-        enemyHP = hp;
-        enemyMaxHP = hp;
-        enemyBaseDmg = dmg;
-        enemyDisplay.innerText = `Enemy: ${name} (${hp} HP)`;
-        updateEnemyHealthBar();
-        addCombatLog(`⚔️ ${name} appears!`);
-    }
-    function updateEnemyHealthBar() { let percent = (enemyHP / enemyMaxHP) * 100; enemyHealthFill.style.width = `${Math.max(0, percent)}%`; }
-    function useAbility(abName) {
-        if (!equippedAura) { addCombatLog("No aura equipped!"); return; }
-        if (enemyHP <= 0) { addCombatLog("No enemy or already defeated. Spawn one."); return; }
-        const ab = ABILITY_POOL[abName];
-        if (!ab) return;
-        let cd = abilityCooldowns.get(abName) || 0;
-        if (cd > 0) { addCombatLog(`${abName} on cooldown (${cd.toFixed(1)}s)`); return; }
-        let damage = Math.floor(ab.baseDamage * equippedAura.multiplier);
-        enemyHP = Math.max(0, enemyHP - damage);
-        addCombatLog(`✨ ${abName} deals ${damage} damage!`);
-        updateEnemyHealthBar();
-        abilityCooldowns.set(abName, ab.cooldown);
-        startCooldownTimer();
-        if (enemyHP <= 0) {
-            addCombatLog(`🏆 Victory! Enemy defeated.`);
-            enemyDisplay.innerText = "Enemy: Defeated";
-            return;
-        }
-        // enemy counterattack
-        setTimeout(() => {
-            if (enemyHP > 0) {
-                let enemyDmg = Math.floor(enemyBaseDmg + Math.random() * 15);
-                addCombatLog(`🤖 Enemy attacks for ${enemyDmg} damage! (Player has no HP, but you feel the hit)`);
-            }
-        }, 500);
-    }
-    function startCooldownTimer() {
-        const interval = setInterval(() => {
-            let any = false;
-            for (let [name, cd] of abilityCooldowns.entries()) {
-                if (cd > 0) { abilityCooldowns.set(name, cd - 0.1); any = true; }
-                else if (cd < 0) abilityCooldowns.set(name, 0);
-            }
-            if (!any) { clearInterval(interval); updateAbilityButtons(); return; }
-            updateAbilityButtons();
-        }, 100);
-    }
-    function updateAbilityButtons() {
-        abilityBtnsDiv.innerHTML = '';
-        if (!equippedAura) return;
-        for (let abName of equippedAura.abilities) {
-            const ab = ABILITY_POOL[abName];
-            if (!ab) continue;
-            const btn = document.createElement('button');
-            btn.textContent = `${abName} (${ab.baseDamage} base)`;
-            const cd = abilityCooldowns.get(abName) || 0;
-            if (cd > 0) { btn.style.opacity = '0.6'; btn.disabled = true; btn.textContent += ` [${cd.toFixed(1)}s]`; }
-            btn.onclick = () => useAbility(abName);
-            abilityBtnsDiv.appendChild(btn);
-        }
-    }
-
-    // ======================== SAVE/LOAD ========================
-    function saveGame() {
-        const save = {
-            inventoryIds: inventory.map(a => a.id),
-            equippedId: equippedAura?.id || null,
-            manualRolls, totalRolls, autoUnlocked, pityCounter
-        };
-        localStorage.setItem("AuraRngSaveV4", JSON.stringify(save));
-    }
-    function loadGame() {
-        const raw = localStorage.getItem("AuraRngSaveV4");
-        if (!raw) return;
-        try {
-            const data = JSON.parse(raw);
-            manualRolls = data.manualRolls || 0;
-            totalRolls = data.totalRolls || 0;
-            autoUnlocked = data.autoUnlocked || false;
-            pityCounter = data.pityCounter || 0;
-            if (data.inventoryIds) {
-                inventory = [];
-                for (let id of data.inventoryIds) {
-                    const found = auraDatabase.find(a => a.id === id);
-                    if (found) inventory.push(structuredClone(found));
-                }
-            }
-            if (data.equippedId) {
-                const eq = auraDatabase.find(a => a.id === data.equippedId);
-                if (eq) equippedAura = structuredClone(eq);
-                else equippedAura = null;
-            }
-            renderInventory();
-            updateEquippedDisplay();
-            updateStatsUI();
-            if (autoUnlocked) autoToggle.disabled = false;
-            else autoToggle.disabled = true;
-        } catch (e) { console.warn(e); }
-    }
-
-    // ======================== EVENT LISTENERS ========================
-    rollBtn.addEventListener('click', () => performRoll(true));
-    document.getElementById('addBtn').addEventListener('click', addCurrentToInventory);
-    document.getElementById('equipCurrentBtn').addEventListener('click', equipCurrent);
-    document.getElementById('clearInvBtn').addEventListener('click', clearInventory);
-    document.getElementById('equipBestBtn').addEventListener('click', equipBestTier);
-    autoToggle.addEventListener('change', toggleAuto);
-    document.getElementById('easyBtn').onclick = () => spawnEnemy(180, 18, "Easy Grunt");
-    document.getElementById('mediumBtn').onclick = () => spawnEnemy(320, 28, "Medium Warrior");
-    document.getElementById('hardBtn').onclick = () => spawnEnemy(550, 40, "Hard Berserker");
-    document.getElementById('bossBtn').onclick = () => spawnEnemy(1000, 55, "Boss Titan");
-
-    // Initialization
+    async function performRoll(isManual=true){ if(cutscenePlaying) return; let aura=rollAura(); currentRolled=aura; totalRolls++; if(isManual) manualRolls++; updateStats(); document.getElementById('auraName').innerText=aura.name; document.getElementById('auraTier').innerText=`Tier ${aura.tier}`; document.getElementById('auraMoves').innerText=`Moves: ${aura.abilities.join(', ')}`; document.getElementById('auraPassive').innerText=`Passive: ${aura.passive||'None'}`; let card=document.getElementById('resultCard'); if(aura.tier>=6) card.classList.add('rare-glow'); else card.classList.remove('rare-glow'); if(aura.tier>=8) await playCutscene(aura.tier,aura.name); if(!autoUnlocked && manualRolls>=100){ autoUnlocked=true; autoToggle.disabled=false; addGlobalMessage("Auto-Roll unlocked!"); } saveGame(); }
+    function updateStats(){ document.getElementById('manualCount').innerText=manualRolls; document.getElementById('totalCount').innerText=totalRolls; document.getElementById('autoStatus').innerHTML=autoUnlocked?"✅ UNLOCKED":`🔒 ${manualRolls}/100`; if(autoUnlocked) autoToggle.disabled=false; document.getElementById('prestigeBonus').innerText=prestigeBonus.toFixed(1)+"x"; document.getElementById('playerHp').innerText=playerHP; }
+    
+    // Inventory / Equip
+    function renderInventory(){ let grid=document.getElementById('inventoryGrid'); grid.innerHTML=''; if(!inventory.length){ grid.innerHTML='<div>🌀 No auras</div>'; return; } inventory.forEach((a,i)=>{ let div=document.createElement('div'); div.className='card'+(equippedAura?.id===a.id?' equipped':''); div.innerHTML=`<strong>${a.name}</strong><br>T${a.tier}<br><button class="eqInv" data-idx="${i}">Equip</button><button class="remInv" data-idx="${i}">🗑️</button>`; grid.appendChild(div); }); document.querySelectorAll('.eqInv').forEach(btn=>btn.addEventListener('click',(e)=>{ let idx=parseInt(btn.dataset.idx); if(inventory[idx]) equipAura(structuredClone(inventory[idx])); })); document.querySelectorAll('.remInv').forEach(btn=>btn.addEventListener('click',(e)=>{ let idx=parseInt(btn.dataset.idx); if(inventory[idx]){ if(equippedAura?.id===inventory[idx].id) equippedAura=null; inventory.splice(idx,1); renderInventory(); updateEquippedDisplay(); saveGame(); if(autoActive && inventory.length>=30) stopAutoFull(); } })); }
+    function equipAura(aura){ equippedAura=structuredClone(aura); abilityCooldowns.clear(); comboCounter=0; updateEquippedDisplay(); renderInventory(); updateAbilityButtons(); addCombatLog(`⚡ Equipped ${aura.name}`); saveGame(); }
+    function updateEquippedDisplay(){ let disp=document.getElementById('equippedDisplay'); if(!equippedAura){ disp.innerText="None"; return; } disp.innerHTML=`<strong>${equippedAura.name}</strong> [T${equippedAura.tier}] ${equippedAura.multiplier.toFixed(1)}x<br>${equippedAura.abilities.join(', ')}`; }
+    function addCurrent(){ if(!currentRolled) return; if(inventory.length>=30){ addGlobalMessage("Inventory full!"); return; } inventory.push(structuredClone(currentRolled)); renderInventory(); saveGame(); }
+    function equipCurrent(){ if(currentRolled) equipAura(structuredClone(currentRolled)); }
+    function clearInventory(){ inventory=[]; if(equippedAura) equippedAura=null; renderInventory(); updateEquippedDisplay(); saveGame(); }
+    function equipBest(){ if(!inventory.length) return; let best=inventory.reduce((a,b)=>a.tier>b.tier?a:b); equipAura(structuredClone(best)); }
+    // Fusion, Evolution, Prestige
+    function fusion(){ if(inventory.length<2){ addGlobalMessage("Need 2 auras to fuse!"); return; } let a=inventory[0],b=inventory[1]; let newTier=Math.min(10,Math.floor((a.tier+b.tier)/2)+1); let pool=auraDatabase.filter(au=>au.tier===newTier); if(!pool.length) pool=auraDatabase.filter(au=>au.tier>=newTier-1); let fused=structuredClone(pool[0]); inventory.splice(0,2); inventory.push(fused); renderInventory(); addGlobalMessage(`Fusion created ${fused.name} (T${fused.tier})!`); saveGame(); }
+    let evolutionXP=0;
+    function addEvolutionXP(amt){ evolutionXP+=amt; if(evolutionXP>=100 && equippedAura && equippedAura.tier<10){ evolutionXP-=100; let newTier=equippedAura.tier+1; let newPool=auraDatabase.filter(a=>a.tier===newTier); if(newPool.length){ let evolved=structuredClone(newPool[0]); equipAura(evolved); addGlobalMessage(`✨ ${equippedAura.name} evolved to Tier ${newTier}! ✨`); } } document.getElementById('evoXP').innerText=evolutionXP; saveGame(); }
+    function prestige(){ if(manualRolls<200){ addGlobalMessage("Need 200 manual rolls to prestige."); return; } prestigeBonus+=0.1; manualRolls=0; totalRolls=0; inventory=[]; equippedAura=null; autoUnlocked=false; autoToggle.checked=false; autoActive=false; if(autoInterval) clearInterval(autoInterval); updateStats(); renderInventory(); updateEquippedDisplay(); addGlobalMessage(`🌀 Prestige! Permanent damage bonus: ${prestigeBonus.toFixed(1)}x`); saveGame(); }
+    
+    // Combat + Combo + Status
+    function applyStatus(target,effect,duration=3){ if(effect==="burn") target.status.burn=duration; if(effect==="freeze") target.status.freeze=duration; if(effect==="shock") target.status.shock=duration; }
+    function updateEnemyStatus(){ if(enemy.hp<=0) return; if(enemy.status.burn>0){ let dmg=Math.floor(enemy.maxHp*0.03); enemy.hp=Math.max(0,enemy.hp-dmg); addCombatLog(`🔥 Burn deals ${dmg} damage!`); enemy.status.burn--; } if(enemy.status.freeze>0){ enemy.status.freeze--; } if(enemy.status.shock>0){ enemy.status.shock--; } updateEnemyBar(); if(enemy.hp<=0) addCombatLog(`💀 Enemy defeated!`); }
+    function useAbility(abName){ if(!equippedAura) return; if(enemy.hp<=0){ addCombatLog("No enemy alive. Spawn one."); return; } let ab=ABILITY_POOL[abName]; if(!ab) return; let cd=abilityCooldowns.get(abName)||0; if(cd>0){ addCombatLog(`${abName} on cooldown`); return; } if(enemy.status.freeze>0){ addCombatLog("Enemy is frozen!"); return; } let dmg=ab.baseDamage*equippedAura.multiplier*prestigeBonus; let crit=false; if(Math.random()<0.1+(equippedAura.tier*0.01)){ dmg*=1.5; crit=true; playHitSound(true); screenFlash(); } else playHitSound(false); if(ab.effect==="heal"){ playerHP=Math.min(maxHP,playerHP+30); addCombatLog(`💚 Healed 30 HP!`); playHealSound(); } else{ enemy.hp=Math.max(0,enemy.hp-dmg); let x=Math.random()*window.innerWidth*0.5+window.innerWidth*0.2; let y=window.innerHeight*0.6; floatDamage(x,y,dmg,crit); if(crit) shake(8); else shake(3); addCombatLog(`${abName} deals ${Math.floor(dmg)} damage${crit?" CRIT!":""}`); if(ab.effect && ab.effect!=="heal") applyStatus(enemy,ab.effect,3); } abilityCooldowns.set(abName,ab.cd); updateAbilityButtons(); updateEnemyBar(); if(enemy.hp<=0){ addCombatLog(`🏆 Victory!`); return; } updateEnemyStatus(); startCooldownTimer(); comboCounter++; if(comboCounter>=3){ let bonus=Math.floor(dmg*0.3); addCombatLog(`🔥 ${comboCounter} combo! +${bonus} bonus!`); enemy.hp=Math.max(0,enemy.hp-bonus); updateEnemyBar(); comboCounter=0; } setTimeout(()=>enemyTurn(),500); }
+    function enemyTurn(){ if(enemy.hp<=0 || playerHP<=0) return; if(enemy.status.freeze>0){ addCombatLog("Enemy frozen, skips turn"); updateEnemyStatus(); return; } let dmg=Math.floor(enemy.baseDmg*(Math.random()*0.5+0.8)); if(Math.random()<0.2){ dmg*=1.5; addCombatLog(`⚠️ Enemy CRITICAL hit!`); shake(6); } else shake(2); playerHP=Math.max(0,playerHP-dmg); addCombatLog(`🤖 ${enemy.name} attacks for ${dmg} damage!`); updatePlayerHP(); if(playerHP<=0){ addCombatLog("💀 You died! Resurrect with heal item? (Fusion restore 50%)"); playerHP=Math.floor(maxHP*0.5); addCombatLog("Revived with 50% HP."); } updateEnemyStatus(); }
+    function updatePlayerHP(){ document.getElementById('playerHp').innerText=playerHP; let percent=(playerHP/maxHP)*100; document.getElementById('playerHp').style.color=percent<30?"red":"white"; }
+    function updateEnemyBar(){ let percent=(enemy.hp/enemy.maxHp)*100; document.getElementById('enemyHealthFill').style.width=Math.max(0,percent)+"%"; document.getElementById('enemyDisplay').innerHTML=`${enemy.name} ${Math.floor(enemy.hp)}/${enemy.maxHp} HP`; if(enemy.status.burn>0) document.getElementById('enemyDisplay').innerHTML+=" 🔥"; if(enemy.status.freeze>0) document.getElementById('enemyDisplay').innerHTML+=" ❄️"; if(enemy.status.shock>0) document.getElementById('enemyDisplay').innerHTML+=" ⚡"; }
+    function spawnEnemy(hp,dmg,name){ enemy={hp,maxHp:hp,hp:hp,name,baseDmg:dmg,attackPattern:0,patternTimer:0,stunRemaining:0,status:{burn:0,freeze:0,shock:0}}; updateEnemyBar(); addCombatLog(`⚔️ ${name} appears!`); }
+    function dodge(){ if(playerDodgeCD>0){ addCombatLog(`Dodge on cooldown!`); return; } playerDodgeCD=2; addCombatLog(`💨 Dodge! Next enemy attack misses.`); // simple: next enemy attack will be negated - modify enemyTurn
+        let oldTurn=enemyTurn; window.enemyTurnOriginal=enemyTurn; enemyTurn=function(){ if(playerDodgeCD>0){ addCombatLog("Dodged!"); playerDodgeCD=0; enemyTurn=window.enemyTurnOriginal; return; } window.enemyTurnOriginal(); }; setTimeout(()=>{ if(window.enemyTurn===enemyTurn) enemyTurn=window.enemyTurnOriginal; },2000); }
+    function startCooldownTimer(){ let interval=setInterval(()=>{ let any=false; for(let [k,v] of abilityCooldowns){ if(v>0){ abilityCooldowns.set(k,v-0.1); any=true; } } if(!any){ clearInterval(interval); updateAbilityButtons(); return; } updateAbilityButtons(); },100); }
+    function updateAbilityButtons(){ let div=document.getElementById('abilityButtons'); div.innerHTML=''; if(!equippedAura) return; for(let ab of equippedAura.abilities){ let btn=document.createElement('button'); btn.innerText=ab; let cd=abilityCooldowns.get(ab)||0; if(cd>0){ btn.style.opacity=0.5; btn.disabled=true; btn.innerText+=` (${cd.toFixed(1)}s)`; let prog=document.createElement('div'); prog.className='cooldown-progress'; prog.style.width=(1-cd/ABILITY_POOL[ab].cd)*100+'%'; btn.appendChild(prog); } btn.onclick=()=>useAbility(ab); div.appendChild(btn); } }
+    
+    // Auto roll
+    function startAuto(){ if(autoInterval) clearInterval(autoInterval); autoInterval=setInterval(async()=>{ if(!autoActive || cutscenePlaying || inventory.length>=30) return; let aura=rollAura(); currentRolled=aura; totalRolls++; updateStats(); document.getElementById('auraName').innerText=aura.name; document.getElementById('auraTier').innerText=`Tier ${aura.tier}`; document.getElementById('auraMoves').innerText=`Moves: ${aura.abilities.join(', ')}`; document.getElementById('auraPassive').innerText=`Passive: ${aura.passive||'None'}`; if(aura.tier>=6) document.getElementById('resultCard').classList.add('rare-glow'); else document.getElementById('resultCard').classList.remove('rare-glow'); if(aura.tier>=8) await playCutscene(aura.tier,aura.name); if(inventory.length<30) inventory.push(structuredClone(aura)); renderInventory(); saveGame(); },1600); }
+    function stopAutoFull(){ if(autoActive){ autoActive=false; autoToggle.checked=false; if(autoInterval) clearInterval(autoInterval); addGlobalMessage("Auto stopped: inventory full"); } }
+    function toggleAuto(e){ if(!autoUnlocked){ autoToggle.checked=false; return; } if(e.target.checked){ if(inventory.length>=30){ alert("Inventory full"); autoToggle.checked=false; return; } autoActive=true; startAuto(); }else{ autoActive=false; if(autoInterval) clearInterval(autoInterval); } }
+    
+    // Save/Load
+    function saveGame(){ let data={inventoryIds:inventory.map(a=>a.id),equippedId:equippedAura?.id,manualRolls,totalRolls,autoUnlocked,pityCounter,prestigeBonus,evolutionXP}; localStorage.setItem("AuraRngSave",JSON.stringify(data)); }
+    function loadGame(){ let raw=localStorage.getItem("AuraRngSave"); if(!raw) return; try{ let d=JSON.parse(raw); manualRolls=d.manualRolls||0; totalRolls=d.totalRolls||0; autoUnlocked=d.autoUnlocked||false; pityCounter=d.pityCounter||0; prestigeBonus=d.prestigeBonus||1; evolutionXP=d.evolutionXP||0; if(d.inventoryIds){ inventory=[]; for(let id of d.inventoryIds){ let f=auraDatabase.find(a=>a.id===id); if(f) inventory.push(structuredClone(f)); } } if(d.equippedId){ let e=auraDatabase.find(a=>a.id===d.equippedId); if(e) equippedAura=structuredClone(e); } renderInventory(); updateEquippedDisplay(); updateStats(); if(autoUnlocked) autoToggle.disabled=false; document.getElementById('evoXP').innerText=evolutionXP; }catch(e){} }
+    
+    // Events
+    rollBtn.onclick=()=>performRoll(true);
+    addBtn.onclick=addCurrent;
+    equipCurrentBtn.onclick=equipCurrent;
+    clearInvBtn.onclick=clearInventory;
+    equipBestBtn.onclick=equipBest;
+    fusionBtn.onclick=fusion;
+    prestigeBtn.onclick=prestige;
+    autoToggle.onchange=toggleAuto;
+    muteToggle.onchange=e=>{soundMuted=e.target.checked; if(audioCtx && !soundMuted) audioCtx.resume();};
+    dodgeBtn.onclick=dodge;
+    easyBtn.onclick=()=>spawnEnemy(200,18,"Easy Grunt");
+    mediumBtn.onclick=()=>spawnEnemy(400,28,"Medium Warrior");
+    hardBtn.onclick=()=>spawnEnemy(650,40,"Hard Berserker");
+    bossBtn.onclick=()=>spawnEnemy(1200,55,"Boss Titan");
+    
     loadGame();
-    if (!currentRolled && auraDatabase[0]) currentRolled = structuredClone(auraDatabase[0]);
-    if (currentRolled) {
-        auraNameSpan.innerText = currentRolled.name;
-        auraTierSpan.innerText = `Tier ${currentRolled.tier}`;
-        auraMovesSpan.innerText = `Moves: ${currentRolled.abilities.join(', ')}`;
-        auraPassiveSpan.innerText = `Passive: ${currentRolled.passive || 'None'}`;
-    }
-    spawnEnemy(180, 18, "Easy Grunt");
-    addGlobalMessage("🌀 AURA.RNG with CINEMATIC CUTSCENES is ready! Roll the black hole! 🌌");
+    spawnEnemy(200,18,"Easy Grunt");
+    addGlobalMessage("🌀 AURA.RNG Cinematic Edition ready! Roll the black hole! 🌌");
+    updateAbilityButtons();
+    setInterval(()=>{ if(playerDodgeCD>0) playerDodgeCD=Math.max(0,playerDodgeCD-0.1); },200);
 </script>
 </body>
 </html>
