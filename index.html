@@ -1,604 +1,795 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>AURA.RNG | AAA Cinematic RPG</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AURA CLICKER RNG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;}
+:root{
+  --gold:#f5c842;--purple:#9b6eff;--cyan:#00e5ff;--pink:#ff6fd8;--red:#ff4444;
+  --bg:#0a0a12;--bg2:#111120;--bg3:#181830;--border:#2a2a4a;
+  --text:#e8e8ff;--muted:#7070a0;
+}
+html,body{min-height:100vh;background:var(--bg);}
+body{font-family:'Inter',sans-serif;color:var(--text);padding:10px;position:relative;overflow-x:hidden;}
 
-        body {
-            background: radial-gradient(circle at 20% 30%, #03050b, #000000);
-            font-family: 'Segoe UI', 'Poppins', 'Orbitron', monospace;
-            color: #eee;
-            min-height: 100vh;
-            padding: 1rem;
-        }
+#fx-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;}
+#bg-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;}
+#game{position:relative;z-index:1;max-width:1200px;margin:0 auto;}
 
-        /* ===== TOP HUD ===== */
-        .top-hud {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 1rem;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(12px);
-            border-radius: 2rem;
-            padding: 0.8rem 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        .hud-stat {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: bold;
-            background: #01010866;
-            padding: 0.3rem 1rem;
-            border-radius: 2rem;
-            justify-content: center;
-        }
-        .hud-stat span:first-child { color: #ffd966; }
-        .game-title {
-            font-size: 1.4rem;
-            letter-spacing: 2px;
-            background: linear-gradient(45deg, gold, #ff6a00);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
+/* TOP BAR */
+#topbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;background:rgba(0,0,0,0.6);border:1px solid var(--border);border-radius:14px;padding:10px 14px;align-items:center;backdrop-filter:blur(8px);}
+.stat-pill{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;white-space:nowrap;}
+.stat-pill span{color:var(--gold);}
+#title-badge{font-family:'Cinzel',serif;font-size:18px;font-weight:700;background:linear-gradient(90deg,var(--gold),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;margin-left:auto;}
 
-        /* ===== MAIN GRID ===== */
-        .game-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-            gap: 1.2rem;
-        }
+/* MAIN LAYOUT */
+#main{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+@media(max-width:900px){#main{grid-template-columns:1fr 1fr;}}
+@media(max-width:600px){#main{grid-template-columns:1fr;}}
 
-        /* game card panel */
-        .game-card {
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            border-radius: 1.8rem;
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 1.2rem;
-            transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-        }
-        .game-card:hover {
-            transform: translateY(-4px);
-            border-color: #9b6eff;
-            box-shadow: 0 10px 25px rgba(155,110,255,0.3);
-        }
-        .card-header {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            border-left: 4px solid #9b6eff;
-            padding-left: 0.6rem;
-        }
+/* PANELS */
+.panel{background:rgba(17,17,32,0.92);border:1px solid var(--border);border-radius:18px;padding:14px;position:relative;overflow:hidden;backdrop-filter:blur(6px);}
+.panel:hover{border-color:#3a3a6a;}
+.panel-title{font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;border-left:3px solid var(--purple);padding-left:8px;}
 
-        /* diamond roll button */
-        .diamond-btn {
-            width: 140px;
-            height: 140px;
-            background: radial-gradient(circle at 30% 30%, #b9f2ff, #2f9eb3);
-            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 1rem auto;
-            font-size: 3.5rem;
-            cursor: pointer;
-            box-shadow: 0 0 30px cyan, inset 0 0 15px white;
-            transition: 0.08s linear;
-        }
-        .diamond-btn:active { transform: scale(0.94); filter: brightness(1.2); }
+/* CLICKER ORB */
+#clicker-area{display:flex;flex-direction:column;align-items:center;gap:10px;}
+#big-orb{width:140px;height:140px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#c084fc,#6d28d9,#1e1040);border:3px solid var(--purple);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:52px;transition:transform 0.08s;box-shadow:0 0 35px #6d28d960,inset 0 0 20px rgba(255,255,255,0.1);position:relative;flex-shrink:0;}
+#big-orb:hover{filter:brightness(1.15);}
+#big-orb:active{transform:scale(0.91);}
+#orb-ring{position:absolute;inset:-8px;border-radius:50%;border:2px solid transparent;border-top-color:var(--cyan);border-right-color:rgba(0,229,255,0.3);animation:spin 3s linear infinite;}
+#orb-ring2{position:absolute;inset:-14px;border-radius:50%;border:1px solid transparent;border-bottom-color:var(--pink);border-left-color:rgba(255,111,216,0.3);animation:spin 5s linear infinite reverse;}
+@keyframes spin{to{transform:rotate(360deg);}}
 
-        .result-card {
-            background: #0b0e1ae0;
-            border-radius: 1.5rem;
-            padding: 0.8rem;
-            margin: 1rem 0;
-            border-left: 6px solid #883eff;
-            transition: all 0.2s;
-        }
+#energy-bar-wrap{width:100%;}
+#aura-energy-bar{width:100%;height:10px;background:#0d0d1a;border-radius:5px;overflow:hidden;border:1px solid var(--border);}
+#aura-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:5px;transition:width 0.12s;width:0%;}
+#energy-label{display:flex;justify-content:space-between;margin-top:4px;font-size:11px;color:var(--muted);}
 
-        /* inventory grid */
-        .inv-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 0.6rem;
-            max-height: 280px;
-            overflow-y: auto;
-            margin: 0.8rem 0;
-        }
-        .inv-card {
-            background: #111;
-            padding: 0.5rem;
-            border-radius: 1rem;
-            border: 1px solid #333;
-            cursor: pointer;
-            transition: 0.1s;
-        }
-        .inv-card:hover { transform: translateY(-2px); border-color: #9b6eff; background: #1a1a2a; }
-        .inv-card.equipped { border: 2px solid gold; background: #1e1a2f; }
+#click-counter{font-size:26px;font-weight:700;color:var(--gold);letter-spacing:1px;}
+#click-rate{font-size:11px;color:var(--muted);}
 
-        /* buttons */
-        .game-btn {
-            background: linear-gradient(135deg, #2a235a, #120e2c);
-            border: none;
-            color: white;
-            font-weight: bold;
-            padding: 0.4rem 0.9rem;
-            border-radius: 2rem;
-            cursor: pointer;
-            margin: 0.2rem;
-            font-family: inherit;
-            border: 1px solid #5f4bcb;
-            transition: 0.1s;
-        }
-        .game-btn:hover { transform: scale(1.02); box-shadow: 0 0 8px #9b6eff; border-color: #9b6eff; }
-        .game-btn:active { transform: scale(0.96); }
+#roll-btn{background:linear-gradient(135deg,#6d28d9,#9b6eff);border:none;color:#fff;font-weight:700;padding:10px 28px;border-radius:22px;cursor:pointer;font-size:14px;letter-spacing:1.5px;transition:0.12s;box-shadow:0 4px 18px #6d28d966;font-family:'Inter',sans-serif;}
+#roll-btn:hover:not(:disabled){transform:scale(1.05);box-shadow:0 6px 25px #9b6effaa;}
+#roll-btn:active:not(:disabled){transform:scale(0.95);}
+#roll-btn:disabled{opacity:0.4;cursor:not-allowed;}
+#roll-cost{font-size:10px;color:var(--muted);}
 
-        /* logs & chat */
-        .log-box, .chat-box {
-            background: #01010880;
-            border-radius: 1rem;
-            padding: 0.4rem;
-            height: 150px;
-            overflow-y: auto;
-            font-size: 0.7rem;
-            margin: 0.5rem 0;
-        }
-        .health-bar { background: #6a0e0e; height: 6px; border-radius: 8px; overflow: hidden; margin: 0.3rem 0; }
-        .health-fill { background: #e04e4e; width: 100%; height: 100%; transition: width 0.1s; }
+/* RESULT CARD */
+#result-panel{min-height:90px;background:rgba(0,0,0,0.4);border-radius:12px;padding:12px;border-left:4px solid var(--purple);margin-top:2px;transition:border-color 0.3s;}
+#rolled-name{font-weight:700;font-size:16px;transition:color 0.3s;}
+#rolled-tier{font-size:11px;color:var(--muted);margin-top:2px;}
+#rolled-desc{font-size:11px;color:#7070b0;margin-top:5px;}
+#result-btns{display:flex;gap:6px;margin-top:10px;}
 
-        /* rarity glows (applied to aura names, cards) */
-        .tier-glow-7 { text-shadow: 0 0 6px gold; border-left-color: gold; }
-        .tier-glow-8 { text-shadow: 0 0 10px #c084fc; border-left-color: #c084fc; box-shadow: 0 0 12px #a855f7; }
-        .tier-glow-9 { text-shadow: 0 0 12px #00ffff; border-left-color: cyan; box-shadow: 0 0 15px cyan; }
-        .tier-glow-10 { text-shadow: 0 0 8px red, 0 0 12px magenta; border-left-color: red; animation: glitchPulse 0.3s infinite alternate; }
-        @keyframes glitchPulse { 0% { text-shadow: 0 0 5px red; } 100% { text-shadow: 0 0 15px magenta, 0 0 5px red; } }
+/* RARITY COLORS */
+.t1{color:#aaa;}
+.t2{color:#57c8ff;}
+.t3{color:#7fff5e;}
+.t4{color:#ff9f43;}
+.t5{color:#e040fb;}
+.t6{color:#f5c842;text-shadow:0 0 8px #f5c84266;}
+.t7{color:#ff6fd8;text-shadow:0 0 10px #ff6fd866;}
+.t8{color:#00e5ff;text-shadow:0 0 12px #00e5ff88,0 0 25px #00e5ff44;}
+.t9{color:#ff4444;text-shadow:0 0 12px #ff444488,0 0 25px magenta44;}
+.t10{color:#fff;text-shadow:0 0 10px #fff,0 0 25px var(--gold),0 0 50px var(--pink);animation:ultra 0.5s infinite alternate;}
+@keyframes ultra{from{text-shadow:0 0 10px #fff,0 0 25px gold;}to{text-shadow:0 0 20px var(--cyan),0 0 40px var(--pink),0 0 60px white;}}
 
-        /* cutscene overlay */
-        .cutscene-overlay {
-            position: fixed; inset: 0; background: black; z-index: 10000;
-            display: flex; align-items: center; justify-content: center;
-            pointer-events: none; opacity: 0; transition: opacity 0.1s;
-        }
-        .cutscene-active { opacity: 1; pointer-events: none; }
-        .cutscene-text {
-            text-align: center; font-size: 1.8rem; font-weight: bold;
-            text-transform: uppercase; letter-spacing: 2px;
-        }
-        .screen-shake { animation: shakeAnim 0.05s infinite; }
-        @keyframes shakeAnim { 0% { transform: translate(1px,1px); } 100% { transform: translate(-1px,-1px); } }
-        .screen-flash { position: fixed; inset: 0; background: white; opacity: 0; pointer-events: none; z-index: 9999; transition: opacity 0.05s; }
-    </style>
+/* PRESTIGE BAR */
+#prestige-bar-wrap{width:100%;}
+#prestige-bar{width:100%;height:5px;background:#0d0d1a;border-radius:3px;overflow:hidden;border:1px solid var(--border);}
+#prestige-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--pink));transition:width 0.4s;}
+#prestige-label{font-size:10px;color:var(--muted);margin-top:4px;}
+
+/* INVENTORY */
+#inv-scroll{max-height:230px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0;}
+#inv-scroll::-webkit-scrollbar{width:4px;}
+#inv-scroll::-webkit-scrollbar-track{background:transparent;}
+#inv-scroll::-webkit-scrollbar-thumb{background:var(--purple);border-radius:2px;}
+.inv-item{background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:10px;padding:7px;cursor:pointer;transition:0.12s;}
+.inv-item:hover{border-color:var(--purple);background:rgba(155,110,255,0.12);}
+.inv-item.equipped{border-color:var(--gold);background:rgba(245,200,66,0.08);}
+.inv-item .iname{font-weight:600;font-size:11px;}
+.inv-item .itier{font-size:10px;color:var(--muted);margin-top:2px;}
+.inv-actions{display:flex;gap:5px;flex-wrap:wrap;}
+
+/* EQUIPPED BOX */
+#equipped-box{background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:12px;padding:12px;margin-top:4px;transition:border-color 0.3s;}
+#eq-name{font-weight:700;font-size:15px;}
+#eq-effect{font-size:11px;color:var(--muted);margin-top:4px;}
+#eq-passive{font-size:11px;color:#57c8ff;margin-top:4px;}
+
+/* SHOP */
+#shop-list{display:flex;flex-direction:column;gap:7px;max-height:270px;overflow-y:auto;}
+#shop-list::-webkit-scrollbar{width:4px;}
+#shop-list::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.shop-item{background:rgba(0,0,0,0.4);border:1px solid var(--border);border-radius:10px;padding:9px 10px;display:flex;justify-content:space-between;align-items:center;gap:8px;transition:border-color 0.12s;}
+.shop-item:hover{border-color:#4a4a7a;}
+.si-name{font-size:12px;font-weight:600;color:var(--text);}
+.si-desc{font-size:10px;color:var(--muted);margin-top:2px;}
+.si-cost{font-size:11px;color:var(--gold);white-space:nowrap;margin-bottom:4px;text-align:right;}
+
+/* LOG */
+#log-box{background:rgba(0,0,0,0.4);border-radius:10px;padding:8px;height:110px;overflow-y:auto;font-size:10px;color:var(--muted);margin-top:8px;border:1px solid var(--border);}
+#log-box::-webkit-scrollbar{width:3px;}
+#log-box::-webkit-scrollbar-thumb{background:#333;}
+.log-entry{padding:2px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
+
+/* STATS */
+#stats-box{font-size:11px;color:var(--muted);display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-top:6px;}
+
+/* MINI BUTTONS */
+.mbtn{background:rgba(109,40,217,0.15);border:1px solid #6d28d9;color:#c4b5fd;font-size:11px;padding:5px 12px;border-radius:16px;cursor:pointer;transition:0.12s;font-family:'Inter',sans-serif;}
+.mbtn:hover:not(:disabled){background:rgba(109,40,217,0.3);border-color:var(--purple);}
+.mbtn:active{transform:scale(0.96);}
+.mbtn:disabled{opacity:0.4;cursor:not-allowed;}
+.mbtn.danger{border-color:#7f1d1d;color:#fca5a5;background:rgba(255,50,50,0.08);}
+.mbtn.danger:hover{background:rgba(255,50,50,0.2);}
+.mbtn.gold{border-color:#92400e;color:var(--gold);background:rgba(245,200,66,0.08);}
+.mbtn.gold:hover{background:rgba(245,200,66,0.18);}
+
+/* CLICK PARTICLES */
+.click-particle{position:fixed;pointer-events:none;z-index:9999;font-size:14px;font-weight:700;animation:floatUp 0.9s ease-out forwards;}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-65px) scale(0.5);}}
+
+/* CUTSCENE */
+#cutscene{position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:10000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;}
+#cutscene.show{display:flex;}
+#cs-phase{font-family:'Cinzel',serif;font-size:32px;font-weight:700;text-align:center;letter-spacing:4px;text-transform:uppercase;max-width:80%;}
+#cs-name{font-family:'Cinzel',serif;font-size:16px;color:var(--muted);letter-spacing:2px;}
+#cs-bar{width:320px;height:4px;background:#222;border-radius:2px;overflow:hidden;}
+#cs-bar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));width:0%;transition:width 0.7s;}
+
+/* SCREEN EFFECTS */
+@keyframes shake{0%{transform:translate(2px,1px);}25%{transform:translate(-2px,-1px);}50%{transform:translate(1px,2px);}75%{transform:translate(-1px,-2px);}100%{transform:translate(0,0);}}
+.shaking{animation:shake 0.07s infinite;}
+@keyframes glitch{0%,100%{transform:none;}20%{transform:translate(-3px,1px)skewX(2deg);}40%{transform:translate(3px,-1px)skewX(-2deg);}60%{transform:translate(-2px,2px);}80%{transform:translate(2px,-2px)skewX(1deg);}}
+.glitching{animation:glitch 0.1s infinite;}
+
+/* NOTIFICATION TOAST */
+#toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(20,20,40,0.95);border:1px solid var(--purple);border-radius:12px;padding:10px 24px;font-size:13px;color:var(--text);z-index:9000;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none;}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* PITY METER */
+#pity-display{font-size:10px;color:var(--muted);text-align:center;}
+</style>
 </head>
 <body>
-<div class="top-hud">
-    <div class="hud-stat"><span>❤️ HP</span> <span id="hudHp">100</span></div>
-    <div class="hud-stat"><span>🛡️ Armor</span> <span id="hudArmor">0</span></div>
-    <div class="hud-stat"><span>💪 Prestige</span> <span id="hudPrestige">1.0x</span></div>
-    <div class="hud-stat"><span>🎲 Manual</span> <span id="hudManual">0</span></div>
-    <div class="hud-stat"><span>🌀 Total</span> <span id="hudTotal">0</span></div>
-    <div class="game-title">💎 AURA.RNG</div>
+
+<canvas id="bg-canvas"></canvas>
+<canvas id="fx-canvas"></canvas>
+<div id="toast"></div>
+
+<div id="game">
+  <div id="topbar">
+    <div class="stat-pill">⚡ Energy <span id="hud-energy">0</span></div>
+    <div class="stat-pill">🎲 Rolls <span id="hud-rolls">0</span></div>
+    <div class="stat-pill">🌀 Prestige <span id="hud-prestige">1.00x</span></div>
+    <div class="stat-pill">🎒 Inv <span id="hud-inv">0</span>/20</div>
+    <div class="stat-pill">🔥 Streak <span id="hud-streak">0</span></div>
+    <div class="stat-pill">🍀 Pity <span id="hud-pity">0</span></div>
+    <div id="title-badge">✦ AURA CLICKER RNG</div>
+  </div>
+
+  <div id="main">
+
+    <!-- PANEL 1: CLICKER -->
+    <div class="panel">
+      <div class="panel-title">✦ Aura Orb</div>
+      <div id="clicker-area">
+        <div id="big-orb">
+          <div id="orb-ring"></div>
+          <div id="orb-ring2"></div>
+          <span id="orb-emoji">🔮</span>
+        </div>
+        <div id="click-counter">0</div>
+        <div id="click-rate">+1 / click</div>
+        <div id="energy-bar-wrap">
+          <div id="aura-energy-bar"><div id="aura-fill"></div></div>
+          <div id="energy-label"><span>Energy</span><span id="energy-val">0 / 100</span></div>
+        </div>
+        <button id="roll-btn">⚡ ROLL AURA</button>
+        <div id="roll-cost">Cost: <span id="cost-val">100</span> energy</div>
+        <div id="pity-display">Pity counter: <span id="pity-val">0</span> / 60</div>
+        <div id="result-panel">
+          <div id="rolled-name" class="t1">— Click orb to build energy —</div>
+          <div id="rolled-tier"></div>
+          <div id="rolled-desc"></div>
+          <div id="result-btns">
+            <button class="mbtn gold" id="add-btn" style="display:none">+ Add to Inventory</button>
+            <button class="mbtn" id="equip-now-btn" style="display:none">⚡ Equip Now</button>
+          </div>
+        </div>
+        <div id="prestige-bar-wrap">
+          <div id="prestige-bar"><div id="prestige-fill" style="width:0%"></div></div>
+          <div id="prestige-label">Prestige progress: <span id="prestige-prog">0</span> / 500 rolls</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANEL 2: EQUIPPED + INVENTORY -->
+    <div class="panel">
+      <div class="panel-title">⚡ Equipped Aura</div>
+      <div id="equipped-box">
+        <div id="eq-name" class="t1">None equipped</div>
+        <div id="eq-effect">No screen effect active</div>
+        <div id="eq-passive">—</div>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="panel-title">🎒 Inventory</div>
+        <div id="inv-scroll">
+          <div style="color:var(--muted);font-size:11px;grid-column:span 2;text-align:center;padding:20px 0;">Roll some auras first!</div>
+        </div>
+        <div class="inv-actions">
+          <button class="mbtn" id="equip-best">🏆 Equip Best</button>
+          <button class="mbtn gold" id="fusion-btn">✨ Fuse 2</button>
+          <button class="mbtn danger" id="clear-inv">🗑️ Clear</button>
+          <button class="mbtn" id="sort-btn">⬇ Sort</button>
+        </div>
+      </div>
+      <div id="log-box"></div>
+    </div>
+
+    <!-- PANEL 3: SHOP + PRESTIGE + STATS -->
+    <div class="panel">
+      <div class="panel-title">🛒 Upgrade Shop</div>
+      <div id="shop-list"></div>
+
+      <div style="margin-top:12px;">
+        <div class="panel-title">🌀 Prestige</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.6;">
+          Reset everything for a permanent <strong style="color:var(--gold)">+0.25x</strong> damage multiplier.
+          Requires 500 total rolls.
+        </div>
+        <button class="mbtn gold" id="prestige-btn" style="width:100%;padding:7px;">🌀 Prestige Reset</button>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div class="panel-title">📊 Roll Stats</div>
+        <div id="stats-box"></div>
+      </div>
+
+      <div style="margin-top:12px;">
+        <div class="panel-title">ℹ️ Guide</div>
+        <div style="font-size:10px;color:var(--muted);line-height:1.7;">
+          🖱️ Click orb → build energy<br>
+          ⚡ Roll for auras when full<br>
+          🎒 Add to inventory, equip to activate screen effects<br>
+          ✨ Fuse 2 same-tier auras → get tier above<br>
+          🛒 Buy upgrades to click faster / roll cheaper<br>
+          ⭐ Tier 6+ triggers epic cutscenes<br>
+          🌀 Prestige at 500 rolls for permanent buff
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
-<div class="game-grid">
-    <!-- ROLL PANEL -->
-    <div class="game-card">
-        <div class="card-header">💎 DIAMOND ROLL</div>
-        <div class="diamond-btn" id="rollBtn">💎</div>
-        <div id="resultCard" class="result-card">
-            <div><strong id="auraName">None</strong> <span id="auraTier">Tier ?</span></div>
-            <div id="auraMoves">Moves: --</div>
-            <div id="auraPassive">Passive: --</div>
-            <div><button class="game-btn" id="addBtn">📦 Add</button> <button class="game-btn" id="equipCurrentBtn">⚡ Equip</button></div>
-        </div>
-        <div><label><input type="checkbox" id="autoToggle"> 🤖 Auto-Roll</label> <span id="autoMsg"></span></div>
-        <div style="margin-top:0.8rem; background:#01001580; border-radius:1rem; padding:0.5rem">
-            <div>✨ Equipped Aura</div>
-            <div id="equippedDisplay">None</div>
-        </div>
-    </div>
-
-    <!-- INVENTORY + FUSION -->
-    <div class="game-card">
-        <div class="card-header">🎒 INVENTORY</div>
-        <div style="display:flex; gap:0.3rem; flex-wrap:wrap; margin-bottom:0.5rem;">
-            <button class="game-btn" id="sortTierBtn">⬇️ Sort by Tier</button>
-            <select id="filterTierSelect" class="game-btn" style="background:#1e2a3a;"><option value="all">All Tiers</option><option value="1">Tier1</option><option value="2">Tier2</option><option value="3">Tier3</option><option value="4">Tier4</option><option value="5">Tier5</option><option value="6">Tier6</option><option value="7">Tier7</option><option value="8">Tier8</option><option value="9">Tier9</option><option value="10">Tier10</option></select>
-        </div>
-        <div id="inventoryGrid" class="inv-grid"></div>
-        <div style="display:flex; gap:0.4rem; flex-wrap:wrap">
-            <button class="game-btn" id="clearInvBtn">🗑️ Clear</button>
-            <button class="game-btn" id="equipBestBtn">🏆 Best</button>
-            <button class="game-btn" id="fusionBtn">✨ Fusion (2 same tier)</button>
-            <button class="game-btn" id="prestigeBtn">🌀 Prestige</button>
-        </div>
-        <div style="font-size:0.7rem; margin-top:0.5rem;">💎 Evolution XP: <span id="evoXP">0</span>/100</div>
-    </div>
-
-    <!-- ARENA + COMBAT -->
-    <div class="game-card">
-        <div class="card-header">⚔️ ARENA</div>
-        <div>
-            <button class="game-btn" id="easyBtn">Easy</button>
-            <button class="game-btn" id="mediumBtn">Medium</button>
-            <button class="game-btn" id="hardBtn">Hard</button>
-            <button class="game-btn" id="bossBtn">Boss</button>
-            <button class="game-btn" id="dodgeBtn">💨 Dodge</button>
-        </div>
-        <div id="enemyDisplay">Enemy: None</div>
-        <div class="health-bar"><div id="enemyHealthFill" class="health-fill"></div></div>
-        <div id="combatLog" class="log-box"></div>
-        <div id="abilityButtons" style="display:flex; flex-wrap:wrap; gap:4px; margin-top:6px;"></div>
-    </div>
-
-    <!-- CHAT & SYSTEMS -->
-    <div class="game-card">
-        <div class="card-header">🌍 WORLD & SYSTEMS</div>
-        <div id="globalChat" class="chat-box" style="height:180px;"></div>
-        <div style="display:flex; gap:0.5rem; margin-top:0.5rem;">
-            <button class="game-btn" id="dailyRewardBtn">🎁 Daily Reward</button>
-            <button class="game-btn" id="leaderboardBtn">🏆 Leaderboard</button>
-            <label style="display:flex; align-items:center; gap:0.3rem;"><input type="checkbox" id="muteToggle"> 🔇 Mute</label>
-        </div>
-        <div style="font-size:0.7rem; margin-top:0.5rem;">
-            <p>⭐ Tier 7+ triggers CUTSCENES</p>
-            <p>💎 Fusion (2 same tier → higher tier)</p>
-            <p>🌀 Prestige resets inventory for permanent buff</p>
-        </div>
-    </div>
+<!-- CUTSCENE OVERLAY -->
+<div id="cutscene">
+  <div id="cs-phase">—</div>
+  <div id="cs-name"></div>
+  <div id="cs-bar"><div id="cs-bar-fill"></div></div>
 </div>
-
-<div id="cutsceneOverlay" class="cutscene-overlay"><div id="cutsceneText" class="cutscene-text">EVENT</div></div>
-<div id="screenFlash" class="screen-flash"></div>
 
 <script>
-    // ======================== 1. GAME STATE (Central) ========================
-    const GameState = {
-        // Player
-        hp: 100, maxHp: 100, armor: 0,
-        prestigeBonus: 1.0,
-        manualRolls: 0, totalRolls: 0,
-        autoUnlocked: false, autoActive: false, autoInterval: null,
-        // Auras
-        inventory: [],       // array of aura objects
-        equippedAura: null,
-        currentRolled: null,
-        // Progression
-        evolutionXP: 0,
-        pityCounter: 0, streakLoss: 0,
-        // Cooldowns timestamp based
-        abilityCD: new Map(), // abilityName -> endTime (ms)
-        playerDodgeEnd: 0,
-        // Misc
-        lastDaily: 0,
-        leaderboard: [],
-        soundMuted: false,
-        audioCtx: null
+// ═══════════════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════════════
+const G = {
+  energy: 0,
+  totalRolls: 0,
+  manualRolls: 0,
+  prestigeBonus: 1.0,
+  clickPower: 1,
+  clickPowerMult: 1.0,
+  rollCost: 100,
+  inventory: [],
+  equippedAura: null,
+  currentRolled: null,
+  pityCounter: 0,
+  streak: 0,
+  bestTier: 0,
+  autoClickInterval: null,
+  upgrades: { clickPower: 0, rollCost: 0, energyMult: 0, luck: 0, autoClick: 0 },
+  stats: { t1:0,t2:0,t3:0,t4:0,t5:0,t6:0,t7:0,t8:0,t9:0,t10:0, fusions:0, prestigeCount:0 }
+};
+
+// ═══════════════════════════════════════════════
+// DATA TABLES
+// ═══════════════════════════════════════════════
+const TIER_NAMES  = ['','Common','Rare','Epic','Legendary','Mythic','Celestial','Divine','Cosmic','Voidborn','Reality Break'];
+const TIER_EMOJIS = ['','⚪','🔵','🟢','🟠','🟣','⭐','💫','🌌','🕳️','💥'];
+const TIER_COLORS = ['','#aaa','#57c8ff','#7fff5e','#ff9f43','#e040fb','#f5c842','#ff6fd8','#00e5ff','#ff4444','#ffffff'];
+const TIER_ODDS   = {1:0.38,2:0.22,3:0.16,4:0.10,5:0.07,6:0.04,7:0.02,8:0.008,9:0.003,10:0.001};
+
+// ═══════════════════════════════════════════════
+// AURA DATABASE (46 named auras)
+// ═══════════════════════════════════════════════
+const AURA_DB = [
+  // T1
+  {id:1,name:'Ember Wisp',tier:1,effect:'ember',passive:'+5% click energy',mult:1.2},
+  {id:2,name:'Frost Tendril',tier:1,effect:'frost',passive:'Cold aura',mult:1.2},
+  {id:3,name:'Static Haze',tier:1,effect:'static',passive:'Shock sparks',mult:1.2},
+  {id:4,name:'Shadow Breath',tier:1,effect:'shadow',passive:'Dim vignette',mult:1.2},
+  {id:5,name:'Wind Trace',tier:1,effect:'wind',passive:'Trailing streaks',mult:1.2},
+  // T2
+  {id:6,name:'Ocean Pulse',tier:2,effect:'ocean',passive:'Blue ripple rings',mult:1.6},
+  {id:7,name:'Neon Spark',tier:2,effect:'neon',passive:'Cyan crackle lines',mult:1.6},
+  {id:8,name:'Earth Ring',tier:2,effect:'earth',passive:'Stone orbit',mult:1.6},
+  {id:9,name:'Blood Mist',tier:2,effect:'blood',passive:'Red particles',mult:1.6},
+  {id:10,name:'Storm Glow',tier:2,effect:'storm',passive:'Electric edge glow',mult:1.6},
+  // T3
+  {id:11,name:'Plasma Surge',tier:3,effect:'plasma',passive:'+10% energy on roll',mult:2.0},
+  {id:12,name:'Crystal Halo',tier:3,effect:'crystal',passive:'Prism fragment orbit',mult:2.0},
+  {id:13,name:'Lava Core',tier:3,effect:'lava',passive:'Ember rain falls',mult:2.0},
+  {id:14,name:'Blizzard Shell',tier:3,effect:'blizzard',passive:'Ice shards orbit',mult:2.0},
+  {id:15,name:'Thunder Ring',tier:3,effect:'thunder',passive:'Electric orbit ring',mult:2.0},
+  // T4
+  {id:16,name:'Void Tendrils',tier:4,effect:'void',passive:'+20% click power',mult:2.6},
+  {id:17,name:'Solar Flare',tier:4,effect:'solar',passive:'Sunbeam streaks',mult:2.6},
+  {id:18,name:'Gravity Well',tier:4,effect:'gravity',passive:'Orbit distortion',mult:2.6},
+  {id:19,name:'Spectral Bloom',tier:4,effect:'spectral',passive:'Ghost petal drift',mult:2.6},
+  {id:20,name:'Inferno Crown',tier:4,effect:'inferno',passive:'+15% energy per click',mult:2.6},
+  // T5
+  {id:21,name:'Celestial Drift',tier:5,effect:'celestial',passive:'Stars orbit the screen',mult:3.0},
+  {id:22,name:'Temporal Rift',tier:5,effect:'temporal',passive:'Clock shards fall',mult:3.0},
+  {id:23,name:'Dark Matter Shell',tier:5,effect:'darkmatter',passive:'Black hole fragments',mult:3.0},
+  {id:24,name:'Radiant Bastion',tier:5,effect:'radiant',passive:'Light pillars rise',mult:3.0},
+  {id:25,name:'Chaos Vortex',tier:5,effect:'chaos',passive:'+30% click power',mult:3.0},
+  // T6
+  {id:26,name:'Nebula Weave',tier:6,effect:'nebula',passive:'Galaxy dust trails',mult:3.8},
+  {id:27,name:'Phoenix Heart',tier:6,effect:'phoenix',passive:'+25% energy on fusion',mult:3.8},
+  {id:28,name:'Abyssal Eye',tier:6,effect:'abyssal',passive:'Eye opens on screen',mult:3.8},
+  {id:29,name:'Eon Pulse',tier:6,effect:'eon',passive:'+20% luck bonus',mult:3.8},
+  {id:30,name:'Storm God',tier:6,effect:'stormgod',passive:'Full screen lightning',mult:3.8},
+  // T7
+  {id:31,name:'Divine Light',tier:7,effect:'divine',passive:'Heaven beams descend',mult:4.6},
+  {id:32,name:'Void Emperor',tier:7,effect:'voidemperor',passive:'Reality tears open',mult:4.6},
+  {id:33,name:'Celestial King',tier:7,effect:'celestialking',passive:'Star explosion halo',mult:4.6},
+  {id:34,name:'Shadow God',tier:7,effect:'shadowgod',passive:'Full screen darkness',mult:4.6},
+  {id:35,name:'Flame Archon',tier:7,effect:'flamearchon',passive:'Wall of fire rises',mult:4.6},
+  // T8
+  {id:36,name:'Cosmic Rift',tier:8,effect:'cosmicrift',passive:'Universe cracks open',mult:5.4},
+  {id:37,name:'Star Devourer',tier:8,effect:'stardevourer',passive:'Stars collapse inward',mult:5.4},
+  {id:38,name:'Reality Weaver',tier:8,effect:'realityweaver',passive:'Screen dimension bends',mult:5.4},
+  {id:39,name:'Void Sovereign',tier:8,effect:'voidsovereign',passive:'Space itself distorts',mult:5.4},
+  {id:40,name:'Eternal Flame',tier:8,effect:'eternalflame',passive:'World edge burns',mult:5.4},
+  // T9
+  {id:41,name:'Abyss Lord',tier:9,effect:'abysslord',passive:'Screen tears & glitches',mult:6.5},
+  {id:42,name:'Omega Rift',tier:9,effect:'omegarift',passive:'All reality tears',mult:6.5},
+  {id:43,name:'Null God',tier:9,effect:'nullgod',passive:'UI and world corrupts',mult:6.5},
+  {id:44,name:'Infinity Core',tier:9,effect:'infinitycore',passive:'Reality loops itself',mult:6.5},
+  // T10
+  {id:45,name:'ABSOLUTE ZERO',tier:10,effect:'absolutezero',passive:'All effects. Reality shatters.',mult:8.0},
+  {id:46,name:'OMNIVERSE',tier:10,effect:'omniverse',passive:'All auras combined. Infinite power.',mult:8.0},
+];
+
+// ═══════════════════════════════════════════════
+// SCREEN EFFECTS LIBRARY
+// ═══════════════════════════════════════════════
+const EFFECTS = {
+  ember:(ctx,W,H,t)=>{for(let i=0;i<10;i++){ctx.beginPath();ctx.arc(Math.random()*W,Math.random()*H,Math.random()*3+1,0,6.28);ctx.fillStyle=`hsla(${15+Math.random()*35},100%,60%,${0.25+Math.random()*0.35})`;ctx.fill();}},
+  frost:(ctx,W,H,t)=>{ctx.strokeStyle='rgba(160,225,255,0.25)';ctx.lineWidth=1;for(let i=0;i<8;i++){ctx.beginPath();ctx.moveTo(Math.random()*W,Math.random()*H);ctx.lineTo(Math.random()*W,Math.random()*H);ctx.stroke();}},
+  static:(ctx,W,H,t)=>{for(let i=0;i<25;i++){ctx.fillStyle='rgba(180,180,255,0.12)';ctx.fillRect(Math.random()*W,Math.random()*H,1+Math.random()*2,1);}},
+  shadow:(ctx,W,H,t)=>{let g=ctx.createRadialGradient(W/2,H/2,H*0.08,W/2,H/2,H*0.75);g.addColorStop(0,'transparent');g.addColorStop(1,'rgba(0,0,0,0.5)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);},
+  wind:(ctx,W,H,t)=>{ctx.strokeStyle='rgba(180,255,220,0.2)';ctx.lineWidth=1;for(let i=0;i<10;i++){let x=Math.random()*W,y=Math.random()*H;ctx.beginPath();ctx.moveTo(x,y);ctx.bezierCurveTo(x+20,y-5,x+40,y+5,x+60,y);ctx.stroke();}},
+  ocean:(ctx,W,H,t)=>{for(let r=0;r<4;r++){let rad=(70+r*70+t*0.04*50)%350;ctx.beginPath();ctx.arc(W/2,H/2,rad,0,6.28);ctx.strokeStyle=`rgba(0,160,255,${0.18-r*0.03})`;ctx.lineWidth=1.5;ctx.stroke();}},
+  neon:(ctx,W,H,t)=>{for(let i=0;i<5;i++){ctx.shadowBlur=8;ctx.shadowColor='cyan';ctx.strokeStyle='rgba(0,230,255,0.4)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(Math.random()*W,0);ctx.lineTo(Math.random()*W,H);ctx.stroke();}ctx.shadowBlur=0;},
+  earth:(ctx,W,H,t)=>{for(let i=0;i<6;i++){let a=i/6*Math.PI*2+t*0.0005;let r=180+Math.sin(t*0.002)*30;ctx.beginPath();ctx.arc(W/2+Math.cos(a)*r,H/2+Math.sin(a)*r,8,0,6.28);ctx.fillStyle='rgba(139,100,60,0.3)';ctx.fill();}},
+  blood:(ctx,W,H,t)=>{for(let i=0;i<8;i++){ctx.beginPath();ctx.arc(Math.random()*W,Math.random()*H,Math.random()*4+1,0,6.28);ctx.fillStyle='rgba(200,0,30,0.25)';ctx.fill();}},
+  storm:(ctx,W,H,t)=>{let g=ctx.createRadialGradient(W/2,H/2,100,W/2,H/2,Math.max(W,H)*0.6);g.addColorStop(0,'transparent');g.addColorStop(1,'rgba(80,100,255,0.2)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);},
+  plasma:(ctx,W,H,t)=>{for(let i=0;i<14;i++){let x=W/2+Math.cos(t*0.0018+i*0.45)*220,y=H/2+Math.sin(t*0.0025+i*0.45)*110;ctx.beginPath();ctx.arc(x,y,3.5,0,6.28);ctx.fillStyle=`hsla(${270+i*25},100%,70%,0.45)`;ctx.fill();}},
+  crystal:(ctx,W,H,t)=>{for(let i=0;i<8;i++){let a=i/8*Math.PI*2+t*0.001;let r=150+Math.sin(t*0.002+i)*40;ctx.beginPath();ctx.moveTo(W/2+Math.cos(a)*r,H/2+Math.sin(a)*r);ctx.lineTo(W/2+Math.cos(a)*r+10,H/2+Math.sin(a)*r+10);ctx.strokeStyle=`hsla(${180+i*20},80%,75%,0.4)`;ctx.lineWidth=2;ctx.stroke();}},
+  lava:(ctx,W,H,t)=>{let g=ctx.createLinearGradient(0,H,0,H*0.55);g.addColorStop(0,'rgba(255,90,0,0.4)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);for(let i=0;i<12;i++){let x=Math.random()*W;ctx.beginPath();ctx.moveTo(x,H);ctx.lineTo(x+(Math.random()-0.5)*25,H*(0.5+Math.random()*0.3));ctx.strokeStyle='rgba(255,150,0,0.35)';ctx.lineWidth=1.5;ctx.stroke();}},
+  blizzard:(ctx,W,H,t)=>{for(let i=0;i<18;i++){let x=(Math.sin(i*4.1+t*0.001)*0.5+0.5)*W,y=(i/18*H+t*0.03)%H;ctx.beginPath();ctx.arc(x,y,2,0,6.28);ctx.fillStyle='rgba(200,230,255,0.5)';ctx.fill();}},
+  thunder:(ctx,W,H,t)=>{let g=ctx.createRadialGradient(W/2,H/2,60,W/2,H/2,280);g.addColorStop(0,'rgba(255,255,150,0.06)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);if(Math.random()<0.08){ctx.strokeStyle='rgba(255,255,180,0.6)';ctx.lineWidth=2;ctx.beginPath();let sx=W*0.3+Math.random()*W*0.4;ctx.moveTo(sx,0);for(let i=0;i<5;i++){sx+=(Math.random()-0.5)*35;ctx.lineTo(sx,H/5*(i+1));}ctx.stroke();}},
+  void:(ctx,W,H,t)=>{let g=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,220);g.addColorStop(0,'rgba(80,0,160,0.18)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);for(let i=0;i<7;i++){ctx.beginPath();ctx.moveTo(W/2,H/2);ctx.lineTo(W/2+Math.cos(i*0.9+t*0.001)*320,H/2+Math.sin(i*0.9+t*0.0015)*200);ctx.strokeStyle='rgba(130,0,255,0.22)';ctx.lineWidth=2;ctx.stroke();}},
+  solar:(ctx,W,H,t)=>{for(let i=0;i<10;i++){let a=i/10*Math.PI*2+t*0.0008;ctx.beginPath();ctx.moveTo(W/2,H/2);ctx.lineTo(W/2+Math.cos(a)*350,H/2+Math.sin(a)*220);ctx.strokeStyle=`rgba(255,200,50,${0.12+Math.sin(t*0.003+i)*0.08})`;ctx.lineWidth=1.5;ctx.stroke();}},
+  gravity:(ctx,W,H,t)=>{for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(W/2,H/2,60+i*50,0,6.28);ctx.strokeStyle=`rgba(180,100,255,${0.15-i*0.02})`;ctx.lineWidth=1;ctx.stroke();}},
+  spectral:(ctx,W,H,t)=>{for(let i=0;i<12;i++){let a=i/12*Math.PI*2+t*0.0008;let r=100+Math.sin(t*0.003+i*0.5)*60;ctx.beginPath();ctx.arc(W/2+Math.cos(a)*r,H/2+Math.sin(a)*r,6,0,6.28);ctx.fillStyle=`rgba(150,255,200,0.3)`;ctx.fill();}},
+  inferno:(ctx,W,H,t)=>{let g=ctx.createLinearGradient(0,H,0,H*0.45);g.addColorStop(0,'rgba(255,70,0,0.4)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);},
+  celestial:(ctx,W,H,t)=>{for(let i=0;i<25;i++){let x=(Math.sin(i*7.3+t*0.0006)*0.5+0.5)*W,y=(Math.cos(i*5.7+t*0.0007)*0.5+0.5)*H;ctx.beginPath();ctx.arc(x,y,1.5,0,6.28);ctx.fillStyle='rgba(255,255,200,0.65)';ctx.fill();}},
+  temporal:(ctx,W,H,t)=>{for(let i=0;i<6;i++){let a=i/6*Math.PI*2;ctx.beginPath();ctx.moveTo(W/2,H/2);ctx.lineTo(W/2+Math.cos(a+t*0.001)*180,H/2+Math.sin(a+t*0.001)*120);ctx.strokeStyle='rgba(200,200,255,0.25)';ctx.lineWidth=1;ctx.stroke();}},
+  darkmatter:(ctx,W,H,t)=>{let g=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H)*0.7);g.addColorStop(0,'rgba(40,0,80,0.2)');g.addColorStop(0.6,'rgba(0,0,20,0.15)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);},
+  radiant:(ctx,W,H,t)=>{for(let i=0;i<7;i++){let x=i*(W/7)+W/14;let h=80+Math.sin(t*0.002+i)*60;ctx.fillStyle=`rgba(255,240,180,${0.07+Math.sin(t*0.003+i)*0.04})`;ctx.fillRect(x-8,0,16,h);}},
+  chaos:(ctx,W,H,t)=>{for(let i=0;i<10;i++){ctx.beginPath();ctx.arc(Math.random()*W,Math.random()*H,Math.random()*35+10,0,6.28);ctx.strokeStyle=`hsla(${Math.random()*360},100%,65%,0.22)`;ctx.lineWidth=1.5;ctx.stroke();}},
+  nebula:(ctx,W,H,t)=>{let g=ctx.createRadialGradient(W/2,H/2,30,W/2,H/2,Math.max(W,H)*0.85);g.addColorStop(0,'rgba(80,0,130,0.22)');g.addColorStop(0.5,'rgba(0,80,170,0.12)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);},
+  phoenix:(ctx,W,H,t)=>{for(let i=0;i<14;i++){let a=Math.PI+i/14*Math.PI,r=65+Math.sin(t*0.004)*22;ctx.beginPath();ctx.moveTo(W/2,H*0.88);ctx.lineTo(W/2+Math.cos(a)*r*2.2,H*0.88+Math.sin(a)*r);ctx.strokeStyle=`rgba(255,${90+i*8},0,0.45)`;ctx.lineWidth=2;ctx.stroke();}},
+  abyssal:(ctx,W,H,t)=>{let r=80+Math.sin(t*0.002)*20;ctx.beginPath();ctx.arc(W/2,H/2,r,0,6.28);ctx.fillStyle='rgba(30,0,60,0.2)';ctx.fill();ctx.beginPath();ctx.arc(W/2,H/2,r,0,6.28);ctx.strokeStyle='rgba(100,0,200,0.4)';ctx.lineWidth=2;ctx.stroke();},
+  eon:(ctx,W,H,t)=>{for(let i=0;i<8;i++){let rad=(100+i*60+t*0.015*50)%500;ctx.beginPath();ctx.arc(W/2,H/2,rad,0,6.28);ctx.strokeStyle=`rgba(180,180,255,${0.12-i*0.01})`;ctx.lineWidth=1;ctx.stroke();}},
+  stormgod:(ctx,W,H,t)=>{if(Math.random()<0.12){ctx.beginPath();let sx=Math.random()*W;ctx.moveTo(sx,0);for(let i=0;i<7;i++){sx+=(Math.random()-0.5)*45;ctx.lineTo(sx,i*H/7);}ctx.strokeStyle='rgba(210,230,255,0.75)';ctx.lineWidth=2.5;ctx.stroke();}},
+  divine:(ctx,W,H,t)=>{for(let i=0;i<7;i++){let x=50+i*(W/7);let h=120+Math.sin(t*0.002+i)*80;ctx.fillStyle=`rgba(255,240,180,${0.09+Math.sin(t*0.003+i)*0.05})`;ctx.fillRect(x-10,0,20,h);}},
+  voidemperor:(ctx,W,H,t)=>{ctx.fillStyle='rgba(0,0,0,0.28)';ctx.fillRect(0,0,W,H);for(let i=0;i<6;i++){ctx.beginPath();ctx.moveTo(Math.random()*W,0);ctx.lineTo(Math.random()*W,H);ctx.strokeStyle='rgba(120,0,220,0.35)';ctx.lineWidth=2;ctx.stroke();}},
+  celestialking:(ctx,W,H,t)=>{for(let i=0;i<30;i++){let x=(Math.sin(i*7.7+t*0.0006)*0.5+0.5)*W,y=(Math.cos(i*5.3+t*0.0009)*0.5+0.5)*H;ctx.beginPath();ctx.arc(x,y,1+Math.random()*2,0,6.28);ctx.fillStyle=`rgba(255,240,100,0.7)`;ctx.fill();}},
+  shadowgod:(ctx,W,H,t)=>{ctx.fillStyle='rgba(0,0,0,0.45)';ctx.fillRect(0,0,W,H);for(let i=0;i<5;i++){ctx.beginPath();ctx.arc(Math.random()*W,Math.random()*H,Math.random()*80+30,0,6.28);ctx.fillStyle='rgba(40,0,80,0.15)';ctx.fill();}},
+  flamearchon:(ctx,W,H,t)=>{let g=ctx.createLinearGradient(0,H,0,0);g.addColorStop(0,'rgba(255,60,0,0.5)');g.addColorStop(0.5,'rgba(255,120,0,0.25)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);},
+  cosmicrift:(ctx,W,H,t)=>{for(let i=0;i<5;i++){ctx.beginPath();ctx.ellipse(W/2,H/2,(110+i*40+Math.sin(t*0.002+i)*22),(65+i*20+Math.cos(t*0.003+i)*15),t*0.0008,0,Math.PI*2);ctx.strokeStyle=`rgba(0,210,255,${0.22-i*0.03})`;ctx.lineWidth=1.5;ctx.stroke();}},
+  stardevourer:(ctx,W,H,t)=>{for(let i=0;i<20;i++){let a=i/20*Math.PI*2+t*0.0006;let r=(250-i*5+t*0.05)%260;ctx.beginPath();ctx.arc(W/2+Math.cos(a)*r,H/2+Math.sin(a)*r,2,0,6.28);ctx.fillStyle='rgba(200,220,255,0.5)';ctx.fill();}},
+  realityweaver:(ctx,W,H,t)=>{ctx.save();ctx.globalAlpha=0.08;let sk=Math.sin(t*0.003)*0.025;ctx.setTransform(1,sk,sk*0.5,1,0,0);ctx.fillStyle='rgba(120,80,255,0.12)';ctx.fillRect(0,0,W,H);ctx.restore();},
+  voidsovereign:(ctx,W,H,t)=>{ctx.fillStyle='rgba(5,0,20,0.35)';ctx.fillRect(0,0,W,H);for(let i=0;i<8;i++){let a=i/8*Math.PI*2+t*0.0005;ctx.beginPath();ctx.moveTo(W/2,H/2);ctx.lineTo(W/2+Math.cos(a)*400,H/2+Math.sin(a)*280);ctx.strokeStyle='rgba(80,0,180,0.22)';ctx.lineWidth=1.5;ctx.stroke();}},
+  eternalflame:(ctx,W,H,t)=>{let g=ctx.createLinearGradient(0,H,0,0);g.addColorStop(0,'rgba(255,80,0,0.55)');g.addColorStop(0.4,'rgba(255,150,0,0.3)');g.addColorStop(0.8,'rgba(255,200,50,0.1)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);},
+  abysslord:(ctx,W,H,t)=>{if(Math.random()<0.06){ctx.fillStyle='rgba(255,255,255,0.04)';ctx.fillRect(0,Math.random()*H,W,1+Math.random()*3);}ctx.fillStyle='rgba(0,0,0,0.2)';ctx.fillRect(0,0,W,H);},
+  omegarift:(ctx,W,H,t)=>{for(let i=0;i<6;i++){ctx.beginPath();let x1=Math.random()*W,y1=Math.random()*H,x2=Math.random()*W,y2=Math.random()*H;ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.strokeStyle='rgba(255,0,100,0.25)';ctx.lineWidth=1.5;ctx.stroke();}},
+  nullgod:(ctx,W,H,t)=>{if(Math.random()<0.18){ctx.fillStyle='rgba(255,0,0,0.04)';ctx.fillRect(0,Math.random()*H,W,2+Math.random()*2);}if(Math.random()<0.05){ctx.fillStyle='rgba(255,255,255,0.03)';ctx.fillRect(0,0,W,H);}},
+  infinitycore:(ctx,W,H,t)=>{for(let i=0;i<7;i++){let r=(i*40+t*0.03)%300;ctx.beginPath();ctx.arc(W/2,H/2,r,0,6.28);ctx.strokeStyle=`hsla(${i*50+t*0.05},90%,65%,0.2)`;ctx.lineWidth=1.5;ctx.stroke();}},
+  absolutezero:(ctx,W,H,t)=>{let g=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,Math.max(W,H));g.addColorStop(0,'rgba(0,200,255,0.18)');g.addColorStop(0.4,'rgba(150,0,255,0.12)');g.addColorStop(1,'rgba(255,0,100,0.18)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);if(Math.random()<0.25){ctx.beginPath();ctx.arc(Math.random()*W,Math.random()*H,Math.random()*6+2,0,6.28);ctx.fillStyle='rgba(255,255,255,0.55)';ctx.fill();}},
+  omniverse:(ctx,W,H,t)=>{for(let i=0;i<24;i++){let x=(Math.sin(i*3.7+t*0.002)*0.5+0.5)*W,y=(Math.cos(i*2.9+t*0.0015)*0.5+0.5)*H;ctx.beginPath();ctx.arc(x,y,2,0,6.28);ctx.fillStyle=`hsla(${t*0.1+i*15},100%,70%,0.55)`;ctx.fill();}ctx.globalAlpha=0.04;ctx.fillStyle='white';ctx.fillRect(0,0,W,H);ctx.globalAlpha=1;},
+};
+
+// ═══════════════════════════════════════════════
+// UPGRADE DEFINITIONS
+// ═══════════════════════════════════════════════
+const UPGRADES = [
+  {id:'clickPower',  name:'Click Amplifier',  desc:'+2 energy per click',          baseCost:50,  maxLevel:10, effect:()=>{G.clickPower+=2;}},
+  {id:'rollCost',    name:'Efficient Roll',   desc:'-5 energy per roll (min 20)',   baseCost:100, maxLevel:8,  effect:()=>{G.rollCost=Math.max(20,G.rollCost-5);}},
+  {id:'energyMult',  name:'Energy Surge',     desc:'+25% energy per click',         baseCost:200, maxLevel:6,  effect:()=>{G.clickPowerMult+=0.25;}},
+  {id:'luck',        name:'Fortune Crystal',  desc:'Shift odds up on lucky rolls',  baseCost:300, maxLevel:5,  effect:()=>{}},
+  {id:'autoClick',   name:'Auto Clicker',     desc:'Auto-clicks every 1.5s',        baseCost:500, maxLevel:3,  effect:()=>setupAutoClick()},
+];
+
+// ═══════════════════════════════════════════════
+// CANVAS SETUP
+// ═══════════════════════════════════════════════
+let fxCtx, fxW, fxH, animT = 0;
+let bgCtx, bgW, bgH;
+
+function initFX(){
+  const c = document.getElementById('fx-canvas');
+  fxCtx = c.getContext('2d');
+  function resize(){ fxW = c.width = window.innerWidth; fxH = c.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+}
+
+function initBG(){
+  const c = document.getElementById('bg-canvas');
+  bgCtx = c.getContext('2d');
+  function resize(){ bgW = c.width = window.innerWidth; bgH = c.height = window.innerHeight; }
+  resize();
+  window.addEventListener('resize', resize);
+  (function loop(t){
+    bgCtx.clearRect(0,0,bgW,bgH);
+    for(let i=0;i<50;i++){
+      let x=(Math.sin(i*7.3+t*0.00025)*0.5+0.5)*bgW;
+      let y=(Math.cos(i*5.1+t*0.0003)*0.5+0.5)*bgH;
+      bgCtx.beginPath();bgCtx.arc(x,y,1,0,6.28);
+      bgCtx.fillStyle=`rgba(155,110,255,${0.2+Math.sin(i+t*0.001)*0.15})`;
+      bgCtx.fill();
+    }
+    requestAnimationFrame(loop);
+  })();
+}
+
+function renderFX(ts){
+  animT = ts || 0;
+  fxCtx.clearRect(0,0,fxW,fxH);
+  if(G.equippedAura){
+    const fn = EFFECTS[G.equippedAura.effect];
+    if(fn) fn(fxCtx, fxW, fxH, animT);
+  }
+  requestAnimationFrame(renderFX);
+}
+
+// ═══════════════════════════════════════════════
+// ROLL LOGIC
+// ═══════════════════════════════════════════════
+function rollAura(){
+  let r = Math.random(), acc = 0, sel = 1;
+  for(let t = 10; t >= 1; t--){
+    acc += TIER_ODDS[t];
+    if(r < acc){ sel = t; break; }
+  }
+  if(G.upgrades.luck > 0 && Math.random() < G.upgrades.luck * 0.12) sel = Math.min(10, sel + 1);
+  if(G.pityCounter >= 60 && sel < 5){ sel = 5; G.pityCounter = 0; }
+  else if(sel >= 5) G.pityCounter = 0;
+  else G.pityCounter++;
+  const pool = AURA_DB.filter(a => a.tier === sel);
+  const base = pool.length ? pool[Math.floor(Math.random()*pool.length)] : AURA_DB[0];
+  G.stats['t'+sel] = (G.stats['t'+sel]||0)+1;
+  return {...base};
+}
+
+// ═══════════════════════════════════════════════
+// CUTSCENE
+// ═══════════════════════════════════════════════
+async function playCutscene(tier, name){
+  const cs    = document.getElementById('cutscene');
+  const phase = document.getElementById('cs-phase');
+  const csName= document.getElementById('cs-name');
+  const fill  = document.getElementById('cs-bar-fill');
+  let phases;
+  if(tier===6)  phases=[['⭐ CELESTIAL SURGE','#f5c842'],['✨ IT AWAKENS','#f5c842']];
+  else if(tier===7) phases=[['💫 DIVINE JUDGMENT','#ff6fd8'],['🌟 HEAVEN OPENS','#ff6fd8'],['✦ DIVINE DESCENT','#ff6fd8']];
+  else if(tier===8) phases=[['🌌 COSMIC COLLAPSE','#00e5ff'],['🪐 UNIVERSE BENDS','#00e5ff'],['🌀 STAR DEVOURED','#00e5ff'],['✨ COSMIC AWAKENING','#00e5ff']];
+  else if(tier===9) phases=[['🕳️ VOID FRACTURE','#ff4444'],['💔 REALITY TEARS','#ff4444'],['⚠️ YOU SHOULD NOT...','#ff00ff'],['🌀 VOIDBORN EMERGENCE','#ff4444']];
+  else phases=[['💀 COLLAPSE','#fff'],['🌀 ALL BREAKS DOWN','#ff4444'],['☠️ REALITY SHATTERS','#fff'],['⚡ ABSOLUTE ZERO','#00e5ff'],['✦ '+name.toUpperCase(),'#fff']];
+  cs.classList.add('show');
+  csName.innerText = name;
+  csName.style.color = TIER_COLORS[tier];
+  if(tier===10) document.getElementById('game').classList.add('glitching');
+  else if(tier>=8) document.getElementById('game').classList.add('shaking');
+  fill.style.transition='none'; fill.style.width='0%';
+  for(let i=0; i<phases.length; i++){
+    phase.innerText = phases[i][0];
+    phase.style.color = phases[i][1];
+    fill.style.transition='width 0.7s ease';
+    fill.style.width = ((i+1)/phases.length*100)+'%';
+    await new Promise(r=>setTimeout(r, tier>=9 ? 600 : 750));
+  }
+  await new Promise(r=>setTimeout(r,500));
+  cs.classList.remove('show');
+  document.getElementById('game').classList.remove('shaking','glitching');
+}
+
+// ═══════════════════════════════════════════════
+// TOAST NOTIFICATION
+// ═══════════════════════════════════════════════
+let toastTimeout;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.innerText = msg; t.classList.add('show');
+  clearTimeout(toastTimeout);
+  toastTimeout = setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+// ═══════════════════════════════════════════════
+// CLICK PARTICLES
+// ═══════════════════════════════════════════════
+function spawnParticle(x, y, val){
+  const el = document.createElement('div');
+  el.className = 'click-particle';
+  el.innerText = '+'+val;
+  el.style.left = x+'px'; el.style.top = y+'px';
+  el.style.color = G.equippedAura ? TIER_COLORS[G.equippedAura.tier] : '#9b6eff';
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 950);
+}
+
+// ═══════════════════════════════════════════════
+// UI RENDER
+// ═══════════════════════════════════════════════
+function updateUI(){
+  document.getElementById('hud-energy').innerText   = Math.floor(G.energy);
+  document.getElementById('hud-rolls').innerText    = G.totalRolls;
+  document.getElementById('hud-prestige').innerText = G.prestigeBonus.toFixed(2)+'x';
+  document.getElementById('hud-inv').innerText      = G.inventory.length;
+  document.getElementById('hud-streak').innerText   = G.streak;
+  document.getElementById('hud-pity').innerText     = G.pityCounter;
+  document.getElementById('energy-val').innerText   = Math.floor(G.energy)+' / '+G.rollCost;
+  document.getElementById('aura-fill').style.width  = Math.min(100, G.energy/G.rollCost*100)+'%';
+  document.getElementById('cost-val').innerText     = G.rollCost;
+  document.getElementById('pity-val').innerText     = G.pityCounter;
+  document.getElementById('roll-btn').disabled      = G.energy < G.rollCost;
+  document.getElementById('prestige-fill').style.width = Math.min(100, G.totalRolls/500*100)+'%';
+  document.getElementById('prestige-prog').innerText   = G.totalRolls;
+
+  const eq = G.equippedAura;
+  if(eq){
+    document.getElementById('orb-emoji').innerText = TIER_EMOJIS[eq.tier]||'🔮';
+    document.getElementById('big-orb').style.boxShadow =
+      `0 0 45px ${TIER_COLORS[eq.tier]}99, 0 0 90px ${TIER_COLORS[eq.tier]}33, inset 0 0 25px rgba(255,255,255,0.12)`;
+    const en = document.getElementById('eq-name');
+    en.className = 't'+eq.tier; en.innerText = TIER_EMOJIS[eq.tier]+' '+eq.name+' (T'+eq.tier+')';
+    document.getElementById('eq-effect').innerText  = 'Screen effect: '+eq.effect+' overlay active';
+    document.getElementById('eq-passive').innerText = 'Passive: '+eq.passive;
+    document.getElementById('result-panel').style.borderLeftColor = TIER_COLORS[eq.tier];
+    document.getElementById('equipped-box').style.borderColor     = TIER_COLORS[eq.tier]+'66';
+  } else {
+    document.getElementById('orb-emoji').innerText = '🔮';
+    document.getElementById('big-orb').style.boxShadow = '';
+    const en = document.getElementById('eq-name');
+    en.className='t1'; en.innerText='None equipped';
+    document.getElementById('eq-effect').innerText  = 'No screen effect active';
+    document.getElementById('eq-passive').innerText = '—';
+    document.getElementById('equipped-box').style.borderColor = '';
+    document.getElementById('result-panel').style.borderLeftColor = '';
+  }
+  renderInventory();
+  updateStats();
+}
+
+function renderInventory(){
+  const div = document.getElementById('inv-scroll');
+  if(!G.inventory.length){
+    div.innerHTML='<div style="color:var(--muted);font-size:11px;grid-column:span 2;text-align:center;padding:22px 0">Empty — roll some auras!</div>';
+    return;
+  }
+  div.innerHTML='';
+  G.inventory.forEach((a)=>{
+    const d = document.createElement('div');
+    d.className = 'inv-item'+(G.equippedAura&&G.equippedAura.id===a.id?' equipped':'');
+    d.innerHTML = `<div class="iname t${a.tier}">${TIER_EMOJIS[a.tier]} ${a.name}</div><div class="itier">${TIER_NAMES[a.tier]} T${a.tier} · ${a.mult.toFixed(1)}x</div>`;
+    d.onclick = ()=>{ G.equippedAura={...a}; updateUI(); addLog('⚡ Equipped: '+a.name); };
+    div.appendChild(d);
+  });
+}
+
+function buildShop(){
+  const d = document.getElementById('shop-list');
+  d.innerHTML='';
+  UPGRADES.forEach(u=>{
+    const lvl = G.upgrades[u.id]||0;
+    const maxed = lvl >= u.maxLevel;
+    const cost = Math.floor(u.baseCost * Math.pow(1.65, lvl));
+    const item = document.createElement('div');
+    item.className = 'shop-item';
+    item.innerHTML=`
+      <div class="si-info">
+        <div class="si-name">${u.name} <span style="color:var(--muted);font-weight:400">${maxed?'(MAX)':'Lv'+lvl+'/'+u.maxLevel}</span></div>
+        <div class="si-desc">${u.desc}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end">
+        <div class="si-cost">${maxed?'—':'⚡ '+cost}</div>
+        <button class="mbtn gold buy-btn" data-id="${u.id}" ${maxed||G.energy<cost?'disabled':''}>Buy</button>
+      </div>`;
+    d.appendChild(item);
+  });
+  document.querySelectorAll('.buy-btn').forEach(btn=>{
+    btn.onclick=()=>{
+      const u = UPGRADES.find(x=>x.id===btn.dataset.id);
+      const lvl = G.upgrades[u.id]||0;
+      const cost = Math.floor(u.baseCost*Math.pow(1.65,lvl));
+      if(G.energy>=cost && lvl<u.maxLevel){
+        G.energy-=cost; G.upgrades[u.id]=lvl+1;
+        u.effect();
+        addLog('🛒 Bought: '+u.name+' Lv'+(lvl+1));
+        showToast('Upgraded: '+u.name);
+        buildShop(); updateUI();
+      }
     };
+  });
+}
 
-    // ======================== ABILITY POOL & TIERS ========================
-    const ABILITY_POOL = {
-        "Light Jab":{base:15,cd:0.8,type:"basic",effect:null},
-        "Spark Tap":{base:12,cd:0.6,type:"basic",effect:"shock"},
-        "Quick Strike":{base:18,cd:0.9,type:"basic"},
-        "Flame Burst":{base:32,cd:1.7,type:"skill",effect:"burn"},
-        "Ice Spike":{base:26,cd:1.4,type:"skill",effect:"freeze"},
-        "Lightning Strike":{base:28,cd:1.5,type:"skill",effect:"shock"},
-        "Meteor Crash":{base:50,cd:2.5,type:"heavy",effect:"burn"},
-        "Judgment Beam":{base:60,cd:3.0,type:"heavy",effect:"stun"},
-        "Reality Cut":{base:90,cd:4.0,type:"ultimate",effect:"critUp"},
-        "World End":{base:120,cd:5.0,type:"ultimate",effect:"stun"},
-        "Healing Light":{base:0,cd:6.0,type:"support",effect:"heal"}
-    };
-    const TIER_MULT = {1:1.0,2:1.2,3:1.5,4:1.8,5:2.2,6:2.8,7:3.5,8:4.2,9:5.0,10:6.5};
-    const RARITY_ODDS = {1:0.40,2:0.20,3:0.15,4:0.10,5:0.06,6:0.04,7:0.025,8:0.01,9:0.004,10:0.001};
-    // 100+ Auras generation (same as before but compact)
-    let auraDatabase = [];
-    function addAura(id,name,tier,abilities,passive=null){
-        let abSet=abilities.filter(a=>ABILITY_POOL[a]).slice(0,tier>=7?3:(tier>=4?2:1));
-        if(!abSet.length) abSet=["Light Jab"];
-        auraDatabase.push({id,name,tier,abilities:abSet,passive,mult:TIER_MULT[tier]});
+function updateStats(){
+  const d = document.getElementById('stats-box');
+  const tierEntries = [1,2,3,4,5,6,7,8,9,10].map(t=>
+    `<div style="color:var(--muted)">T${t} rolls: <span style="color:${TIER_COLORS[t]}">${G.stats['t'+t]||0}</span></div>`
+  ).join('');
+  d.innerHTML = tierEntries +
+    `<div style="color:var(--muted)">Fusions: <span style="color:var(--text)">${G.stats.fusions}</span></div>` +
+    `<div style="color:var(--muted)">Prestiges: <span style="color:var(--gold)">${G.stats.prestigeCount}</span></div>`;
+}
+
+function addLog(msg){
+  const d = document.getElementById('log-box');
+  const el = document.createElement('div'); el.className='log-entry'; el.innerText=msg;
+  d.appendChild(el); d.scrollTop=d.scrollHeight;
+  if(d.children.length>40) d.removeChild(d.firstChild);
+}
+
+function setupAutoClick(){
+  if(G.autoClickInterval) clearInterval(G.autoClickInterval);
+  if(G.upgrades.autoClick>0){
+    const delay = 1500/G.upgrades.autoClick;
+    G.autoClickInterval = setInterval(()=>{
+      const val = Math.floor(G.clickPower*G.clickPowerMult*G.prestigeBonus);
+      G.energy += val; G.streak = Math.min(20, G.streak+1);
+      document.getElementById('click-counter').innerText = Math.floor(G.energy);
+      updateUI(); buildShop();
+    }, delay);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// EVENT HANDLERS
+// ═══════════════════════════════════════════════
+document.getElementById('big-orb').addEventListener('click', e=>{
+  const val = Math.floor(G.clickPower * G.clickPowerMult * G.prestigeBonus);
+  G.energy += val;
+  G.streak = Math.min(20, G.streak+1);
+  document.getElementById('click-counter').innerText = Math.floor(G.energy);
+  document.getElementById('click-rate').innerText = '+'+val+' / click';
+  spawnParticle(e.clientX, e.clientY, val);
+  updateUI(); buildShop();
+});
+
+document.getElementById('roll-btn').addEventListener('click', async ()=>{
+  if(G.energy < G.rollCost) return;
+  G.energy -= G.rollCost;
+  G.totalRolls++; G.manualRolls++; G.streak = 0;
+  const aura = rollAura();
+  G.currentRolled = aura;
+  const rn = document.getElementById('rolled-name');
+  rn.className = 't'+aura.tier;
+  rn.innerText = TIER_EMOJIS[aura.tier]+' '+aura.name;
+  document.getElementById('rolled-tier').innerText = TIER_NAMES[aura.tier]+' (Tier '+aura.tier+')';
+  document.getElementById('rolled-desc').innerText = aura.passive;
+  document.getElementById('add-btn').style.display = 'inline-block';
+  document.getElementById('equip-now-btn').style.display = 'inline-block';
+  if(aura.tier > G.bestTier){ G.bestTier = aura.tier; showToast('New best: '+aura.name+'!'); }
+  if(aura.tier >= 6) await playCutscene(aura.tier, aura.name);
+  addLog(TIER_EMOJIS[aura.tier]+' Rolled: '+aura.name+' (T'+aura.tier+')');
+  updateUI(); buildShop();
+});
+
+document.getElementById('add-btn').addEventListener('click', ()=>{
+  if(!G.currentRolled){ return; }
+  if(G.inventory.length >= 20){ showToast('Inventory full! (20 max)'); return; }
+  G.inventory.push({...G.currentRolled});
+  addLog('Added: '+G.currentRolled.name);
+  updateUI();
+});
+
+document.getElementById('equip-now-btn').addEventListener('click', ()=>{
+  if(!G.currentRolled) return;
+  if(!G.inventory.find(a=>a.id===G.currentRolled.id)) G.inventory.push({...G.currentRolled});
+  G.equippedAura = {...G.currentRolled};
+  addLog('⚡ Equipped: '+G.currentRolled.name);
+  updateUI();
+});
+
+document.getElementById('equip-best').addEventListener('click', ()=>{
+  if(!G.inventory.length){ showToast('Inventory is empty!'); return; }
+  const best = G.inventory.reduce((a,b)=>a.tier>b.tier?a:b);
+  G.equippedAura = {...best};
+  addLog('🏆 Equipped best: '+best.name);
+  updateUI();
+});
+
+document.getElementById('fusion-btn').addEventListener('click', ()=>{
+  const groups = {};
+  G.inventory.forEach((a,i)=>{ groups[a.tier]=groups[a.tier]||[]; groups[a.tier].push(i); });
+  for(let t=10; t>=1; t--){
+    if(groups[t] && groups[t].length>=2){
+      const [i1,i2] = [groups[t][0], groups[t][1]];
+      const nt = Math.min(10, t+1);
+      const pool = AURA_DB.filter(a=>a.tier===nt);
+      if(!pool.length) continue;
+      const fused = {...pool[Math.floor(Math.random()*pool.length)]};
+      const toRemove = [i1,i2].sort((a,b)=>b-a);
+      toRemove.forEach(i=>G.inventory.splice(i,1));
+      G.inventory.push(fused);
+      G.stats.fusions++;
+      addLog('✨ Fusion! → '+fused.name+' (T'+fused.tier+')');
+      showToast('Fusion: '+fused.name+' created!');
+      updateUI(); return;
     }
-    for(let i=0;i<10;i++) addAura(i+1,["Faint Spark","Dust Aura","Weak Flow","Pale Mist","Basic Glow","Static Air","Soft Pulse","Low Spark","Dim Aura","Silent Glow"][i],1,["Light Jab"]);
-    for(let i=0;i<10;i++) addAura(11+i,["Neon Flicker","Static Core","Flow Aura","Light Mist","Blue Spark","Warm Pulse","Stable Glow","Small Rift","Soft Voltage","Calm Spark"][i],2,["Spark Tap"]);
-    for(let i=0;i<10;i++) addAura(21+i,["Storm Flicker","Void Spark","Ember Flow","Ice Pulse","Wind Spark","Gravity Flick","Plasma Tap","Rift Glow","Shock Core","Fire Mist"][i],3,["Quick Strike"]);
-    for(let i=0;i<20;i++) addAura(31+i,`Rare ${31+i}`,4,["Light Jab","Spark Tap"]);
-    for(let i=0;i<10;i++) addAura(51+i,`Epic ${51+i}`,6,["Flame Burst","Ice Spike"]);
-    for(let i=0;i<10;i++) addAura(61+i,`Legendary ${61+i}`,7,["Meteor Crash","Judgment Beam","Light Jab"]);
-    const mythic=["Celestial Rift","Void Emperor","Star God","Flame God","Ice God","Gravity God","Thunder Emperor","Wind God","Ember Emperor","Rift Emperor"];
-    for(let i=0;i<10;i++) addAura(71+i,mythic[i],8,["Judgment Beam","Lightning Strike","Reality Cut"],"Mythic: 10% lifesteal");
-    const divine=["Divine Light","Void Angel","Celestial King","Flame Archon","Ice Archon","Gravity Archon","Thunder Archon","Wind Archon","Ember Archon","Rift Archon"];
-    for(let i=0;i<10;i++) addAura(81+i,divine[i],9,["Reality Cut","World End","Healing Light"],"Divine: +25% dmg");
-    const trans=["Absolute Zero","Void Overlord","Star Destroyer","Flame Sovereign","Ice Sovereign","Gravity Sovereign","Thunder Sovereign","Wind Sovereign","Reality Breaker","Omniverse Aura"];
-    for(let i=0;i<10;i++) addAura(91+i,trans[i],10,["World End","Reality Cut","Judgment Beam"],"Transcendent: double crit dmg");
-    addAura(101,"Eclipse Shard",9,["Void Slash","Healing Light"],"Secret: +15% dodge");
-    addAura(102,"Stardust Weaver",10,["World End","Healing Light","Lightning Strike"],"Secret: all stats +30%");
+  }
+  showToast('Need 2 auras of the same tier to fuse!');
+});
 
-    // ======================== 2. SYSTEMS ========================
-    // Audio System
-    const AudioSystem = {
-        init(){ if(!GameState.audioCtx && !GameState.soundMuted) GameState.audioCtx=new (window.AudioContext||window.webkitAudioContext)(); },
-        play(freq,duration,type="sine",vol=0.3){
-            if(GameState.soundMuted) return;
-            this.init();
-            if(!GameState.audioCtx) return;
-            const osc=GameState.audioCtx.createOscillator(), gain=GameState.audioCtx.createGain();
-            osc.connect(gain); gain.connect(GameState.audioCtx.destination);
-            osc.frequency.value=freq; osc.type=type; gain.gain.value=vol;
-            osc.start(); gain.gain.exponentialRampToValueAtTime(0.0001,GameState.audioCtx.currentTime+duration);
-            osc.stop(GameState.audioCtx.currentTime+duration);
-        },
-        playHit(crit=false){ this.play(crit?800:400,0.1,"triangle",0.2); if(crit) this.play(1000,0.2,"sawtooth",0.3); },
-        playHeal(){ this.play(550,0.3,"sine",0.2); },
-        playRoll(tier){ let f=300+tier*50; this.play(f,0.2,"sine",0.2); if(tier>=8){ this.play(600,0.4,"sawtooth",0.4); setTimeout(()=>this.play(800,0.5,"square",0.3),200); } },
-        playCutsceneTier(tier){ if(tier===8){ this.play(300,0.5); setTimeout(()=>this.play(500,0.4),1000); } else if(tier===9){ this.play(400,0.6); this.play(600,0.8); } else{ this.play(100,1,"sawtooth",0.5); this.play(40,0.8,"square",0.6); } }
-    };
+document.getElementById('sort-btn').addEventListener('click', ()=>{
+  G.inventory.sort((a,b)=>b.tier-a.tier);
+  renderInventory();
+});
 
-    // CombatSystem (handles damage, armor, status)
-    const CombatSystem = {
-        calculateDamage(abilityBase, auraMult, critChance){
-            let dmg = abilityBase * auraMult * GameState.prestigeBonus;
-            let crit = Math.random() < (0.1 + (GameState.equippedAura?.tier||1)*0.01);
-            if(crit) dmg *= 1.5;
-            return { dmg: Math.floor(dmg), crit };
-        },
-        applyDamageToEnemy(dmg){
-            if(!currentEnemy) return false;
-            currentEnemy.hp = Math.max(0, currentEnemy.hp - dmg);
-            return currentEnemy.hp <= 0;
-        },
-        enemyAttackDamage(baseDmg){
-            let raw = Math.floor(baseDmg * (0.8 + Math.random()*0.5));
-            let armor = GameState.armor;
-            let final = Math.max(1, raw - armor);
-            return final;
-        },
-        applyStatus(target, effect){
-            if(effect==="burn") target.burnTurns=3;
-            if(effect==="freeze") target.freezeTurns=1;
-            if(effect==="shock") target.shockTurns=2;
-        }
-    };
+document.getElementById('clear-inv').addEventListener('click', ()=>{
+  if(!confirm('Clear entire inventory?')) return;
+  G.inventory = []; G.equippedAura = null;
+  addLog('Cleared inventory.'); updateUI();
+});
 
-    let currentEnemy = null;
-    let comboCounter = 0;
+document.getElementById('prestige-btn').addEventListener('click', ()=>{
+  if(G.totalRolls < 500){ showToast('Need 500 total rolls to prestige! ('+G.totalRolls+'/500)'); return; }
+  if(!confirm('Prestige? This resets your run for a permanent +0.25x bonus.')) return;
+  G.prestigeBonus += 0.25;
+  G.clickPower=1; G.clickPowerMult=1.0; G.rollCost=100;
+  G.upgrades = {clickPower:0,rollCost:0,energyMult:0,luck:0,autoClick:0};
+  G.inventory=[]; G.equippedAura=null; G.currentRolled=null;
+  G.totalRolls=0; G.manualRolls=0; G.energy=0; G.streak=0; G.pityCounter=0;
+  G.stats.prestigeCount++;
+  if(G.autoClickInterval){ clearInterval(G.autoClickInterval); G.autoClickInterval=null; }
+  addLog('🌀 PRESTIGE! Permanent bonus: '+G.prestigeBonus.toFixed(2)+'x');
+  showToast('🌀 Prestige! Bonus: '+G.prestigeBonus.toFixed(2)+'x');
+  updateUI(); buildShop();
+});
 
-    // UIManager (cached DOM)
-    const DOM = {
-        hudHp: document.getElementById('hudHp'), hudArmor: document.getElementById('hudArmor'), hudPrestige: document.getElementById('hudPrestige'),
-        hudManual: document.getElementById('hudManual'), hudTotal: document.getElementById('hudTotal'),
-        auraName: document.getElementById('auraName'), auraTier: document.getElementById('auraTier'),
-        auraMoves: document.getElementById('auraMoves'), auraPassive: document.getElementById('auraPassive'),
-        resultCard: document.getElementById('resultCard'), equippedDisplay: document.getElementById('equippedDisplay'),
-        invGrid: document.getElementById('inventoryGrid'), combatLog: document.getElementById('combatLog'),
-        abilityDiv: document.getElementById('abilityButtons'), enemyDisplay: document.getElementById('enemyDisplay'),
-        enemyHealthFill: document.getElementById('enemyHealthFill'), globalChat: document.getElementById('globalChat'),
-        evoXP: document.getElementById('evoXP'), autoMsg: document.getElementById('autoMsg'), autoToggle: document.getElementById('autoToggle')
-    };
-
-    function addLog(msg){ let d=DOM.combatLog; let div=document.createElement('div'); div.innerText=msg; d.appendChild(div); d.scrollTop=d.scrollHeight; if(d.children.length>30) d.removeChild(d.firstChild); }
-    function addGlobalMessage(msg,rare=false){ let d=DOM.globalChat; let div=document.createElement('div'); div.innerHTML=rare?`🌍 ${msg}`:`💬 ${msg}`; d.appendChild(div); d.scrollTop=d.scrollHeight; if(d.children.length>40) d.removeChild(d.firstChild); }
-
-    // Update UI from GameState
-    function updateUI(){
-        DOM.hudHp.innerText = GameState.hp;
-        DOM.hudArmor.innerText = GameState.armor;
-        DOM.hudPrestige.innerText = GameState.prestigeBonus.toFixed(1)+"x";
-        DOM.hudManual.innerText = GameState.manualRolls;
-        DOM.hudTotal.innerText = GameState.totalRolls;
-        DOM.evoXP.innerText = GameState.evolutionXP;
-        if(GameState.equippedAura){
-            DOM.equippedDisplay.innerHTML = `<strong>${GameState.equippedAura.name}</strong> [T${GameState.equippedAura.tier}] ${GameState.equippedAura.mult.toFixed(1)}x<br>${GameState.equippedAura.abilities.join(', ')}`;
-            GameState.armor = GameState.equippedAura.tier * 2;
-        } else { DOM.equippedDisplay.innerText="None"; GameState.armor=0; }
-        if(currentEnemy){
-            let percent = (currentEnemy.hp/currentEnemy.maxHp)*100;
-            DOM.enemyHealthFill.style.width = Math.max(0,percent)+"%";
-            DOM.enemyDisplay.innerHTML = `${currentEnemy.name} ${Math.floor(currentEnemy.hp)}/${currentEnemy.maxHp} HP`;
-            if(currentEnemy.burnTurns) DOM.enemyDisplay.innerHTML+=" 🔥";
-            if(currentEnemy.freezeTurns) DOM.enemyDisplay.innerHTML+=" ❄️";
-            if(currentEnemy.shockTurns) DOM.enemyDisplay.innerHTML+=" ⚡";
-        }
-    }
-
-    // Rarity glow apply
-    function applyRarityGlow(element, tier){
-        element.classList.remove('tier-glow-7','tier-glow-8','tier-glow-9','tier-glow-10');
-        if(tier>=7) element.classList.add(`tier-glow-${tier}`);
-    }
-
-    // Roll with pity
-    function rollAura(){
-        let r=Math.random(), acc=0, sel=1;
-        for(let t=1;t<=10;t++){ acc+=RARITY_ODDS[t]; if(r<acc){sel=t;break;} }
-        // soft/hard pity
-        if(GameState.pityCounter>=80 && sel<7){ sel=7; GameState.pityCounter=0; }
-        else if(sel>=7){ GameState.pityCounter=0; GameState.streakLoss=0; }
-        else{ GameState.pityCounter++; GameState.streakLoss++; if(GameState.streakLoss>5){ sel=Math.min(10,sel+1); GameState.streakLoss=0; } }
-        let pool=auraDatabase.filter(a=>a.tier===sel);
-        if(!pool.length) pool=auraDatabase;
-        return structuredClone(pool[Math.floor(Math.random()*pool.length)]);
-    }
-
-    // Cutscene Engine (timeline)
-    async function playCutscene(tier, name){
-        let overlay=document.getElementById('cutsceneOverlay'), textDiv=document.getElementById('cutsceneText');
-        let phases=[];
-        if(tier===8) phases=["🌀 MYTHIC SURGE","💜 PURPLE VORTEX","⚡ COSMIC ENERGY","🌟 MYTHIC REVEAL"];
-        else if(tier===9) phases=["✨ DIVINE JUDGMENT","🌅 HEAVENLY LIGHT","⏳ MOMENT OF TRUTH","💥 DIVINE EXPLOSION"];
-        else phases=["🕳️ COLLAPSE","💔 REALITY FRACTURE","🌀 GLITCH OVERDRIVE","🌌 WORLD BREAK","⚫ TRANSCENDENT"];
-        overlay.classList.add('cutscene-active');
-        AudioSystem.playCutsceneTier(tier);
-        for(let phrase of phases){
-            textDiv.innerText=phrase;
-            await new Promise(r=>setTimeout(r,900));
-            if(tier===10) document.body.classList.add('screen-shake');
-        }
-        overlay.classList.remove('cutscene-active');
-        document.body.classList.remove('screen-shake');
-        addGlobalMessage(`✨ ${name} (Tier ${tier}) appeared! ✨`,true);
-        AudioSystem.playRoll(tier);
-    }
-
-    async function performRoll(isManual=true){
-        let aura=rollAura();
-        GameState.currentRolled=aura;
-        GameState.totalRolls++;
-        if(isManual) GameState.manualRolls++;
-        updateUI();
-        DOM.auraName.innerText=aura.name;
-        DOM.auraTier.innerText=`Tier ${aura.tier}`;
-        DOM.auraMoves.innerText=`Moves: ${aura.abilities.join(', ')}`;
-        DOM.auraPassive.innerText=`Passive: ${aura.passive||'None'}`;
-        applyRarityGlow(DOM.resultCard, aura.tier);
-        if(aura.tier>=7) await playCutscene(aura.tier, aura.name);
-        if(!GameState.autoUnlocked && GameState.manualRolls>=100){
-            GameState.autoUnlocked=true;
-            DOM.autoToggle.disabled=false;
-            addGlobalMessage("Auto-Roll unlocked!");
-        }
-        SaveSystem.save();
-    }
-
-    // Inventory render with sorting/filter
-    let currentSort="none", currentFilter="all";
-    function renderInventory(){
-        let filtered = [...GameState.inventory];
-        if(currentFilter!=="all") filtered = filtered.filter(a=>a.tier==parseInt(currentFilter));
-        if(currentSort==="tier") filtered.sort((a,b)=>b.tier-a.tier);
-        DOM.invGrid.innerHTML='';
-        if(!filtered.length){ DOM.invGrid.innerHTML='<div>🌀 No auras</div>'; return; }
-        filtered.forEach((a,i)=>{
-            let idx=GameState.inventory.findIndex(orig=>orig.id===a.id);
-            let div=document.createElement('div'); div.className='inv-card';
-            if(GameState.equippedAura && GameState.equippedAura.id===a.id) div.classList.add('equipped');
-            div.innerHTML=`<strong>${a.name}</strong><br>T${a.tier}<br><button class="game-btn eqInv" data-idx="${idx}">Equip</button><button class="game-btn remInv" data-idx="${idx}">🗑️</button>`;
-            DOM.invGrid.appendChild(div);
-        });
-        document.querySelectorAll('.eqInv').forEach(btn=>btn.addEventListener('click',(e)=>{ let idx=parseInt(btn.dataset.idx); if(GameState.inventory[idx]) equipAura(structuredClone(GameState.inventory[idx])); }));
-        document.querySelectorAll('.remInv').forEach(btn=>btn.addEventListener('click',(e)=>{ let idx=parseInt(btn.dataset.idx); if(GameState.inventory[idx]){ if(GameState.equippedAura?.id===GameState.inventory[idx].id) GameState.equippedAura=null; GameState.inventory.splice(idx,1); renderInventory(); updateUI(); SaveSystem.save(); if(GameState.autoActive && GameState.inventory.length>=30) stopAutoFull(); } }));
-    }
-    function equipAura(aura){ GameState.equippedAura=structuredClone(aura); GameState.abilityCD.clear(); comboCounter=0; updateUI(); renderInventory(); updateAbilityButtons(); addLog(`⚡ Equipped ${aura.name}`); SaveSystem.save(); }
-    function addCurrent(){ if(GameState.currentRolled && GameState.inventory.length<30){ GameState.inventory.push(structuredClone(GameState.currentRolled)); renderInventory(); SaveSystem.save(); } else addGlobalMessage("Inventory full!"); }
-    function equipBest(){ if(!GameState.inventory.length) return; let best=GameState.inventory.reduce((a,b)=>a.tier>b.tier?a:b); equipAura(structuredClone(best)); }
-    function fusion(){ let sameTier={}; for(let a of GameState.inventory){ sameTier[a.tier]=sameTier[a.tier]||[]; sameTier[a.tier].push(a); } for(let t=10;t>=1;t--){ if(sameTier[t] && sameTier[t].length>=2){ let idx1=GameState.inventory.findIndex(a=>a.id===sameTier[t][0].id); let idx2=GameState.inventory.findIndex(a=>a.id===sameTier[t][1].id); if(idx1!==-1 && idx2!==-1){ let newTier=Math.min(10,t+1); let pool=auraDatabase.filter(a=>a.tier===newTier); let fused=structuredClone(pool[Math.floor(Math.random()*pool.length)]); GameState.inventory.splice(Math.max(idx1,idx2),1); GameState.inventory.splice(Math.min(idx1,idx2),1); GameState.inventory.push(fused); renderInventory(); addGlobalMessage(`Fusion: ${fused.name} created!`); SaveSystem.save(); return; } } } addGlobalMessage("Need 2 same-tier auras to fuse!"); }
-    function prestige(){ if(GameState.manualRolls<200){ addGlobalMessage("Need 200 manual rolls to prestige."); return; } GameState.prestigeBonus+=0.1; GameState.manualRolls=0; GameState.totalRolls=0; GameState.inventory=[]; GameState.equippedAura=null; GameState.autoUnlocked=false; GameState.autoActive=false; if(GameState.autoInterval) clearInterval(GameState.autoInterval); updateUI(); renderInventory(); addGlobalMessage(`🌀 Prestige! Permanent damage bonus: ${GameState.prestigeBonus.toFixed(1)}x`); SaveSystem.save(); }
-
-    // Ability buttons with timestamp cooldowns
-    function updateAbilityButtons(){
-        DOM.abilityDiv.innerHTML='';
-        if(!GameState.equippedAura) return;
-        let now=Date.now();
-        for(let ab of GameState.equippedAura.abilities){
-            let btn=document.createElement('button'); btn.className='game-btn'; btn.innerText=ab;
-            let end=GameState.abilityCD.get(ab)||0;
-            if(now<end){ btn.disabled=true; btn.innerText+=` (${((end-now)/1000).toFixed(1)}s)`; }
-            btn.onclick=()=>useAbility(ab);
-            DOM.abilityDiv.appendChild(btn);
-        }
-    }
-    function startCooldown(abName, seconds){ GameState.abilityCD.set(abName, Date.now()+seconds*1000); updateAbilityButtons(); setTimeout(()=>updateAbilityButtons(), seconds*1000); }
-    async function useAbility(abName){
-        if(!GameState.equippedAura) return;
-        if(!currentEnemy || currentEnemy.hp<=0){ addLog("No enemy alive."); return; }
-        let now=Date.now();
-        if(GameState.abilityCD.get(abName) > now){ addLog(`${abName} on cooldown`); return; }
-        let ab=ABILITY_POOL[abName];
-        if(!ab) return;
-        if(currentEnemy.freezeTurns>0){ addLog("Enemy frozen!"); currentEnemy.freezeTurns--; return; }
-        let {dmg, crit}=CombatSystem.calculateDamage(ab.base, GameState.equippedAura.mult, 0.1+GameState.equippedAura.tier*0.01);
-        if(ab.effect==="heal"){ GameState.hp=Math.min(GameState.maxHp, GameState.hp+30); AudioSystem.playHeal(); addLog(`💚 Healed 30 HP`); updateUI(); }
-        else{
-            let shockMult = currentEnemy.shockTurns>0 ? 1.3 : 1;
-            dmg = Math.floor(dmg * shockMult);
-            currentEnemy.hp = Math.max(0, currentEnemy.hp - dmg);
-            addLog(`${abName} deals ${dmg} damage${crit?" CRIT!":""}${shockMult>1?" (shock amp)":""}`);
-            AudioSystem.playHit(crit);
-            if(ab.effect && ab.effect!=="heal") CombatSystem.applyStatus(currentEnemy, ab.effect);
-            if(currentEnemy.hp<=0) addLog(`🏆 Victory!`);
-            comboCounter++;
-            if(comboCounter>=3){ let bonus=Math.floor(dmg*0.2); currentEnemy.hp=Math.max(0,currentEnemy.hp-bonus); addLog(`🔥 ${comboCounter} combo! +${bonus} bonus!`); comboCounter=0; }
-        }
-        startCooldown(abName, ab.cd);
-        updateUI();
-        if(currentEnemy.hp>0) setTimeout(()=>enemyTurn(), 400);
-    }
-    function enemyTurn(){
-        if(!currentEnemy || currentEnemy.hp<=0) return;
-        if(currentEnemy.freezeTurns>0){ addLog("Enemy frozen, skips turn"); currentEnemy.freezeTurns--; updateUI(); return; }
-        let dmg = CombatSystem.enemyAttackDamage(currentEnemy.baseDmg);
-        GameState.hp = Math.max(0, GameState.hp - dmg);
-        addLog(`🤖 ${currentEnemy.name} attacks for ${dmg} damage!`);
-        if(currentEnemy.burnTurns>0){ let burnDmg=Math.floor(currentEnemy.maxHp*0.03); currentEnemy.hp=Math.max(0,currentEnemy.hp-burnDmg); addLog(`🔥 Burn deals ${burnDmg} damage!`); currentEnemy.burnTurns--; }
-        if(currentEnemy.shockTurns>0) currentEnemy.shockTurns--;
-        updateUI();
-        if(GameState.hp<=0){ addLog("💀 You died! Revived with 50% HP."); GameState.hp=Math.floor(GameState.maxHp*0.5); updateUI(); }
-        if(currentEnemy.hp<=0) addLog(`Enemy defeated.`);
-    }
-    function spawnEnemy(hp,dmg,name){ currentEnemy={hp,maxHp:hp,hp: hp, name, baseDmg:dmg, burnTurns:0, freezeTurns:0, shockTurns:0}; updateUI(); addLog(`⚔️ ${name} appears!`); }
-    function dodge(){ let now=Date.now(); if(GameState.playerDodgeEnd>now){ addLog("Dodge on cooldown"); return; } GameState.playerDodgeEnd=now+2000; addLog("💨 Next enemy attack dodged!"); let original=enemyTurn; window.enemyTurnWrapper=function(){ if(Date.now()<GameState.playerDodgeEnd){ addLog("Dodged!"); GameState.playerDodgeEnd=0; enemyTurn=original; return; } original(); }; enemyTurn=window.enemyTurnWrapper; setTimeout(()=>{ if(enemyTurn===window.enemyTurnWrapper) enemyTurn=original; },2000); }
-
-    // Auto-roll
-    function startAuto(){ if(GameState.autoInterval) clearInterval(GameState.autoInterval); GameState.autoInterval=setInterval(async()=>{ if(!GameState.autoActive || GameState.inventory.length>=30) return; let aura=rollAura(); GameState.currentRolled=aura; GameState.totalRolls++; updateUI(); DOM.auraName.innerText=aura.name; DOM.auraTier.innerText=`Tier ${aura.tier}`; DOM.auraMoves.innerText=`Moves: ${aura.abilities.join(', ')}`; DOM.auraPassive.innerText=`Passive: ${aura.passive||'None'}`; applyRarityGlow(DOM.resultCard, aura.tier); if(aura.tier>=7) await playCutscene(aura.tier, aura.name); if(GameState.inventory.length<30) GameState.inventory.push(structuredClone(aura)); renderInventory(); SaveSystem.save(); },1600); }
-    function stopAutoFull(){ if(GameState.autoActive){ GameState.autoActive=false; DOM.autoToggle.checked=false; if(GameState.autoInterval) clearInterval(GameState.autoInterval); addGlobalMessage("Auto stopped: inventory full"); } }
-    function toggleAuto(e){ if(!GameState.autoUnlocked){ DOM.autoToggle.checked=false; return; } if(e.target.checked){ if(GameState.inventory.length>=30){ alert("Inventory full"); DOM.autoToggle.checked=false; return; } GameState.autoActive=true; startAuto(); DOM.autoMsg.innerText="🌀 AUTO"; }else{ GameState.autoActive=false; if(GameState.autoInterval) clearInterval(GameState.autoInterval); DOM.autoMsg.innerText=""; } }
-
-    // Daily reward & leaderboard
-    function dailyReward(){ let now=Math.floor(Date.now()/86400000); if(GameState.lastDaily===now){ addGlobalMessage("Already claimed today!"); return; } GameState.lastDaily=now; let reward=Math.floor(Math.random()*50)+20; GameState.hp=Math.min(GameState.maxHp, GameState.hp+reward); updateUI(); addGlobalMessage(`🎁 Daily reward: +${reward} HP!`); SaveSystem.save(); }
-    function updateLeaderboard(){ let score=GameState.totalRolls; let entry={name:"Player",score}; let lb=JSON.parse(localStorage.getItem("auraLeaderboard")||"[]"); lb.unshift(entry); lb=lb.slice(0,10); localStorage.setItem("auraLeaderboard",JSON.stringify(lb)); addGlobalMessage("🏆 Leaderboard updated!"); }
-
-    // Save/Load
-    const SaveSystem = {
-        save(){
-            let data={ inventoryIds:GameState.inventory.map(a=>a.id), equippedId:GameState.equippedAura?.id, manualRolls:GameState.manualRolls, totalRolls:GameState.totalRolls, autoUnlocked:GameState.autoUnlocked, pityCounter:GameState.pityCounter, prestigeBonus:GameState.prestigeBonus, evolutionXP:GameState.evolutionXP, lastDaily:GameState.lastDaily, hp:GameState.hp };
-            localStorage.setItem("AuraRngSave",JSON.stringify(data));
-        },
-        load(){
-            let raw=localStorage.getItem("AuraRngSave"); if(!raw) return;
-            try{ let d=JSON.parse(raw);
-                GameState.manualRolls=d.manualRolls||0; GameState.totalRolls=d.totalRolls||0; GameState.autoUnlocked=d.autoUnlocked||false; GameState.pityCounter=d.pityCounter||0; GameState.prestigeBonus=d.prestigeBonus||1; GameState.evolutionXP=d.evolutionXP||0; GameState.lastDaily=d.lastDaily||0; GameState.hp=d.hp||100;
-                if(d.inventoryIds){ GameState.inventory=[]; for(let id of d.inventoryIds){ let f=auraDatabase.find(a=>a.id===id); if(f) GameState.inventory.push(structuredClone(f)); } }
-                if(d.equippedId){ let e=auraDatabase.find(a=>a.id===d.equippedId); if(e) GameState.equippedAura=structuredClone(e); }
-                renderInventory(); updateUI(); if(GameState.autoUnlocked) DOM.autoToggle.disabled=false;
-            }catch(e){}
-        }
-    };
-
-    // Event binding
-    document.getElementById('rollBtn').onclick=()=>performRoll(true);
-    document.getElementById('addBtn').onclick=addCurrent;
-    document.getElementById('equipCurrentBtn').onclick=()=>{ if(GameState.currentRolled) equipAura(structuredClone(GameState.currentRolled)); };
-    document.getElementById('clearInvBtn').onclick=()=>{ GameState.inventory=[]; GameState.equippedAura=null; renderInventory(); updateUI(); SaveSystem.save(); };
-    document.getElementById('equipBestBtn').onclick=equipBest;
-    document.getElementById('fusionBtn').onclick=fusion;
-    document.getElementById('prestigeBtn').onclick=prestige;
-    DOM.autoToggle.onchange=toggleAuto;
-    document.getElementById('muteToggle').onchange=e=>{ GameState.soundMuted=e.target.checked; if(GameState.audioCtx && !GameState.soundMuted) GameState.audioCtx.resume(); };
-    document.getElementById('dodgeBtn').onclick=dodge;
-    document.getElementById('easyBtn').onclick=()=>spawnEnemy(200,18,"Easy Grunt");
-    document.getElementById('mediumBtn').onclick=()=>spawnEnemy(400,28,"Medium Warrior");
-    document.getElementById('hardBtn').onclick=()=>spawnEnemy(650,40,"Hard Berserker");
-    document.getElementById('bossBtn').onclick=()=>spawnEnemy(1200,55,"Boss Titan");
-    document.getElementById('dailyRewardBtn').onclick=dailyReward;
-    document.getElementById('leaderboardBtn').onclick=updateLeaderboard;
-    document.getElementById('sortTierBtn').onclick=()=>{ currentSort="tier"; renderInventory(); };
-    document.getElementById('filterTierSelect').onchange=e=>{ currentFilter=e.target.value; renderInventory(); };
-
-    SaveSystem.load();
-    spawnEnemy(200,18,"Easy Grunt");
-    updateAbilityButtons();
-    addGlobalMessage("💎 AURA.RNG AAA EDITION ready! Roll the diamond! 🌌");
-    setInterval(()=>updateAbilityButtons(), 500);
+// ═══════════════════════════════════════════════
+// BOOT
+// ═══════════════════════════════════════════════
+initFX();
+initBG();
+requestAnimationFrame(renderFX);
+buildShop();
+updateUI();
+addLog('💎 Welcome to Aura Clicker RNG!');
+addLog('Click the orb to build energy, then roll!');
+addLog('Equip auras to see live screen effects.');
 </script>
 </body>
 </html>
