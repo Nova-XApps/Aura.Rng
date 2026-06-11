@@ -1,102 +1,97 @@
-<!DOCTYPE html>
+.<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>AURA CLICKER RNG V4 — EXPANDED UNIVERSE</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;user-select:none;}
+*{box-sizing:border-box;margin:0;padding:0;user-select:none;-webkit-tap-highlight-color:transparent;}
 :root{
   --gold:#f5c842;--purple:#9b6eff;--cyan:#00e5ff;--pink:#ff6fd8;--red:#ff4444;
   --bg:#0a0a12;--bg2:#111120;--bg3:#181830;--border:#2a2a4a;
   --text:#e8e8ff;--muted:#7070a0;
 }
-html,body{min-height:100vh;background:var(--bg);}
-body{font-family:'Inter',sans-serif;color:var(--text);padding:10px;position:relative;overflow-x:hidden;}
+html,body{min-height:100vh;background:var(--bg);overflow-x:hidden;}
+body{font-family:'Inter',sans-serif;color:var(--text);padding:8px;position:relative;}
 
 #fx-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;}
 #bg-canvas{position:fixed;inset:0;pointer-events:none;z-index:0;}
-#game{position:relative;z-index:1;max-width:1400px;margin:0 auto;}
+#game{position:relative;z-index:1;max-width:100%;margin:0 auto;}
 
-#topbar{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;background:rgba(0,0,0,0.7);border:1px solid var(--border);border-radius:14px;padding:10px 14px;align-items:center;backdrop-filter:blur(8px);}
-.stat-pill{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:500;white-space:nowrap;}
+#topbar{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;background:rgba(0,0,0,0.75);border:1px solid var(--border);border-radius:12px;padding:8px 10px;align-items:center;backdrop-filter:blur(8px);font-size:10px;}
+.stat-pill{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:16px;padding:3px 10px;font-size:10px;font-weight:500;white-space:nowrap;}
 .stat-pill span{color:var(--gold);}
-#title-badge{font-family:'Cinzel',serif;font-size:18px;font-weight:700;background:linear-gradient(90deg,var(--gold),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;margin-left:auto;}
+#title-badge{font-family:'Cinzel',serif;font-size:14px;font-weight:700;background:linear-gradient(90deg,var(--gold),var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent;margin-left:auto;}
 
-#main{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
-@media(max-width:1200px){#main{grid-template-columns:1fr 1fr 1fr;}}
-@media(max-width:800px){#main{grid-template-columns:1fr 1fr;}}
-@media(max-width:550px){#main{grid-template-columns:1fr;}}
+#main{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+@media(min-width:900px){#main{grid-template-columns:repeat(3,1fr);}}
+@media(min-width:1200px){#main{grid-template-columns:repeat(4,1fr);}}
 
-.panel{background:rgba(17,17,32,0.92);border:1px solid var(--border);border-radius:18px;padding:14px;position:relative;overflow:hidden;backdrop-filter:blur(6px);}
-.panel:hover{border-color:#3a3a6a;}
-.panel-title{font-size:11px;font-weight:700;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;border-left:3px solid var(--purple);padding-left:8px;}
+.panel{background:rgba(17,17,32,0.92);border:1px solid var(--border);border-radius:14px;padding:10px;position:relative;overflow:hidden;backdrop-filter:blur(6px);min-height:0;}
+.panel-title{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;border-left:3px solid var(--purple);padding-left:6px;}
 
-#big-orb{width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#c084fc,#6d28d9,#1e1040);border:3px solid var(--purple);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:38px;transition:transform 0.08s;box-shadow:0 0 35px #6d28d960,inset 0 0 20px rgba(255,255,255,0.1);position:relative;margin:0 auto;}
-#big-orb:hover{filter:brightness(1.15);}
-#big-orb:active{transform:scale(0.91);}
-#orb-ring{position:absolute;inset:-8px;border-radius:50%;border:2px solid transparent;border-top-color:var(--cyan);border-right-color:rgba(0,229,255,0.3);animation:spin 3s linear infinite;}
-#orb-ring2{position:absolute;inset:-14px;border-radius:50%;border:1px solid transparent;border-bottom-color:var(--pink);border-left-color:rgba(255,111,216,0.3);animation:spin 5s linear infinite reverse;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
-#aura-energy-bar{width:100%;height:10px;background:#0d0d1a;border-radius:5px;overflow:hidden;border:1px solid var(--border);margin:8px 0;}
-#aura-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:5px;transition:width 0.12s;width:0%;}
-#energy-label{display:flex;justify-content:space-between;margin-top:2px;font-size:10px;color:var(--muted);}
-
-#roll-btn{background:linear-gradient(135deg,#6d28d9,#9b6eff);border:none;color:#fff;font-weight:700;padding:10px 28px;border-radius:22px;cursor:pointer;font-size:14px;letter-spacing:1.5px;transition:0.12s;box-shadow:0 4px 18px #6d28d966;font-family:'Inter',sans-serif;width:100%;margin:6px 0;}
-#roll-btn:hover:not(:disabled){transform:scale(1.03);box-shadow:0 6px 25px #9b6effaa;}
-#roll-btn:active:not(:disabled){transform:scale(0.95);}
-#roll-btn:disabled{opacity:0.4;cursor:not-allowed;}
-
-.mbtn{background:rgba(109,40,217,0.15);border:1px solid #6d28d9;color:#c4b5fd;font-size:10px;padding:5px 10px;border-radius:16px;cursor:pointer;transition:0.12s;font-family:'Inter',sans-serif;}
-.mbtn:hover:not(:disabled){background:rgba(109,40,217,0.3);border-color:var(--purple);}
-.mbtn:active{transform:scale(0.96);}
-.mbtn:disabled{opacity:0.4;cursor:not-allowed;}
+button{touch-action:manipulation;}
+.mbtn{background:rgba(109,40,217,0.15);border:1px solid #6d28d9;color:#c4b5fd;font-size:10px;padding:6px 10px;border-radius:14px;cursor:pointer;transition:0.12s;font-family:'Inter',sans-serif;white-space:nowrap;}
+.mbtn:active{transform:scale(0.95);background:rgba(109,40,217,0.35);}
 .mbtn.danger{border-color:#7f1d1d;color:#fca5a5;background:rgba(255,50,50,0.08);}
 .mbtn.gold{border-color:#92400e;color:var(--gold);background:rgba(245,200,66,0.08);}
+.mbtn.active{background:rgba(0,229,255,0.2);border-color:var(--cyan);color:var(--cyan);}
 
-#inv-scroll{max-height:180px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:4px;margin:6px 0;}
-#inv-scroll::-webkit-scrollbar{width:4px;}
+#big-orb{width:90px;height:90px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#c084fc,#6d28d9,#1e1040);border:3px solid var(--purple);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:32px;transition:transform 0.08s;box-shadow:0 0 30px #6d28d960,inset 0 0 15px rgba(255,255,255,0.1);position:relative;margin:0 auto;touch-action:manipulation;}
+#big-orb:active{transform:scale(0.9);}
+#orb-ring{position:absolute;inset:-6px;border-radius:50%;border:2px solid transparent;border-top-color:var(--cyan);animation:spin 3s linear infinite;}
+#orb-ring2{position:absolute;inset:-12px;border-radius:50%;border:1px solid transparent;border-bottom-color:var(--pink);animation:spin 5s linear infinite reverse;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+#aura-energy-bar{width:100%;height:8px;background:#0d0d1a;border-radius:4px;overflow:hidden;border:1px solid var(--border);margin:6px 0;}
+#aura-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));border-radius:4px;transition:width 0.12s;width:0%;}
+#energy-label{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);}
+
+#roll-btn{background:linear-gradient(135deg,#6d28d9,#9b6eff);border:none;color:#fff;font-weight:700;padding:8px 20px;border-radius:18px;cursor:pointer;font-size:13px;letter-spacing:1px;transition:0.12s;box-shadow:0 4px 15px #6d28d966;font-family:'Inter',sans-serif;width:100%;margin:4px 0;}
+#roll-btn:active:not(:disabled){transform:scale(0.95);}
+#roll-btn:disabled{opacity:0.3;cursor:not-allowed;}
+
+#inv-scroll{max-height:150px;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr;gap:3px;margin:4px 0;}
+#inv-scroll::-webkit-scrollbar{width:3px;}
 #inv-scroll::-webkit-scrollbar-thumb{background:var(--purple);border-radius:2px;}
-.inv-item{background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:8px;padding:6px;cursor:pointer;transition:0.12s;font-size:10px;display:flex;justify-content:space-between;align-items:center;}
-.inv-item:hover{border-color:var(--purple);background:rgba(155,110,255,0.12);}
+.inv-item{background:rgba(0,0,0,0.5);border:1px solid var(--border);border-radius:8px;padding:5px;cursor:pointer;font-size:9px;display:flex;justify-content:space-between;align-items:center;transition:0.1s;}
+.inv-item:active{background:rgba(155,110,255,0.2);}
 .inv-item.equipped{border-color:var(--gold);background:rgba(245,200,66,0.1);}
-.inv-item.selected{border-color:var(--cyan);background:rgba(0,229,255,0.1);}
+.inv-item.selected{border-color:var(--cyan);background:rgba(0,229,255,0.15);}
 
-#log-box{background:rgba(0,0,0,0.4);border-radius:10px;padding:8px;height:100px;overflow-y:auto;font-size:9px;color:var(--muted);margin-top:6px;border:1px solid var(--border);}
-#log-box::-webkit-scrollbar{width:3px;}
-#log-box::-webkit-scrollbar-thumb{background:#333;}
+#log-box{background:rgba(0,0,0,0.4);border-radius:8px;padding:6px;height:80px;overflow-y:auto;font-size:9px;color:var(--muted);margin-top:4px;border:1px solid var(--border);}
 
-#result-panel{background:rgba(0,0,0,0.5);border-radius:12px;padding:10px;border-left:4px solid var(--purple);margin-top:4px;font-size:11px;}
-#sacrifice-panel{background:rgba(0,0,0,0.5);border-radius:12px;padding:10px;margin-top:8px;border:1px solid #7f1d1d;}
-#boss-panel{background:rgba(0,0,0,0.5);border-radius:12px;padding:10px;margin-top:8px;}
+.click-particle{position:fixed;pointer-events:none;z-index:9999;font-size:12px;font-weight:700;animation:floatUp 0.8s ease-out forwards;}
+@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-50px) scale(0.5);}}
 
-.click-particle{position:fixed;pointer-events:none;z-index:9999;font-size:13px;font-weight:700;animation:floatUp 0.9s ease-out forwards;}
-@keyframes floatUp{0%{opacity:1;transform:translateY(0) scale(1);}100%{opacity:0;transform:translateY(-60px) scale(0.5);}}
-
-#cutscene{position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:10000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;}
+#cutscene{position:fixed;inset:0;background:rgba(0,0,0,0.97);z-index:10000;display:none;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
 #cutscene.show{display:flex;}
-#cs-phase{font-family:'Cinzel',serif;font-size:28px;font-weight:700;text-align:center;letter-spacing:4px;text-transform:uppercase;max-width:80%;}
-#cs-name{font-size:14px;color:var(--muted);letter-spacing:2px;}
-#cs-bar{width:320px;height:4px;background:#222;border-radius:2px;overflow:hidden;}
+#cs-phase{font-family:'Cinzel',serif;font-size:22px;font-weight:700;text-align:center;letter-spacing:3px;text-transform:uppercase;max-width:90%;}
+#cs-name{font-size:12px;color:var(--muted);letter-spacing:1px;}
+#cs-bar{width:250px;height:3px;background:#222;border-radius:2px;overflow:hidden;}
 #cs-bar-fill{height:100%;background:linear-gradient(90deg,var(--purple),var(--cyan));width:0%;transition:width 0.7s;}
-#cs-glitch-text{display:none;font-family:monospace;font-size:14px;color:var(--red);text-align:center;max-width:80%;}
-#cs-error{display:none;position:absolute;top:10%;left:5%;font-family:monospace;font-size:12px;color:#ff0000;background:rgba(0,0,0,0.8);padding:8px;border:1px solid red;z-index:10001;}
 
 @keyframes shake{0%{transform:translate(2px,1px);}25%{transform:translate(-2px,-1px);}50%{transform:translate(1px,2px);}75%{transform:translate(-1px,-2px);}100%{transform:translate(0,0);}}
-.shaking{animation:shake 0.07s infinite;}
-@keyframes glitch{0%,100%{transform:none;opacity:1;}20%{transform:translate(-3px,1px)skewX(2deg);opacity:0.9;}40%{transform:translate(3px,-1px)skewX(-2deg);opacity:1;}60%{transform:translate(-2px,2px);opacity:0.85;}80%{transform:translate(2px,-2px)skewX(1deg);opacity:1;}}
-.glitching{animation:glitch 0.15s infinite;}
-.glitch-overlay{position:fixed;inset:0;pointer-events:none;z-index:9998;background:rgba(255,0,0,0.02);mix-blend-mode:overlay;}
+.shaking{animation:shake 0.08s infinite;}
+@keyframes glitch{0%,100%{transform:none;}20%{transform:translate(-3px,1px)skewX(2deg);}40%{transform:translate(3px,-1px)skewX(-2deg);}60%{transform:translate(-2px,2px);}80%{transform:translate(2px,-2px)skewX(1deg);}}
+.glitching{animation:glitch 0.12s infinite;}
+.glitch-overlay{position:fixed;inset:0;pointer-events:none;z-index:9998;mix-blend-mode:overlay;display:none;}
+
+#leaderboard-panel{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(10,10,30,0.98);border:2px solid var(--purple);border-radius:16px;padding:16px;z-index:5000;min-width:280px;max-height:70vh;overflow-y:auto;display:none;}
+#leaderboard-panel.show{display:block;}
+.ld-entry{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);font-size:11px;}
+
+select{background:#111;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px;font-size:10px;width:100%;margin:2px 0;}
+select option{background:#111;color:var(--text);}
 </style>
 </head>
 <body>
 <canvas id="bg-canvas"></canvas>
 <canvas id="fx-canvas"></canvas>
-<div id="glitch-overlay" class="glitch-overlay" style="display:none;"></div>
-<div id="toast" style="position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(20,20,40,0.95);border:1px solid var(--purple);border-radius:12px;padding:10px 24px;font-size:13px;color:var(--text);z-index:9000;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none;"></div>
+<div class="glitch-overlay" id="glitch-overlay"></div>
+<div id="toast" style="position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(20,20,40,0.95);border:1px solid var(--purple);border-radius:10px;padding:8px 20px;font-size:12px;color:var(--text);z-index:9000;opacity:0;transition:opacity 0.3s,transform 0.3s;pointer-events:none;"></div>
 
 <div id="game">
   <div id="topbar">
@@ -104,90 +99,83 @@ body{font-family:'Inter',sans-serif;color:var(--text);padding:10px;position:rela
     <div class="stat-pill">🎲 <span id="hud-rolls">0</span></div>
     <div class="stat-pill">🌀 <span id="hud-prestige">1.00x</span></div>
     <div class="stat-pill">🩸 <span id="hud-sac">0</span></div>
-    <div class="stat-pill">🍀 <span id="hud-luck">0%</span></div>
     <div class="stat-pill">🐾 <span id="hud-pet">None</span></div>
-    <div class="stat-pill">🗺️ <span id="hud-biome">Plains</span></div>
-    <div id="title-badge">✦ AURA CLICKER RNG ✦</div>
+    <button class="mbtn gold" onclick="saveGame()" style="font-size:9px;padding:3px 8px;">💾</button>
+    <button class="mbtn" onclick="showLeaderboard()" style="font-size:9px;padding:3px 8px;">🏆</button>
+    <div id="title-badge">✦ AURA CLICKER ✦</div>
   </div>
 
   <div id="main">
-    <!-- PANEL 1: CLICKER + RESULT -->
+    <!-- PANEL 1: CLICKER -->
     <div class="panel">
       <div class="panel-title">✦ Aura Orb</div>
       <div style="text-align:center;">
         <div id="big-orb"><div id="orb-ring"></div><div id="orb-ring2"></div><span id="orb-emoji">🔮</span></div>
-        <div id="click-counter" style="font-size:22px;font-weight:700;color:var(--gold);margin:4px 0;">0</div>
-        <div id="click-rate" style="font-size:10px;color:var(--muted);">+1 / click</div>
+        <div id="click-counter" style="font-size:18px;font-weight:700;color:var(--gold);margin:2px 0;">0</div>
+        <div id="click-rate" style="font-size:9px;color:var(--muted);">+1 / tap</div>
         <div id="aura-energy-bar"><div id="aura-fill"></div></div>
-        <div id="energy-label"><span>Energy</span><span id="energy-val">0 / 100</span></div>
+        <div id="energy-label"><span>Energy</span><span id="energy-val">0/100</span></div>
         <button id="roll-btn">⚡ ROLL AURA</button>
-        <div style="font-size:10px;color:var(--muted);">Cost: <span id="cost-val">100</span> | Pity: <span id="pity-val">0</span>/<span id="pity-thresh">60</span></div>
-        <div id="result-panel">
-          <div style="color:var(--muted);text-align:center;">— Roll to begin —</div>
-        </div>
+        <div style="font-size:9px;color:var(--muted);text-align:center;">Cost: <span id="cost-val">100</span> | Pity: <span id="pity-val">0</span></div>
+        <div id="result-panel" style="margin-top:6px;font-size:10px;text-align:center;color:var(--muted);">— Tap orb to begin —</div>
       </div>
     </div>
 
     <!-- PANEL 2: INVENTORY + EQUIPPED -->
     <div class="panel">
-      <div class="panel-title">⚡ Equipped Aura</div>
-      <div id="equipped-box" style="background:rgba(0,0,0,0.5);border-radius:12px;padding:10px;margin-bottom:8px;">
-        <div id="eq-name" style="font-weight:700;">None</div>
-        <div id="eq-effect" style="font-size:10px;color:var(--muted);">No effect</div>
-        <div id="eq-abilities" style="font-size:10px;color:#57c8ff;"></div>
+      <div class="panel-title">⚡ Equipped</div>
+      <div id="equipped-box" style="background:rgba(0,0,0,0.5);border-radius:10px;padding:8px;margin-bottom:6px;">
+        <div id="eq-name" style="font-weight:700;font-size:11px;">None</div>
+        <div id="eq-abilities" style="font-size:9px;color:#57c8ff;"></div>
       </div>
-      <div class="panel-title">🎒 Inventory <span id="inv-count">0/20</span></div>
+      <div class="panel-title">🎒 Inventory (<span id="inv-count">0</span>/20)</div>
+      <div style="font-size:8px;color:var(--muted);margin-bottom:4px;">Tap to equip · Shift+Tap for sacrifice</div>
       <div id="inv-scroll"></div>
-      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px;">
-        <button class="mbtn" id="equip-best">🏆 Best</button>
-        <button class="mbtn gold" id="fusion-btn">✨ Fuse</button>
-        <button class="mbtn danger" id="sacrifice-btn">🩸 Sac</button>
-        <button class="mbtn" id="sort-btn">⬇ Sort</button>
+      <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px;">
+        <button class="mbtn" onclick="equipBest()">🏆 Best</button>
+        <button class="mbtn gold" onclick="fuseAuras()">✨ Fuse</button>
+        <button class="mbtn danger" id="sacrifice-btn" onclick="toggleSacMode()">🩸 Sac</button>
+        <button class="mbtn" onclick="sortInventory()">⬇ Sort</button>
+        <button class="mbtn danger" onclick="clearInventory()" style="font-size:9px;">🗑️</button>
       </div>
+      <div style="font-size:8px;color:var(--muted);margin-top:4px;" id="sac-mode-indicator"></div>
       <div id="log-box"></div>
     </div>
 
-    <!-- PANEL 3: SACRIFICE + PETS -->
+    <!-- PANEL 3: PETS + SACRIFICE -->
     <div class="panel">
-      <div class="panel-title">🩸 Sacrifice Altar</div>
-      <div id="sacrifice-panel">
-        <div id="sac-stats" style="font-size:10px;color:var(--muted);">
-          Sacrifices: <span id="sac-count">0</span><br>
-          Luck bonus: <span id="sac-luck">0%</span><br>
-          Pity boost: <span id="sac-pity">0</span><br>
-          Charge: <span id="sac-charge">0</span>/100
-        </div>
-        <div id="sac-bar" style="width:100%;height:6px;background:#0d0d1a;border-radius:3px;overflow:hidden;margin:6px 0;"><div id="sac-fill" style="height:100%;background:linear-gradient(90deg,#7f1d1d,#ff4444);width:0%;transition:width 0.3s;"></div></div>
-        <div style="font-size:10px;color:var(--muted);">Select auras from inventory, then sacrifice:</div>
-        <div id="sac-selected" style="font-size:10px;color:var(--gold);margin:4px 0;">None selected</div>
-        <button class="mbtn danger" id="sac-confirm" disabled>🩸 Sacrifice Selected</button>
+      <div class="panel-title">🐾 Pets</div>
+      <div id="pet-display" style="font-size:11px;font-weight:600;">No pet active</div>
+      <div id="pet-xp" style="font-size:9px;color:var(--muted);">—</div>
+      <select id="pet-select" onchange="switchPet(this.value)"><option value="">— Select pet —</option></select>
+      <div id="pet-bonuses" style="font-size:9px;color:var(--muted);margin-top:4px;"></div>
+      <div class="panel-title" style="margin-top:8px;">🩸 Sacrifice Altar</div>
+      <div id="sac-stats" style="font-size:9px;color:var(--muted);">
+        Sacrifices: <span id="sac-count">0</span><br>
+        Luck: <span id="sac-luck">0%</span> | Pity boost: <span id="sac-pity">0</span><br>
+        Charge: <span id="sac-charge">0</span>/100
       </div>
-      <div class="panel-title" style="margin-top:12px;">🐾 Pets</div>
-      <div id="pet-area" style="font-size:10px;">
-        <div id="pet-display">No pet active</div>
-        <div id="pet-xp" style="color:var(--muted);">—</div>
-        <select id="pet-select" style="background:#111;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:4px;width:100%;margin-top:4px;font-size:10px;"></select>
-      </div>
+      <div style="width:100%;height:5px;background:#0d0d1a;border-radius:3px;overflow:hidden;margin:4px 0;"><div id="sac-fill" style="height:100%;background:#ff4444;width:0%;transition:width 0.3s;"></div></div>
     </div>
 
-    <!-- PANEL 4: BOSSES + BIOMES + SHOP -->
+    <!-- PANEL 4: BOSSES + BIOMES + SHOP + PRESTIGE -->
     <div class="panel">
-      <div class="panel-title">👾 Boss Arena</div>
-      <div id="boss-panel">
-        <div id="boss-fight" style="display:none;">
+      <div class="panel-title">👾 Bosses</div>
+      <div id="boss-area" style="font-size:9px;">
+        <div id="boss-active" style="display:none;">
           <div id="boss-name" style="font-weight:700;color:var(--red);"></div>
-          <div id="boss-hp-bar" style="width:100%;height:8px;background:#0d0d1a;border-radius:4px;overflow:hidden;margin:4px 0;"><div id="boss-hp-fill" style="height:100%;background:var(--red);width:100%;"></div></div>
-          <div id="boss-hp-text" style="font-size:10px;color:var(--muted);"></div>
+          <div style="width:100%;height:6px;background:#0d0d1a;border-radius:3px;overflow:hidden;margin:3px 0;"><div id="boss-hp-fill" style="height:100%;background:var(--red);width:100%;"></div></div>
+          <div id="boss-hp-text" style="color:var(--muted);"></div>
         </div>
-        <div id="boss-list" style="max-height:150px;overflow-y:auto;"></div>
+        <div id="boss-buttons" style="display:flex;flex-wrap:wrap;gap:3px;"></div>
       </div>
-      <div class="panel-title" style="margin-top:10px;">🗺️ Biome</div>
-      <select id="biome-select" style="background:#111;color:var(--text);border:1px solid var(--border);border-radius:6px;padding:5px;width:100%;margin-bottom:10px;font-size:10px;"></select>
-      <div class="panel-title">🛒 Upgrades</div>
-      <div id="shop-list" style="max-height:200px;overflow-y:auto;font-size:10px;"></div>
-      <div style="margin-top:10px;">
-        <button class="mbtn gold" id="prestige-btn" style="width:100%;">🌀 Prestige (500 rolls)</button>
-        <button class="mbtn" id="genesis-btn" style="width:100%;margin-top:4px;display:none;">💠 Genesis (T18+)</button>
+      <div class="panel-title" style="margin-top:8px;">🗺️ Biome</div>
+      <select id="biome-select" onchange="changeBiome(this.value)"></select>
+      <div class="panel-title" style="margin-top:8px;">🛒 Shop</div>
+      <div id="shop-list" style="max-height:150px;overflow-y:auto;font-size:9px;"></div>
+      <div style="margin-top:8px;display:flex;gap:3px;flex-wrap:wrap;">
+        <button class="mbtn gold" onclick="prestige()" style="font-size:9px;">🌀 Prestige</button>
+        <button class="mbtn danger" onclick="genesisReset()" id="genesis-btn" style="display:none;font-size:9px;">💠 Genesis</button>
       </div>
     </div>
   </div>
@@ -197,16 +185,22 @@ body{font-family:'Inter',sans-serif;color:var(--text);padding:10px;position:rela
   <div id="cs-phase"></div>
   <div id="cs-name"></div>
   <div id="cs-bar"><div id="cs-bar-fill"></div></div>
-  <div id="cs-glitch-text"></div>
-  <div id="cs-error">ERROR: REALITY_BUFFER_OVERFLOW<br>STACK TRACE: 0x7FFF_AURA_BREACH<br>UNSTABLE TIER DETECTED<br>SYSTEM INTEGRITY: FAILED</div>
+</div>
+
+<div id="leaderboard-panel">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+    <div class="panel-title" style="margin:0;">🏆 Leaderboard</div>
+    <button class="mbtn danger" onclick="hideLeaderboard()" style="font-size:9px;padding:3px 8px;">✕</button>
+  </div>
+  <div id="ld-content"></div>
 </div>
 
 <script>
 // ═══════════════════════════════════════════
-// FULL GAME STATE
+// COMPLETE GAME STATE
 // ═══════════════════════════════════════════
-const G = {
-  energy: 0, totalRolls: 0, manualRolls: 0, prestigeBonus: 1.0,
+let G = {
+  energy: 0, totalRolls: 0, prestigeBonus: 1.0,
   clickPower: 1, clickPowerMult: 1.0, rollCost: 100,
   inventory: [], equippedAura: null, currentRolled: null,
   pityCounter: 0, pityThreshold: 60, permanentPityFloor: 0,
@@ -218,45 +212,97 @@ const G = {
   autoClickInterval: null,
   offlineTimestamp: Date.now(),
   upgrades: { clickPower:0, rollCost:0, energyMult:0, luck:0, autoClick:0, autoEquip:0, autoRoll:0, autoFusion:0 },
-  stats: { t1:0,t2:0,t3:0,t4:0,t5:0,t6:0,t7:0,t8:0,t9:0,t10:0,t11:0,t12:0,t13:0,t14:0,t15:0,t16:0,t17:0,t18:0,t19:0,t20:0,fusions:0,prestigeCount:0,genesisCount:0 },
-  selectedForSacrifice: [],
-  petXpGain: 0
+  stats: { fusions:0, prestigeCount:0, genesisCount:0, totalSacrifices:0 },
+  sacMode: false,
+  sacSelected: []
 };
 
+// Track tier stats separately
+for(let t=1; t<=20; t++) G.stats['t'+t] = 0;
+
 // ═══════════════════════════════════════════
-// 20-TIER SYSTEM
+// DATA
 // ═══════════════════════════════════════════
 const TIER_NAMES  = ['','Common','Uncommon','Advanced','Rare','Super Rare','Epic','Mythic','Legendary','Ancient','Celestial','Divine','Cosmic','Voidborn','Reality-Breaker','Timeworn','Galaxy Emperor','Infinity','Genesis','Omega','Apex Eternal'];
 const TIER_EMOJIS = ['','⚪','🔵','🟢','🟠','🟣','⭐','💫','🌌','🕳️','💥','✨','🌀','♾️','⚠️','⌛','👑','∞','🔮','💀','🔥'];
 const TIER_COLORS = ['','#aaa','#57c8ff','#7fff5e','#ff9f43','#e040fb','#f5c842','#ff6fd8','#00e5ff','#ff4444','#ff00ff','#9b6eff','#00ffff','#ff88ff','#ff2222','#ffbb00','#ffffff','#7700ff','#ff00dd','#000000','#ff0000'];
 const TIER_ODDS = {1:0.30,2:0.16,3:0.12,4:0.09,5:0.07,6:0.06,7:0.05,8:0.04,9:0.03,10:0.025,11:0.012,12:0.006,13:0.003,14:0.0015,15:0.0008,16:0.0004,17:0.0002,18:0.0001,19:0.00005,20:0.000025};
 
-// ═══════════════════════════════════════════
-// PROCEDURAL AURA GENERATION — 200 AURAS
-// ═══════════════════════════════════════════
 const ARCHETYPES = ['Flame','Frost','Storm','Void','Light','Earth','Time','Cosmic','Glitch','Blood'];
 const MODIFIERS = ['Corrupted','Enhanced','Prime','Fragmented','Eternal','Ascended','Broken','Infinite','Cursed','Blessed'];
 const TITLES = ['Wisp','Shard','Tendril','Halo','Core','Breath','Pulse','Rift','Drift','Surge','Titan','Lord','Wraith','Sovereign','Archon','Phantom','Leviathan','Seraph','Overlord','God'];
 
 const ABILITY_POOL = [
-  { type:'energyBoost', label:'+energy gain', apply:(v)=>{G.clickPowerMult += v/100;} },
-  { type:'clickPower', label:'+click power', apply:(v)=>{G.clickPower += Math.floor(v/3);} },
-  { type:'luckBoost', label:'+luck', apply:(v)=>{G.sacrificeLuck += v/200;} },
-  { type:'rollCostReduction', label:'-roll cost', apply:(v)=>{G.rollCost = Math.max(20,G.rollCost-Math.floor(v/10));} },
-  { type:'bossDamage', label:'+boss dmg', apply:()=>{} },
-  { type:'autoClickSpeed', label:'+auto speed', apply:()=>{if(G.autoClickInterval)setupAutoClick();} },
-  { type:'pityManipulation', label:'+pity', apply:(v)=>{G.pityCounter += Math.floor(v/5);} },
-  { type:'fusionBonus', label:'+fusion luck', apply:()=>{} },
-  { type:'biomeSynergy', label:'+biome power', apply:()=>{} }
+  {type:'energyBoost',label:'+Energy',apply:(v)=>{G.clickPowerMult+=v/150;}},
+  {type:'clickPower',label:'+Click',apply:(v)=>{G.clickPower+=Math.max(1,Math.floor(v/4));}},
+  {type:'luckBoost',label:'+Luck',apply:(v)=>{G.sacrificeLuck+=v/300;}},
+  {type:'rollCostReduction',label:'-Cost',apply:(v)=>{G.rollCost=Math.max(20,G.rollCost-Math.floor(v/12));}},
+  {type:'bossDamage',label:'+Boss',apply:()=>{}},
+  {type:'autoClickSpeed',label:'+Auto',apply:()=>{setupAutoClick();}},
+  {type:'pityManipulation',label:'+Pity',apply:(v)=>{G.pityCounter+=Math.floor(v/6);}},
+  {type:'fusionBonus',label:'+Fusion',apply:()=>{}},
+  {type:'biomeSynergy',label:'+Biome',apply:()=>{}}
 ];
 
+const BIOMES = {
+  plains:{name:'Starter Plains',emoji:'🌱',unlock:()=>true,weights:{},bg:'#0a0a12'},
+  volcano:{name:'Infernal Volcano',emoji:'🔥',unlock:()=>G.totalRolls>=50,weights:{Flame:2.5},bg:'#1a0a00'},
+  frozen:{name:'Frozen Abyss',emoji:'❄️',unlock:()=>G.totalRolls>=120,weights:{Frost:2.5},bg:'#001a2e'},
+  ocean:{name:'Ocean Depths',emoji:'🌊',unlock:()=>G.totalRolls>=200,weights:{Storm:2},bg:'#001a3a'},
+  cosmicvoid:{name:'Cosmic Void',emoji:'🌌',unlock:()=>G.totalRolls>=350,weights:{Void:3,Cosmic:2},bg:'#05001a'},
+  stormrealm:{name:'Storm Realm',emoji:'⚡',unlock:()=>G.totalRolls>=500,weights:{Storm:3},bg:'#1a1a3a'},
+  glitch:{name:'Glitch Dimension',emoji:'🕳️',unlock:()=>G.totalRolls>=800,weights:{Glitch:4},bg:'#000'},
+  galactic:{name:'Galactic Core',emoji:'🪐',unlock:()=>G.prestigeBonus>=1.5,weights:{Cosmic:3,Light:2},bg:'#000020'},
+  infinite:{name:'Infinite Zone',emoji:'♾️',unlock:()=>G.prestigeBonus>=2.5,weights:{Time:3,Void:2,Glitch:1.5},bg:'#100020'}
+};
+
+const BASE_PETS = [
+  {id:'wisp',name:'Energy Wisp',rarity:'Common',emoji:'🔥',effect:{energyBoost:0.1},xpRate:1},
+  {id:'frostpup',name:'Frost Pup',rarity:'Common',emoji:'🐺',effect:{autoClickSpeed:0.05},xpRate:1},
+  {id:'luckycat',name:'Lucky Cat',rarity:'Rare',emoji:'🐱',effect:{luckBoost:0.03},xpRate:1.5},
+  {id:'voidspirit',name:'Void Spirit',rarity:'Rare',emoji:'👻',effect:{pityBoost:2},xpRate:1.5},
+  {id:'dragon',name:'Star Dragon',rarity:'Mythic',emoji:'🐉',effect:{bossDamage:0.15,energyBoost:0.2},xpRate:2},
+  {id:'phoenix',name:'Phoenix',rarity:'Mythic',emoji:'🔥',effect:{fusionBonus:0.1,sacrificeBoost:0.1},xpRate:2},
+  {id:'nullcat',name:'Null Cat',rarity:'Secret',emoji:'😼',effect:{sacrificeBoost:0.25,luckBoost:0.08,duplicateChance:0.05},xpRate:3},
+  {id:'timefox',name:'Time Fox',rarity:'Legendary',emoji:'🦊',effect:{pityBoost:4,autoClickSpeed:0.1},xpRate:2.5}
+];
+
+const BOSS_LIST = [
+  {id:'slime',name:'Slime Core',hp:150,unlock:()=>true,rewards:{energy:80,petChance:0.15}},
+  {id:'shadow',name:'Shadow Wisp',hp:400,unlock:()=>G.defeatedBosses.includes('slime'),rewards:{energy:150,petChance:0.2}},
+  {id:'colossus',name:'Iron Colossus',hp:1000,unlock:()=>G.defeatedBosses.includes('shadow'),rewards:{energy:300,auraTier:5}},
+  {id:'flamebeast',name:'Flame Beast',hp:2000,unlock:()=>G.defeatedBosses.includes('colossus'),rewards:{energy:500,petChance:0.25}},
+  {id:'frosttitan',name:'Frost Titan',hp:4000,unlock:()=>G.defeatedBosses.includes('flamebeast'),rewards:{energy:800,biomeUnlock:'frozen'}},
+  {id:'voidstalker',name:'Void Stalker',hp:8000,unlock:()=>G.defeatedBosses.includes('frosttitan'),rewards:{energy:1500,auraTier:8,dualAbility:true}},
+  {id:'stormlevi',name:'Storm Leviathan',hp:15000,unlock:()=>G.defeatedBosses.includes('voidstalker'),rewards:{energy:3000,petChance:0.3}},
+  {id:'cosmicserp',name:'Cosmic Serpent',hp:30000,unlock:()=>G.defeatedBosses.includes('stormlevi'),rewards:{energy:6000,biomeUnlock:'cosmicvoid'}},
+  {id:'realityphant',name:'Reality Phantom',hp:60000,unlock:()=>G.defeatedBosses.includes('cosmicserp'),rewards:{energy:12000,auraTier:12,dualAbility:true}},
+  {id:'nullking',name:'✦ NULL KING ✦',hp:150000,unlock:()=>G.defeatedBosses.includes('realityphant'),rewards:{energy:40000,secretPet:'nullcat'}}
+];
+
+const UPGRADE_DEFS = [
+  {id:'clickPower',name:'Click Amp',desc:'+2 energy/tap',baseCost:50,max:12},
+  {id:'rollCost',name:'Efficient Roll',desc:'-5 roll cost',baseCost:100,max:8},
+  {id:'energyMult',name:'Energy Surge',desc:'+25% multiplier',baseCost:200,max:6},
+  {id:'luck',name:'Fortune',desc:'+3% luck',baseCost:300,max:5},
+  {id:'autoClick',name:'Auto Tap',desc:'Auto every 1.5s',baseCost:500,max:4},
+  {id:'autoEquip',name:'Auto Equip',desc:'Auto best aura',baseCost:800,max:1},
+  {id:'autoRoll',name:'Auto Roll',desc:'Auto roll',baseCost:1500,max:1},
+  {id:'autoFusion',name:'Auto Fuse',desc:'Auto fuse',baseCost:5000,max:1}
+];
+
+// ═══════════════════════════════════════════
+// AURA GENERATION
+// ═══════════════════════════════════════════
 function generateAuraName(tier, archetype, secondary, modifier) {
-  const titlePool = TITLES.slice(Math.min(tier-1, 14), Math.min(tier+3, 20));
+  const titlePool = TITLES.slice(Math.min(tier-1,14), Math.min(tier+3,20));
   const title = titlePool[Math.floor(Math.random()*titlePool.length)];
-  const pattern = Math.random();
-  if(pattern < 0.4) return `${modifier} ${archetype} ${title}`;
-  if(pattern < 0.7) return `${archetype} ${secondary} ${modifier}`;
-  return `${title} of ${modifier} ${archetype}`;
+  const patterns = [
+    `${modifier} ${archetype} ${title}`,
+    `${archetype} ${secondary} ${modifier}`,
+    `${title} of ${modifier} ${archetype}`
+  ];
+  return patterns[Math.floor(Math.random()*patterns.length)];
 }
 
 function generateAllAuras() {
@@ -276,23 +322,23 @@ function generateAllAuras() {
       if(usedNames.has(name)) continue;
       usedNames.add(name);
 
-      const abilityCount = tier <= 9 ? 1 : (tier <= 15 ? 2 : 3);
+      const abilityCount = tier<=9?1:(tier<=15?2:3);
       const abilities = [];
       const usedTypes = new Set();
       for(let i=0; i<abilityCount; i++) {
         let ab;
-        do { ab = ABILITY_POOL[Math.floor(Math.random()*ABILITY_POOL.length)]; }
-        while(usedTypes.has(ab.type) && usedTypes.size < ABILITY_POOL.length);
+        do{ab=ABILITY_POOL[Math.floor(Math.random()*ABILITY_POOL.length)];}
+        while(usedTypes.has(ab.type)&&usedTypes.size<ABILITY_POOL.length);
         usedTypes.add(ab.type);
-        abilities.push({ ...ab, value: Math.floor(tier * 1.8 + Math.random()*5) });
+        abilities.push({...ab, value:Math.floor(tier*1.8+Math.random()*5)});
       }
 
       auras.push({
-        id: `gen-${tier}-${added}`,
-        name, tier, archetype: arch, modifier: mod,
-        mult: 1.2 + (tier * 0.25),
-        effect: arch.toLowerCase(),
-        passive: generatePassive(tier, arch),
+        id:`gen-${tier}-${added}`,
+        name,tier,archetype:arch,modifier:mod,
+        mult:1.2+(tier*0.25),
+        effect:arch.toLowerCase(),
+        passive:`+${Math.floor(tier*2.5)}% power`,
         abilities
       });
       added++;
@@ -301,845 +347,564 @@ function generateAllAuras() {
   return auras;
 }
 
-function generatePassive(tier, archetype) {
-  const boosts = ['energy gain','click power','luck','roll efficiency'];
-  const b = boosts[Math.floor(Math.random()*boosts.length)];
-  return `+${Math.floor(tier*2.5)}% ${b}`;
-}
-
 const AURA_DB = generateAllAuras();
 
 // ═══════════════════════════════════════════
-// SCREEN EFFECTS (FULL ARCHETYPE VISUALS)
+// SCREEN EFFECTS
 // ═══════════════════════════════════════════
 const EFFECTS = {
-  flame:(ctx,W,H,t)=>{for(let i=0;i<12;i++){ctx.beginPath();ctx.arc(Math.random()*W,Math.random()*H,Math.random()*3+1,0,6.28);ctx.fillStyle=`rgba(255,${100+Math.random()*120},0,0.35)`;ctx.fill();}},
-  frost:(ctx,W,H,t)=>{ctx.strokeStyle='rgba(160,225,255,0.3)';ctx.lineWidth=1;for(let i=0;i<10;i++){ctx.beginPath();ctx.moveTo(Math.random()*W,Math.random()*H);ctx.lineTo(Math.random()*W,Math.random()*H);ctx.stroke();}},
-  storm:(ctx,W,H,t)=>{let g=ctx.createRadialGradient(W/2,H/2,100,W/2,H/2,Math.max(W,H)*0.7);g.addColorStop(0,'transparent');g.addColorStop(1,'rgba(80,100,255,0.25)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);},
-  void:(ctx,W,H,t)=>{let g=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,250);g.addColorStop(0,'rgba(80,0,160,0.2)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);},
-  light:(ctx,W,H,t)=>{for(let i=0;i<8;i++){let x=50+i*(W/8);let h=70+Math.sin(t*0.002+i)*35;ctx.fillStyle=`rgba(255,240,180,0.12)`;ctx.fillRect(x-8,0,16,h);}},
-  earth:(ctx,W,H,t)=>{for(let i=0;i<7;i++){let a=i/7*Math.PI*2+t*0.0005;let r=160+Math.sin(t*0.002)*25;ctx.beginPath();ctx.arc(W/2+Math.cos(a)*r,H/2+Math.sin(a)*r,7,0,6.28);ctx.fillStyle='rgba(139,100,60,0.35)';ctx.fill();}},
-  time:(ctx,W,H,t)=>{for(let i=0;i<8;i++){let a=i/8*Math.PI*2;ctx.beginPath();ctx.moveTo(W/2,H/2);ctx.lineTo(W/2+Math.cos(a+t*0.001)*200,H/2+Math.sin(a+t*0.001)*130);ctx.strokeStyle='rgba(200,200,255,0.3)';ctx.lineWidth=1;ctx.stroke();}},
-  cosmic:(ctx,W,H,t)=>{for(let i=0;i<25;i++){let x=(Math.sin(i*7.3+t*0.0006)*0.5+0.5)*W,y=(Math.cos(i*5.7+t*0.0007)*0.5+0.5)*H;ctx.beginPath();ctx.arc(x,y,1.5,0,6.28);ctx.fillStyle='rgba(255,255,200,0.7)';ctx.fill();}},
-  glitch:(ctx,W,H,t)=>{if(Math.random()<0.08){ctx.fillStyle='rgba(255,0,0,0.06)';ctx.fillRect(0,Math.random()*H,W,2+Math.random()*4);}},
-  blood:(ctx,W,H,t)=>{for(let i=0;i<10;i++){ctx.beginPath();ctx.arc(Math.random()*W,Math.random()*H,Math.random()*4+1,0,6.28);ctx.fillStyle='rgba(200,0,30,0.3)';ctx.fill();}}
+  flame:(ctx,W,H,t)=>{for(let i=0;i<8;i++){ctx.beginPath();ctx.arc(Math.random()*W,Math.random()*H,Math.random()*3+1,0,6.28);ctx.fillStyle=`rgba(255,${100+Math.random()*100},0,0.3)`;ctx.fill();}},
+  frost:(ctx,W,H,t)=>{ctx.strokeStyle='rgba(160,225,255,0.25)';for(let i=0;i<6;i++){ctx.beginPath();ctx.moveTo(Math.random()*W,Math.random()*H);ctx.lineTo(Math.random()*W,Math.random()*H);ctx.stroke();}},
+  storm:(ctx,W,H,t)=>{let g=ctx.createRadialGradient(W/2,H/2,80,W/2,H/2,Math.max(W,H)*0.6);g.addColorStop(0,'transparent');g.addColorStop(1,'rgba(80,100,255,0.2)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);},
+  void:(ctx,W,H,t)=>{let g=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,200);g.addColorStop(0,'rgba(80,0,160,0.18)');g.addColorStop(1,'transparent');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);},
+  light:(ctx,W,H,t)=>{for(let i=0;i<5;i++){let x=60+i*(W/5);ctx.fillStyle='rgba(255,240,180,0.1)';ctx.fillRect(x-8,0,16,H);}},
+  earth:(ctx,W,H,t)=>{for(let i=0;i<5;i++){let a=i/5*Math.PI*2+t*0.0005;let r=140+Math.sin(t*0.002)*20;ctx.beginPath();ctx.arc(W/2+Math.cos(a)*r,H/2+Math.sin(a)*r,6,0,6.28);ctx.fillStyle='rgba(139,100,60,0.3)';ctx.fill();}},
+  time:(ctx,W,H,t)=>{for(let i=0;i<6;i++){let a=i/6*Math.PI*2;ctx.beginPath();ctx.moveTo(W/2,H/2);ctx.lineTo(W/2+Math.cos(a+t*0.001)*160,H/2+Math.sin(a+t*0.001)*100);ctx.strokeStyle='rgba(200,200,255,0.25)';ctx.lineWidth=1;ctx.stroke();}},
+  cosmic:(ctx,W,H,t)=>{for(let i=0;i<20;i++){let x=(Math.sin(i*7.3+t*0.0006)*0.5+0.5)*W,y=(Math.cos(i*5.7+t*0.0007)*0.5+0.5)*H;ctx.beginPath();ctx.arc(x,y,1,0,6.28);ctx.fillStyle='rgba(255,255,200,0.6)';ctx.fill();}},
+  glitch:(ctx,W,H,t)=>{if(Math.random()<0.06){ctx.fillStyle='rgba(255,0,0,0.05)';ctx.fillRect(0,Math.random()*H,W,2+Math.random()*3);}},
+  blood:(ctx,W,H,t)=>{for(let i=0;i<8;i++){ctx.beginPath();ctx.arc(Math.random()*W,Math.random()*H,Math.random()*3+1,0,6.28);ctx.fillStyle='rgba(200,0,30,0.25)';ctx.fill();}}
 };
 
 // ═══════════════════════════════════════════
-// BIOME SYSTEM
+// CANVAS
 // ═══════════════════════════════════════════
-const BIOMES = {
-  plains: {name:'Starter Plains',emoji:'🌱',unlock:()=>true,weights:{},bg:'#0a0a12',overlay:'transparent'},
-  volcano:{name:'Infernal Volcano',emoji:'🔥',unlock:()=>G.totalRolls>=50,weights:{Flame:2.5},bg:'#1a0a00',overlay:'rgba(255,40,0,0.08)'},
-  frozen:{name:'Frozen Abyss',emoji:'❄️',unlock:()=>G.totalRolls>=120,weights:{Frost:2.5},bg:'#001a2e',overlay:'rgba(0,150,255,0.06)'},
-  ocean:{name:'Ocean Depths',emoji:'🌊',unlock:()=>G.totalRolls>=200,weights:{Storm:2},bg:'#001a3a',overlay:'rgba(0,100,200,0.06)'},
-  cosmicvoid:{name:'Cosmic Void',emoji:'🌌',unlock:()=>G.totalRolls>=350,weights:{Void:3,Cosmic:2},bg:'#05001a',overlay:'rgba(80,0,160,0.1)'},
-  stormrealm:{name:'Storm Realm',emoji:'⚡',unlock:()=>G.totalRolls>=500,weights:{Storm:3},bg:'#1a1a3a',overlay:'rgba(100,100,255,0.1)'},
-  glitch:{name:'Glitch Dimension',emoji:'🕳️',unlock:()=>G.totalRolls>=800,weights:{Glitch:4},bg:'#000',overlay:'rgba(255,0,0,0.04)'},
-  galactic:{name:'Galactic Core',emoji:'🪐',unlock:()=>G.prestigeBonus>=1.5,weights:{Cosmic:3,Light:2},bg:'#000020',overlay:'rgba(255,255,200,0.06)'},
-  infinite:{name:'Infinite Zone',emoji:'♾️',unlock:()=>G.prestigeBonus>=2.5,weights:{Time:3,Void:2,Glitch:1.5},bg:'#100020',overlay:'rgba(255,0,255,0.06)'}
-};
-
-// ═══════════════════════════════════════════
-// PET SYSTEM
-// ═══════════════════════════════════════════
-const BASE_PETS = [
-  {id:'wisp',name:'Energy Wisp',rarity:'Common',emoji:'🔥',effect:{energyBoost:0.1},xpRate:1},
-  {id:'frostpup',name:'Frost Pup',rarity:'Common',emoji:'🐺',effect:{autoClickSpeed:0.05},xpRate:1},
-  {id:'luckycat',name:'Lucky Cat',rarity:'Rare',emoji:'🐱',effect:{luckBoost:0.03},xpRate:1.5},
-  {id:'voidspirit',name:'Void Spirit',rarity:'Rare',emoji:'👻',effect:{pityBoost:2},xpRate:1.5},
-  {id:'dragon',name:'Star Dragon',rarity:'Mythic',emoji:'🐉',effect:{bossDamage:0.15,energyBoost:0.2},xpRate:2},
-  {id:'phoenix',name:'Phoenix',rarity:'Mythic',emoji:'🔥',effect:{fusionBonus:0.1,sacrificeBoost:0.1},xpRate:2},
-  {id:'nullcat',name:'Null Cat',rarity:'Secret',emoji:'😼',effect:{sacrificeBoost:0.25,luckBoost:0.08,duplicateChance:0.05},xpRate:3},
-  {id:'timefox',name:'Time Fox',rarity:'Legendary',emoji:'🦊',effect:{pityBoost:4,autoClickSpeed:0.1},xpRate:2.5}
-];
-
-function getPetBonus(type) {
-  if(!G.activePet || !G.activePet.effect) return 0;
-  const lvl = G.activePet.level || 1;
-  return (G.activePet.effect[type] || 0) * lvl;
+let fxCtx,fxW,fxH,animT=0,bgCtx,bgW,bgH;
+function initFX(){
+  const c=document.getElementById('fx-canvas');
+  fxCtx=c.getContext('2d');
+  function r(){fxW=c.width=window.innerWidth;fxH=c.height=window.innerHeight;}
+  r();window.addEventListener('resize',r);
 }
-
-// ═══════════════════════════════════════════
-// BOSS SYSTEM
-// ═══════════════════════════════════════════
-const BOSS_LIST = [
-  {id:'slime',name:'Slime Core',hp:200,unlock:()=>true,rewards:{energy:100,petChance:0.1}},
-  {id:'shadow',name:'Shadow Wisp',hp:500,unlock:()=>G.defeatedBosses.includes('slime'),rewards:{energy:200,petChance:0.15}},
-  {id:'colossus',name:'Iron Colossus',hp:1200,unlock:()=>G.defeatedBosses.includes('shadow'),rewards:{energy:400,auraTier:5}},
-  {id:'flamebeast',name:'Flame Beast',hp:2500,unlock:()=>G.defeatedBosses.includes('colossus'),rewards:{energy:700,petChance:0.2}},
-  {id:'frosttitan',name:'Frost Titan',hp:5000,unlock:()=>G.defeatedBosses.includes('flamebeast'),rewards:{energy:1000,biomeUnlock:'frozen'}},
-  {id:'voidstalker',name:'Void Stalker',hp:10000,unlock:()=>G.defeatedBosses.includes('frosttitan'),rewards:{energy:2000,auraTier:8,dualAbility:true}},
-  {id:'stormlevi',name:'Storm Leviathan',hp:20000,unlock:()=>G.defeatedBosses.includes('voidstalker'),rewards:{energy:4000,petChance:0.3}},
-  {id:'cosmicserp',name:'Cosmic Serpent',hp:40000,unlock:()=>G.defeatedBosses.includes('stormlevi'),rewards:{energy:8000,biomeUnlock:'cosmicvoid'}},
-  {id:'realityphant',name:'Reality Phantom',hp:80000,unlock:()=>G.defeatedBosses.includes('cosmicserp'),rewards:{energy:15000,auraTier:12,dualAbility:true}},
-  {id:'nullking',name:'✦ THE NULL KING ✦',hp:200000,unlock:()=>G.defeatedBosses.includes('realityphant'),rewards:{energy:50000,secretPet:'nullcat'}}
-];
-
-// ═══════════════════════════════════════════
-// UPGRADES
-// ═══════════════════════════════════════════
-const UPGRADE_DEFS = [
-  {id:'clickPower',name:'Click Amplifier',desc:'+2 energy/click',baseCost:50,max:12},
-  {id:'rollCost',name:'Efficient Roll',desc:'-5 roll cost (min 20)',baseCost:100,max:8},
-  {id:'energyMult',name:'Energy Surge',desc:'+25% energy multiplier',baseCost:200,max:6},
-  {id:'luck',name:'Fortune Crystal',desc:'+3% base luck',baseCost:300,max:5},
-  {id:'autoClick',name:'Auto Clicker',desc:'Auto-click every 1.5s',baseCost:500,max:4},
-  {id:'autoEquip',name:'Auto Equip',desc:'Auto-equip best aura',baseCost:800,max:1},
-  {id:'autoRoll',name:'Auto Roll',desc:'Auto-roll when full',baseCost:1500,max:1},
-  {id:'autoFusion',name:'Auto Fusion',desc:'Auto-fuse duplicates',baseCost:5000,max:1}
-];
-
-// ═══════════════════════════════════════════
-// ROLL LOGIC
-// ═══════════════════════════════════════════
-function rollAura() {
-  const biome = BIOMES[G.biome];
-  let effectiveOdds = {...TIER_ODDS};
-
-  // Biome weights
-  if(biome.weights) {
-    for(let t=1; t<=20; t++) {
-      const pool = AURA_DB.filter(a=>a.tier===t);
-      let bonus = 1;
-      for(let arch in biome.weights) {
-        if(pool.some(a=>a.archetype===arch)) bonus += (biome.weights[arch]-1);
-      }
-      effectiveOdds[t] *= bonus;
-    }
-  }
-
-  // Luck shifts odds upward
-  const luck = G.sacrificeLuck + getPetBonus('luckBoost') + (G.upgrades.luck*0.03);
-  if(luck > 0) {
-    const shift = Math.floor(luck * 10);
-    for(let i=0; i<shift; i++) {
-      for(let t=19; t>=1; t--) {
-        const transfer = effectiveOdds[t] * 0.05;
-        effectiveOdds[t] -= transfer;
-        effectiveOdds[t+1] += transfer;
-      }
-    }
-  }
-
-  const total = Object.values(effectiveOdds).reduce((a,b)=>a+b,0);
-  let r = Math.random()*total, acc=0, sel=1;
-  for(let t=20; t>=1; t--) {
-    acc += effectiveOdds[t];
-    if(r < acc) { sel=t; break; }
-  }
-
-  // Pet duplicate chance
-  if(getPetBonus('duplicateChance') > 0 && Math.random() < getPetBonus('duplicateChance') && G.inventory.length>0) {
-    const dup = {...G.inventory[Math.floor(Math.random()*G.inventory.length)]};
-    dup.id = dup.id + '-dup-' + Date.now();
-    return dup;
-  }
-
-  // Pity system: decays, doesn't fully reset, permanent floor from sacrifices
-  const effectiveThreshold = Math.max(20, G.pityThreshold - G.sacrificePityBoost - getPetBonus('pityBoost'));
-  const permanentFloor = Math.floor(G.sacrifices / 3);
-  if(G.pityCounter >= effectiveThreshold && sel < 5) sel = 5;
-
-  if(sel >= 5) {
-    G.pityCounter = Math.max(permanentFloor, Math.floor(G.pityCounter * 0.4));
-  } else {
-    G.pityCounter++;
-  }
-
-  G.pityCounter = Math.max(G.permanentPityFloor, G.pityCounter);
-
-  const pool = AURA_DB.filter(a=>a.tier===sel);
-  const aura = pool.length ? pool[Math.floor(Math.random()*pool.length)] : AURA_DB[0];
-  G.stats['t'+sel] = (G.stats['t'+sel]||0)+1;
-  return {...aura};
+function initBG(){
+  const c=document.getElementById('bg-canvas');
+  bgCtx=c.getContext('2d');
+  function r(){bgW=c.width=window.innerWidth;bgH=c.height=window.innerHeight;}
+  r();window.addEventListener('resize',r);
+  (function loop(t){updateBG(t);requestAnimationFrame(loop);})();
 }
-
-// ═══════════════════════════════════════════
-// DAMAGE CALC
-// ═══════════════════════════════════════════
-function calculateDamage() {
-  let base = G.clickPower * G.clickPowerMult * G.prestigeBonus;
-  if(G.equippedAura) base *= G.equippedAura.mult;
-  base *= (1 + getPetBonus('energyBoost'));
-  return Math.floor(base);
-}
-
-// ═══════════════════════════════════════════
-// ABILITY APPLICATION
-// ═══════════════════════════════════════════
-function applyAllAbilities() {
-  // Reset temporary boosts first
-  if(!G.equippedAura) return;
-  for(let ab of G.equippedAura.abilities) {
-    if(ab.apply) ab.apply(ab.value);
+function updateBG(t=0){
+  bgCtx.clearRect(0,0,bgW,bgH);
+  const biome=BIOMES[G.biome]||BIOMES.plains;
+  bgCtx.fillStyle=biome.bg;bgCtx.fillRect(0,0,bgW,bgH);
+  for(let i=0;i<25;i++){
+    let x=(Math.sin(i*7.3+t*0.00025)*0.5+0.5)*bgW,y=(Math.cos(i*5.1+t*0.0003)*0.5+0.5)*bgH;
+    bgCtx.beginPath();bgCtx.arc(x,y,0.8,0,6.28);bgCtx.fillStyle='rgba(255,255,255,0.03)';bgCtx.fill();
   }
 }
-
-function unapplyAllAbilities() {
-  // Simplified: full recalc on equip change
-}
-
-// ═══════════════════════════════════════════
-// SACRIFICE
-// ═══════════════════════════════════════════
-function sacrificeSelected() {
-  if(!G.selectedForSacrifice.length) return;
-  let totalTier = 0;
-  const indices = G.selectedForSacrifice
-    .map(id => G.inventory.findIndex(a=>a.id===id))
-    .filter(i=>i>=0)
-    .sort((a,b)=>b-a);
-
-  for(let idx of indices) {
-    const aura = G.inventory[idx];
-    totalTier += aura.tier;
-    if(G.equippedAura && G.equippedAura.id === aura.id) {
-      G.equippedAura = null;
-    }
-    G.inventory.splice(idx, 1);
-  }
-
-  // Diminishing returns
-  const sacBonus = totalTier * (1 / (1 + G.sacrifices * 0.05));
-  G.sacrifices += indices.length;
-  G.sacrificeLuck = Math.min(5, G.sacrificeLuck + sacBonus * 0.015);
-  G.sacrificePityBoost = Math.min(50, G.sacrificePityBoost + Math.floor(sacBonus * 0.4));
-  G.permanentPityFloor = Math.floor(G.sacrifices / 3);
-  G.sacrificeCharge += sacBonus;
-
-  if(G.sacrificeCharge >= 100) {
-    G.sacrificeCharge -= 100;
-    G.energy += 300;
-    showToast('💥 Sacrifice Charge full! +300 energy');
-  }
-
-  G.selectedForSacrifice = [];
-  addLog(`🩸 Sacrificed ${indices.length} auras (power: ${sacBonus.toFixed(1)})`);
-  updateUI();
-}
-
-// ═══════════════════════════════════════════
-// BOSS FIGHT
-// ═══════════════════════════════════════════
-function startBoss(bossDef) {
-  if(G.currentBoss) return;
-  const boss = {...bossDef, currentHp: bossDef.hp, maxHp: bossDef.hp};
-  G.currentBoss = boss;
-  document.getElementById('boss-fight').style.display = 'block';
-  document.getElementById('boss-list').style.display = 'none';
-  document.getElementById('boss-name').innerText = boss.name;
-
-  if(G.bossInterval) clearInterval(G.bossInterval);
-  G.bossInterval = setInterval(() => {
-    const dmg = calculateDamage() * (1 + getPetBonus('bossDamage'));
-    G.currentBoss.currentHp -= dmg;
-    if(G.currentBoss.currentHp <= 0) {
-      clearInterval(G.bossInterval);
-      G.bossInterval = null;
-      const r = boss.rewards;
-      G.energy += r.energy || 0;
-      if(r.petChance && Math.random() < r.petChance) obtainRandomPet();
-      if(r.auraTier) {
-        const pool = AURA_DB.filter(a=>a.tier===r.auraTier);
-        let reward;
-        if(r.dualAbility && pool.length) {
-          reward = {...pool[Math.floor(Math.random()*pool.length)]};
-          reward.abilities.push(ABILITY_POOL[Math.floor(Math.random()*ABILITY_POOL.length)]);
-        } else if(pool.length) {
-          reward = {...pool[Math.floor(Math.random()*pool.length)]};
-        }
-        if(reward && G.inventory.length < 20) G.inventory.push(reward);
-      }
-      if(r.biomeUnlock && !G.unlockedBiomes.includes(r.biomeUnlock)) G.unlockedBiomes.push(r.biomeUnlock);
-      if(r.secretPet) obtainRandomPet(r.secretPet);
-      G.defeatedBosses.push(boss.id);
-      G.currentBoss = null;
-      document.getElementById('boss-fight').style.display = 'none';
-      document.getElementById('boss-list').style.display = 'block';
-      addLog(`🏆 Defeated ${boss.name}!`);
-      updateUI();
-    }
-    updateBossUI();
-  }, 100);
-  updateUI();
-}
-
-function updateBossUI() {
-  if(!G.currentBoss) return;
-  const pct = Math.max(0, G.currentBoss.currentHp / G.currentBoss.maxHp * 100);
-  document.getElementById('boss-hp-fill').style.width = pct + '%';
-  document.getElementById('boss-hp-text').innerText = `${Math.ceil(G.currentBoss.currentHp)} / ${G.currentBoss.maxHp}`;
-}
-
-function obtainRandomPet(specific) {
-  const pet = specific ? BASE_PETS.find(p=>p.id===specific) : BASE_PETS[Math.floor(Math.random()*BASE_PETS.length)];
-  if(!pet) return;
-  G.pets.push({...pet, level:1, xp:0, id: pet.id+'-'+Date.now()});
-  if(!G.activePet) G.activePet = G.pets[G.pets.length-1];
-  addLog(`🐾 Obtained ${pet.name}!`);
-}
-
-// ═══════════════════════════════════════════
-// CUTSCENE
-// ═══════════════════════════════════════════
-async function playCutscene(tier, name) {
-  const cs = document.getElementById('cutscene');
-  const phase = document.getElementById('cs-phase');
-  const csName = document.getElementById('cs-name');
-  const fill = document.getElementById('cs-bar-fill');
-  const glitchText = document.getElementById('cs-glitch-text');
-  const errorBox = document.getElementById('cs-error');
-
-  cs.classList.add('show');
-  csName.innerText = name;
-  csName.style.color = TIER_COLORS[tier] || '#fff';
-  glitchText.style.display = 'none';
-  errorBox.style.display = 'none';
-
-  let phases;
-  if(tier <= 5) { cs.classList.remove('show'); return; }
-  else if(tier <= 9) phases = [['⭐ AWAKENING','#f5c842'],['✨ POWER SURGES','#f5c842']];
-  else if(tier <= 14) phases = [['🌌 COSMIC RESONANCE','#00e5ff'],['🪐 DIMENSIONAL SHIFT','#00e5ff'],['🌀 POWER MANIFESTS','#ff6fd8'],['✨ AURA AWAKENED','#00e5ff']];
-  else if(tier <= 19) {
-    phases = [['⚠️ REALITY DISTORTION','#ff0000'],['🕳️ VOID FRACTURES','#ff4444'],['💀 SYSTEM BREACH','#ff00ff'],['☠️ YOU SHOULD NOT HAVE THIS','#ff0000']];
-    errorBox.style.display = 'block';
-    document.getElementById('game').classList.add('glitching');
-    document.getElementById('glitch-overlay').style.display = 'block';
-  } else {
-    phases = [['💀 COLLAPSE','#fff'],['🌀 ALL BREAKS DOWN','#ff4444'],['⚠️ REALITY_SHATTER.EXE','#fff'],['⚡ ABSOLUTE ZERO','#00e5ff'],['🔥 APEX ETERNAL','#ff0000']];
-    glitchText.style.display = 'block';
-    glitchText.innerText = 'YOU SHOULD NOT HAVE OBTAINED THIS.\nREALITY INTEGRITY: 0%\nSYSTEM: CORRUPTED';
-    errorBox.style.display = 'block';
-    document.getElementById('game').classList.add('glitching');
-    document.getElementById('glitch-overlay').style.display = 'block';
-  }
-
-  fill.style.transition = 'none'; fill.style.width = '0%';
-  for(let i=0; i<phases.length; i++) {
-    phase.innerText = phases[i][0];
-    phase.style.color = phases[i][1];
-    fill.style.transition = 'width 0.7s ease';
-    fill.style.width = ((i+1)/phases.length*100)+'%';
-    await new Promise(r=>setTimeout(r, tier>=15 ? 500 : 700));
-  }
-  await new Promise(r=>setTimeout(r, 400));
-  cs.classList.remove('show');
-  document.getElementById('game').classList.remove('glitching');
-  document.getElementById('glitch-overlay').style.display = 'none';
-  errorBox.style.display = 'none';
-  glitchText.style.display = 'none';
-}
-
-// ═══════════════════════════════════════════
-// UI UPDATE
-// ═══════════════════════════════════════════
-function updateUI() {
-  document.getElementById('hud-energy').innerText = Math.floor(G.energy);
-  document.getElementById('hud-rolls').innerText = G.totalRolls;
-  document.getElementById('hud-prestige').innerText = G.prestigeBonus.toFixed(2)+'x';
-  document.getElementById('hud-sac').innerText = G.sacrifices;
-  document.getElementById('hud-luck').innerText = (G.sacrificeLuck*100).toFixed(0)+'%';
-  document.getElementById('hud-pet').innerText = G.activePet ? G.activePet.emoji+' '+G.activePet.name : 'None';
-  document.getElementById('hud-biome').innerText = BIOMES[G.biome]?.emoji || '🌱';
-  document.getElementById('energy-val').innerText = Math.floor(G.energy)+' / '+G.rollCost;
-  document.getElementById('aura-fill').style.width = Math.min(100, G.energy/G.rollCost*100)+'%';
-  document.getElementById('cost-val').innerText = G.rollCost;
-  document.getElementById('pity-val').innerText = G.pityCounter;
-  document.getElementById('pity-thresh').innerText = Math.max(20, G.pityThreshold - G.sacrificePityBoost - getPetBonus('pityBoost'));
-  document.getElementById('roll-btn').disabled = G.energy < G.rollCost;
-  document.getElementById('sac-count').innerText = G.sacrifices;
-  document.getElementById('sac-luck').innerText = (G.sacrificeLuck*100).toFixed(1)+'%';
-  document.getElementById('sac-pity').innerText = G.sacrificePityBoost;
-  document.getElementById('sac-charge').innerText = Math.floor(G.sacrificeCharge);
-  document.getElementById('sac-fill').style.width = (G.sacrificeCharge/100*100)+'%';
-  document.getElementById('inv-count').innerText = G.inventory.length+'/20';
-
-  const eq = G.equippedAura;
-  if(eq) {
-    document.getElementById('orb-emoji').innerText = TIER_EMOJIS[eq.tier]||'🔮';
-    document.getElementById('big-orb').style.boxShadow = `0 0 45px ${TIER_COLORS[eq.tier]}99, 0 0 90px ${TIER_COLORS[eq.tier]}33`;
-    document.getElementById('eq-name').innerText = TIER_EMOJIS[eq.tier]+' '+eq.name+' (T'+eq.tier+')';
-    document.getElementById('eq-name').className = 't'+Math.min(20,eq.tier);
-    document.getElementById('eq-effect').innerText = 'Passive: '+eq.passive;
-    document.getElementById('eq-abilities').innerText = 'Abilities: '+eq.abilities.map(a=>a.label||a.type).join(', ');
-    document.getElementById('equipped-box').style.borderColor = TIER_COLORS[eq.tier]+'66';
-
-    // Persistent glitch for T14+
-    if(eq.tier >= 14) {
-      document.getElementById('glitch-overlay').style.display = 'block';
-      if(eq.tier >= 17) document.getElementById('game').classList.add('shaking');
-    } else {
-      document.getElementById('glitch-overlay').style.display = 'none';
-      document.getElementById('game').classList.remove('shaking');
-    }
-  } else {
-    document.getElementById('orb-emoji').innerText = '🔮';
-    document.getElementById('big-orb').style.boxShadow = '';
-    document.getElementById('eq-name').innerText = 'None';
-    document.getElementById('eq-name').className = '';
-    document.getElementById('eq-effect').innerText = '';
-    document.getElementById('eq-abilities').innerText = '';
-    document.getElementById('equipped-box').style.borderColor = '';
-    document.getElementById('glitch-overlay').style.display = 'none';
-    document.getElementById('game').classList.remove('shaking');
-  }
-
-  renderInventory();
-  renderPetUI();
-  renderBossList();
-  renderBiomeSelect();
-  renderShop();
-  updateStats();
-}
-
-function renderInventory() {
-  const div = document.getElementById('inv-scroll');
-  div.innerHTML = '';
-  if(!G.inventory.length) {
-    div.innerHTML = '<div style="color:var(--muted);font-size:10px;grid-column:span 2;text-align:center;">Empty</div>';
-    return;
-  }
-  G.inventory.forEach((a,i) => {
-    const d = document.createElement('div');
-    const isEq = G.equippedAura && G.equippedAura.id === a.id;
-    const isSel = G.selectedForSacrifice.includes(a.id);
-    d.className = 'inv-item' + (isEq ? ' equipped' : '') + (isSel ? ' selected' : '');
-    d.innerHTML = `<span style="color:${TIER_COLORS[a.tier]}">${TIER_EMOJIS[a.tier]} ${a.name.substring(0,18)}</span><span style="font-size:9px;">T${a.tier}</span>`;
-    d.onclick = (e) => {
-      if(e.shiftKey) {
-        // Toggle sacrifice selection
-        const idx = G.selectedForSacrifice.indexOf(a.id);
-        if(idx >= 0) G.selectedForSacrifice.splice(idx, 1);
-        else if(G.selectedForSacrifice.length < 5) G.selectedForSacrifice.push(a.id);
-        document.getElementById('sac-selected').innerText = G.selectedForSacrifice.length ? `${G.selectedForSacrifice.length} selected` : 'None selected';
-        document.getElementById('sac-confirm').disabled = !G.selectedForSacrifice.length;
-        renderInventory();
-      } else {
-        G.equippedAura = {...a};
-        applyAllAbilities();
-        addLog('⚡ Equipped: '+a.name);
-        updateUI();
-      }
-    };
-    div.appendChild(d);
-  });
-}
-
-function renderPetUI() {
-  const display = document.getElementById('pet-display');
-  const xpEl = document.getElementById('pet-xp');
-  const select = document.getElementById('pet-select');
-
-  if(G.activePet) {
-    display.innerText = `${G.activePet.emoji} ${G.activePet.name} Lv.${G.activePet.level}`;
-    xpEl.innerText = `XP: ${G.activePet.xp}/${G.activePet.level * 100}`;
-  } else {
-    display.innerText = 'No pet active';
-    xpEl.innerText = '—';
-  }
-
-  select.innerHTML = '<option value="">— Select —</option>';
-  G.pets.forEach((p,i) => {
-    select.innerHTML += `<option value="${i}" ${G.activePet && G.activePet.id===p.id?'selected':''}>${p.emoji} ${p.name} Lv${p.level}</option>`;
-  });
-  select.onchange = (e) => {
-    if(e.target.value !== '') {
-      G.activePet = G.pets[parseInt(e.target.value)];
-      updateUI();
-    }
-  };
-}
-
-function renderBossList() {
-  const div = document.getElementById('boss-list');
-  if(G.currentBoss) {
-    div.style.display = 'none';
-    return;
-  }
-  div.style.display = 'block';
-  div.innerHTML = '';
-  BOSS_LIST.forEach(b => {
-    if(!b.unlock()) return;
-    const defeated = G.defeatedBosses.includes(b.id);
-    const btn = document.createElement('button');
-    btn.className = 'mbtn' + (defeated ? '' : ' gold');
-    btn.style.margin = '2px';
-    btn.style.fontSize = '9px';
-    btn.innerText = `${defeated ? '✅' : '👾'} ${b.name}`;
-    btn.onclick = () => startBoss(b);
-    div.appendChild(btn);
-  });
-}
-
-function renderBiomeSelect() {
-  const select = document.getElementById('biome-select');
-  select.innerHTML = '';
-  for(let key in BIOMES) {
-    if(G.unlockedBiomes.includes(key)) {
-      select.innerHTML += `<option value="${key}" ${G.biome===key?'selected':''}>${BIOMES[key].emoji} ${BIOMES[key].name}</option>`;
-    }
-  }
-  select.onchange = (e) => { G.biome = e.target.value; updateBG(); updateUI(); };
-}
-
-function renderShop() {
-  const d = document.getElementById('shop-list');
-  d.innerHTML = '';
-  UPGRADE_DEFS.forEach(u => {
-    const lvl = G.upgrades[u.id]||0;
-    const maxed = lvl >= u.max;
-    const cost = Math.floor(u.baseCost * Math.pow(1.6, lvl));
-    d.innerHTML += `<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.05);">
-      <div><b>${u.name}</b> <small>Lv${lvl}/${u.max}</small><br><small style="color:var(--muted);">${u.desc}</small></div>
-      <button class="mbtn gold" onclick="buyUpgrade('${u.id}')" ${maxed||G.energy<cost?'disabled':''} style="font-size:9px;">${maxed?'MAX':cost+' ⚡'}</button>
-    </div>`;
-  });
-}
-
-function updateStats() {
-  const d = document.getElementById('stats-box');
-  d.style.display = 'none'; // Simplified stats in top bar for space
-}
-
-function addLog(msg) {
-  const d = document.getElementById('log-box');
-  const el = document.createElement('div');
-  el.style.padding = '1px 0';
-  el.style.borderBottom = '1px solid rgba(255,255,255,0.03)';
-  el.innerText = msg;
-  d.appendChild(el);
-  d.scrollTop = d.scrollHeight;
-  if(d.children.length > 50) d.removeChild(d.firstChild);
-}
-
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.innerText = msg;
-  t.classList.add('show');
-  clearTimeout(window._toastTimeout);
-  window._toastTimeout = setTimeout(() => t.classList.remove('show'), 2500);
-}
-
-// ═══════════════════════════════════════════
-// CANVAS SETUP
-// ═══════════════════════════════════════════
-let fxCtx, fxW, fxH, animT = 0;
-let bgCtx, bgW, bgH;
-
-function initFX() {
-  const c = document.getElementById('fx-canvas');
-  fxCtx = c.getContext('2d');
-  function resize() { fxW = c.width = window.innerWidth; fxH = c.height = window.innerHeight; }
-  resize();
-  window.addEventListener('resize', resize);
-}
-
-function initBG() {
-  const c = document.getElementById('bg-canvas');
-  bgCtx = c.getContext('2d');
-  function resize() { bgW = c.width = window.innerWidth; bgH = c.height = window.innerHeight; }
-  resize();
-  window.addEventListener('resize', resize);
-  (function loop(t) {
-    updateBG(t);
-    requestAnimationFrame(loop);
-  })();
-}
-
-function updateBG(t = 0) {
-  bgCtx.clearRect(0, 0, bgW, bgH);
-  const biome = BIOMES[G.biome];
-  bgCtx.fillStyle = biome.bg || '#0a0a12';
-  bgCtx.fillRect(0, 0, bgW, bgH);
-  // Biome overlay
-  if(biome.overlay && biome.overlay !== 'transparent') {
-    bgCtx.fillStyle = biome.overlay;
-    bgCtx.fillRect(0, 0, bgW, bgH);
-  }
-  // Subtle particles
-  for(let i = 0; i < 35; i++) {
-    let x = (Math.sin(i * 7.3 + t * 0.00025) * 0.5 + 0.5) * bgW;
-    let y = (Math.cos(i * 5.1 + t * 0.0003) * 0.5 + 0.5) * bgH;
-    bgCtx.beginPath();
-    bgCtx.arc(x, y, 1, 0, 6.28);
-    bgCtx.fillStyle = 'rgba(255,255,255,0.04)';
-    bgCtx.fill();
-  }
-}
-
-function renderFX(ts) {
-  animT = ts || 0;
-  fxCtx.clearRect(0, 0, fxW, fxH);
-  if(G.equippedAura) {
-    const fn = EFFECTS[G.equippedAura.effect];
-    if(fn) fn(fxCtx, fxW, fxH, animT);
-  }
-  // Biome secondary effect
-  if(G.biome === 'volcano') {
-    for(let i = 0; i < 5; i++) {
-      fxCtx.beginPath();
-      fxCtx.arc(Math.random()*fxW, fxH, Math.random()*4+2, 0, 6.28);
-      fxCtx.fillStyle = 'rgba(255,100,0,0.15)';
-      fxCtx.fill();
-    }
-  }
-  if(G.biome === 'glitch' && Math.random() < 0.1) {
-    fxCtx.fillStyle = 'rgba(255,0,0,0.03)';
-    fxCtx.fillRect(0, Math.random()*fxH, fxW, 2);
+function renderFX(ts){
+  animT=ts||0;fxCtx.clearRect(0,0,fxW,fxH);
+  if(G.equippedAura){
+    const fn=EFFECTS[G.equippedAura.effect];
+    if(fn)fn(fxCtx,fxW,fxH,animT);
   }
   requestAnimationFrame(renderFX);
 }
 
 // ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+function showToast(msg){
+  const t=document.getElementById('toast');t.innerText=msg;t.classList.add('show');
+  clearTimeout(window._tt);window._tt=setTimeout(()=>t.classList.remove('show'),2000);
+}
+function addLog(msg){
+  const d=document.getElementById('log-box'),el=document.createElement('div');
+  el.style.padding='1px 0';el.style.borderBottom='1px solid rgba(255,255,255,0.03)';el.innerText=msg;
+  d.appendChild(el);d.scrollTop=d.scrollHeight;if(d.children.length>40)d.removeChild(d.firstChild);
+}
+function getPetBonus(type){return G.activePet?.effect?.(G.activePet.effect[type]||0)*(G.activePet.level||1)||0;}
+function calculateDamage(){
+  let base=G.clickPower*G.clickPowerMult*G.prestigeBonus;
+  if(G.equippedAura)base*=G.equippedAura.mult;
+  base*=(1+getPetBonus('energyBoost'));
+  return Math.max(1,Math.floor(base));
+}
+function applyEquippedAbilities(){
+  if(!G.equippedAura)return;
+  for(let ab of G.equippedAura.abilities){if(ab.apply)ab.apply(ab.value);}
+}
+
+// ═══════════════════════════════════════════
+// ROLL
+// ═══════════════════════════════════════════
+function rollAura(){
+  const biome=BIOMES[G.biome];
+  let odds={...TIER_ODDS};
+  if(biome.weights){
+    for(let t=1;t<=20;t++){
+      const pool=AURA_DB.filter(a=>a.tier===t);
+      let bonus=1;
+      for(let arch in biome.weights){if(pool.some(a=>a.archetype===arch))bonus+=(biome.weights[arch]-1);}
+      odds[t]*=bonus;
+    }
+  }
+  const luck=G.sacrificeLuck+getPetBonus('luckBoost')+(G.upgrades.luck*0.03);
+  if(luck>0){for(let i=0;i<Math.floor(luck*10);i++){for(let t=19;t>=1;t--){const tr=odds[t]*0.05;odds[t]-=tr;odds[t+1]+=tr;}}}
+  const total=Object.values(odds).reduce((a,b)=>a+b,0);
+  let r=Math.random()*total,acc=0,sel=1;
+  for(let t=20;t>=1;t--){acc+=odds[t];if(r<acc){sel=t;break;}}
+
+  if(getPetBonus('duplicateChance')>0&&Math.random()<getPetBonus('duplicateChance')&&G.inventory.length>0){
+    return{...G.inventory[Math.floor(Math.random()*G.inventory.length)],id:'dup-'+Date.now()};
+  }
+
+  const effThresh=Math.max(20,G.pityThreshold-G.sacrificePityBoost-getPetBonus('pityBoost'));
+  if(G.pityCounter>=effThresh&&sel<5)sel=5;
+  if(sel>=5)G.pityCounter=Math.max(G.permanentPityFloor,Math.floor(G.pityCounter*0.4));
+  else G.pityCounter++;
+  G.pityCounter=Math.max(G.permanentPityFloor,G.pityCounter);
+
+  const pool=AURA_DB.filter(a=>a.tier===sel);
+  const aura=pool.length?pool[Math.floor(Math.random()*pool.length)]:AURA_DB[0];
+  G.stats['t'+sel]=(G.stats['t'+sel]||0)+1;
+  return{...aura};
+}
+
+// ═══════════════════════════════════════════
+// PET FUNCTIONS
+// ═══════════════════════════════════════════
+function obtainPet(specificId){
+  const template=specificId?BASE_PETS.find(p=>p.id===specificId):BASE_PETS[Math.floor(Math.random()*BASE_PETS.length)];
+  if(!template)return;
+  const pet={...template,level:1,xp:0,instanceId:template.id+'-'+Date.now()};
+  G.pets.push(pet);
+  if(!G.activePet)G.activePet=pet;
+  addLog(`🐾 Obtained ${pet.emoji} ${pet.name}!`);
+  showToast(`New pet: ${pet.name}!`);
+}
+
+function switchPet(val){
+  if(val===''){G.activePet=null;}
+  else{G.activePet=G.pets[parseInt(val)]||null;}
+  updateUI();
+}
+
+// ═══════════════════════════════════════════
+// BOSS
+// ═══════════════════════════════════════════
+function startBoss(bossDef){
+  if(G.currentBoss)return;
+  G.currentBoss={...bossDef,currentHp:bossDef.hp};
+  if(G.bossInterval)clearInterval(G.bossInterval);
+  G.bossInterval=setInterval(()=>{
+    const dmg=calculateDamage()*(1+getPetBonus('bossDamage'));
+    G.currentBoss.currentHp-=dmg;
+    if(G.currentBoss.currentHp<=0){
+      clearInterval(G.bossInterval);G.bossInterval=null;
+      const rw=G.currentBoss.rewards;
+      G.energy+=rw.energy||0;
+      if(rw.petChance&&Math.random()<rw.petChance)obtainPet();
+      if(rw.auraTier){
+        const pool=AURA_DB.filter(a=>a.tier===rw.auraTier);
+        if(pool.length){
+          let reward={...pool[Math.floor(Math.random()*pool.length)]};
+          if(rw.dualAbility)reward.abilities.push({...ABILITY_POOL[Math.floor(Math.random()*ABILITY_POOL.length)],value:rw.auraTier*2});
+          if(G.inventory.length<20)G.inventory.push(reward);
+        }
+      }
+      if(rw.biomeUnlock&&!G.unlockedBiomes.includes(rw.biomeUnlock))G.unlockedBiomes.push(rw.biomeUnlock);
+      if(rw.secretPet)obtainPet(rw.secretPet);
+      G.defeatedBosses.push(G.currentBoss.id);
+      addLog(`🏆 Defeated ${G.currentBoss.name}!`);
+      showToast(`Boss defeated: ${G.currentBoss.name}`);
+      G.currentBoss=null;
+      updateUI();
+    }
+    updateUI();
+  },100);
+}
+
+// ═══════════════════════════════════════════
+// SACRIFICE
+// ═══════════════════════════════════════════
+function toggleSacMode(){
+  G.sacMode=!G.sacMode;
+  G.sacSelected=[];
+  document.getElementById('sacrifice-btn').classList.toggle('active',G.sacMode);
+  document.getElementById('sac-mode-indicator').innerText=G.sacMode?'⚠️ Tap auras to select for sacrifice':'';
+  updateUI();
+}
+
+function toggleSacSelection(aid){
+  if(!G.sacMode)return;
+  const idx=G.sacSelected.indexOf(aid);
+  if(idx>=0)G.sacSelected.splice(idx,1);
+  else if(G.sacSelected.length<5)G.sacSelected.push(aid);
+  updateUI();
+}
+
+function executeSacrifice(){
+  if(!G.sacSelected.length)return;
+  let totalTier=0;
+  const indices=G.sacSelected.map(id=>G.inventory.findIndex(a=>a.id===id)).filter(i=>i>=0).sort((a,b)=>b-a);
+  for(let idx of indices){
+    const aura=G.inventory[idx];
+    totalTier+=aura.tier;
+    if(G.equippedAura&&G.equippedAura.id===aura.id)G.equippedAura=null;
+    G.inventory.splice(idx,1);
+  }
+  const sacBonus=totalTier*(1/(1+G.sacrifices*0.04));
+  G.sacrifices+=indices.length;
+  G.stats.totalSacrifices+=indices.length;
+  G.sacrificeLuck=Math.min(5,G.sacrificeLuck+sacBonus*0.012);
+  G.sacrificePityBoost=Math.min(50,G.sacrificePityBoost+Math.floor(sacBonus*0.35));
+  G.permanentPityFloor=Math.floor(G.sacrifices/3);
+  G.sacrificeCharge+=sacBonus;
+  if(G.sacrificeCharge>=100){G.sacrificeCharge-=100;G.energy+=300;showToast('💥 Sacrifice Charge! +300');}
+  G.sacSelected=[];
+  addLog(`🩸 Sacrificed ${indices.length} auras`);
+  updateUI();
+}
+
+// ═══════════════════════════════════════════
+// FUSION
+// ═══════════════════════════════════════════
+function fuseAuras(){
+  const groups={};
+  G.inventory.forEach((a,i)=>{groups[a.tier]=groups[a.tier]||[];groups[a.tier].push(i);});
+  for(let t=20;t>=1;t--){
+    if(groups[t]&&groups[t].length>=2){
+      const[i1,i2]=[groups[t][0],groups[t][1]];
+      const nt=Math.min(20,t+1);
+      const pool=AURA_DB.filter(a=>a.tier===nt);
+      if(!pool.length)continue;
+      const fused={...pool[Math.floor(Math.random()*pool.length)]};
+      [i1,i2].sort((a,b)=>b-a).forEach(i=>G.inventory.splice(i,1));
+      G.inventory.push(fused);G.stats.fusions++;
+      addLog(`✨ Fused → ${fused.name} (T${fused.tier})`);
+      showToast(`Fusion: ${fused.name}!`);
+      updateUI();return;
+    }
+  }
+  showToast('Need 2 same-tier auras');
+}
+
+function equipBest(){
+  if(!G.inventory.length)return;
+  const best=G.inventory.reduce((a,b)=>a.tier>b.tier?a:b);
+  G.equippedAura={...best};applyEquippedAbilities();
+  addLog('🏆 Equipped: '+best.name);updateUI();
+}
+
+function sortInventory(){G.inventory.sort((a,b)=>b.tier-a.tier);updateUI();}
+function clearInventory(){if(confirm('Clear all?')){G.inventory=[];G.equippedAura=null;updateUI();}}
+function changeBiome(val){if(G.unlockedBiomes.includes(val)){G.biome=val;updateUI();}}
+
+// ═══════════════════════════════════════════
+// PRESTIGE & GENESIS
+// ═══════════════════════════════════════════
+function prestige(){
+  if(G.totalRolls<500){showToast(`Need 500 rolls (${G.totalRolls}/500)`);return;}
+  if(!confirm('Prestige? Resets progress for +0.25x permanent bonus.'))return;
+  G.prestigeBonus+=0.25;G.stats.prestigeCount++;
+  hardReset();
+  addLog('🌀 Prestige! Bonus: '+G.prestigeBonus.toFixed(2)+'x');
+  showToast('🌀 Prestige!');
+}
+
+function genesisReset(){
+  if(G.bestTier<18){showToast('Need T18+ aura first!');return;}
+  if(!confirm('GENESIS? Resets almost everything for +1.0x bonus and Infinite Zone.'))return;
+  G.prestigeBonus+=1.0;G.stats.genesisCount++;
+  if(!G.unlockedBiomes.includes('infinite'))G.unlockedBiomes.push('infinite');
+  hardReset();
+  G.pets=[];G.activePet=null;G.defeatedBosses=[];G.unlockedBiomes=['plains','infinite'];
+  addLog('💠 Genesis Reset!');showToast('💠 Genesis!');
+}
+
+function hardReset(){
+  G.energy=0;G.totalRolls=0;G.clickPower=1;G.clickPowerMult=1.0;G.rollCost=100;
+  G.inventory=[];G.equippedAura=null;G.currentRolled=null;
+  G.pityCounter=0;G.streak=0;G.bestTier=0;
+  G.sacrificeCharge=0;G.sacSelected=[];G.sacMode=false;
+  G.upgrades={clickPower:0,rollCost:0,energyMult:0,luck:0,autoClick:0,autoEquip:0,autoRoll:0,autoFusion:0};
+  if(G.autoClickInterval){clearInterval(G.autoClickInterval);G.autoClickInterval=null;}
+  updateUI();
+}
+
+// ═══════════════════════════════════════════
+// SAVE / LOAD / LEADERBOARD
+// ═══════════════════════════════════════════
+function saveGame(){
+  const saveData={
+    energy:G.energy,totalRolls:G.totalRolls,prestigeBonus:G.prestigeBonus,
+    clickPower:G.clickPower,clickPowerMult:G.clickPowerMult,rollCost:G.rollCost,
+    inventory:G.inventory,equippedAura:G.equippedAura,
+    pityCounter:G.pityCounter,bestTier:G.bestTier,
+    sacrifices:G.sacrifices,sacrificeLuck:G.sacrificeLuck,sacrificeCharge:G.sacrificeCharge,
+    sacrificePityBoost:G.sacrificePityBoost,permanentPityFloor:G.permanentPityFloor,
+    pets:G.pets,activePet:G.activePet,defeatedBosses:G.defeatedBosses,
+    biome:G.biome,unlockedBiomes:G.unlockedBiomes,
+    upgrades:G.upgrades,stats:G.stats,
+    timestamp:Date.now()
+  };
+  localStorage.setItem('auraClickerSave',JSON.stringify(saveData));
+  updateLeaderboard();
+  showToast('💾 Saved!');
+}
+
+function loadGame(){
+  const raw=localStorage.getItem('auraClickerSave');
+  if(!raw)return false;
+  try{
+    const data=JSON.parse(raw);
+    G.energy=data.energy||0;G.totalRolls=data.totalRolls||0;G.prestigeBonus=data.prestigeBonus||1.0;
+    G.clickPower=data.clickPower||1;G.clickPowerMult=data.clickPowerMult||1.0;G.rollCost=data.rollCost||100;
+    G.inventory=data.inventory||[];G.equippedAura=data.equippedAura||null;
+    G.pityCounter=data.pityCounter||0;G.bestTier=data.bestTier||0;
+    G.sacrifices=data.sacrifices||0;G.sacrificeLuck=data.sacrificeLuck||0;
+    G.sacrificeCharge=data.sacrificeCharge||0;G.sacrificePityBoost=data.sacrificePityBoost||0;
+    G.permanentPityFloor=data.permanentPityFloor||0;
+    G.pets=data.pets||[];G.activePet=data.activePet||null;G.defeatedBosses=data.defeatedBosses||[];
+    G.biome=data.biome||'plains';G.unlockedBiomes=data.unlockedBiomes||['plains'];
+    G.upgrades=data.upgrades||{clickPower:0,rollCost:0,energyMult:0,luck:0,autoClick:0,autoEquip:0,autoRoll:0,autoFusion:0};
+    G.stats=data.stats||{fusions:0,prestigeCount:0,genesisCount:0,totalSacrifices:0};
+    for(let t=1;t<=20;t++)G.stats['t'+t]=G.stats['t'+t]||0;
+    G.offlineTimestamp=data.timestamp||Date.now();
+
+    // Offline progress
+    const elapsed=Math.floor((Date.now()-G.offlineTimestamp)/1000);
+    if(elapsed>10){const earned=Math.floor(elapsed*0.4*G.prestigeBonus);G.energy+=earned;addLog(`⏰ Offline: +${earned} energy`);}
+    G.offlineTimestamp=Date.now();
+
+    if(G.upgrades.autoClick)setupAutoClick();
+    return true;
+  }catch(e){return false;}
+}
+
+function updateLeaderboard(){
+  const current={prestige:G.prestigeBonus,bestTier:G.bestTier,totalRolls:G.totalRolls,sacrifices:G.stats.totalSacrifices||G.sacrifices,time:Date.now()};
+  let lb=JSON.parse(localStorage.getItem('auraLeaderboard')||'[]');
+  lb.push(current);
+  lb.sort((a,b)=>b.prestige-a.prestige||b.bestTier-a.bestTier);
+  lb=lb.slice(0,20);
+  localStorage.setItem('auraLeaderboard',JSON.stringify(lb));
+}
+
+function showLeaderboard(){
+  const panel=document.getElementById('leaderboard-panel');
+  const content=document.getElementById('ld-content');
+  const lb=JSON.parse(localStorage.getItem('auraLeaderboard')||'[]');
+  content.innerHTML=lb.length?'':'<div style="color:var(--muted);text-align:center;">No entries yet — save your game!</div>';
+  lb.forEach((e,i)=>{
+    content.innerHTML+=`<div class="ld-entry"><span>#${i+1}</span><span>🌀${e.prestige.toFixed(2)}x</span><span>T${e.bestTier}</span><span>${e.totalRolls}🎲</span></div>`;
+  });
+  panel.classList.add('show');
+}
+
+function hideLeaderboard(){document.getElementById('leaderboard-panel').classList.remove('show');}
+
+// ═══════════════════════════════════════════
+// UI UPDATE
+// ═══════════════════════════════════════════
+function updateUI(){
+  document.getElementById('hud-energy').innerText=Math.floor(G.energy);
+  document.getElementById('hud-rolls').innerText=G.totalRolls;
+  document.getElementById('hud-prestige').innerText=G.prestigeBonus.toFixed(2)+'x';
+  document.getElementById('hud-sac').innerText=G.sacrifices;
+  document.getElementById('hud-pet').innerText=G.activePet?G.activePet.emoji+' '+G.activePet.name:'None';
+  document.getElementById('energy-val').innerText=Math.floor(G.energy)+'/'+G.rollCost;
+  document.getElementById('aura-fill').style.width=Math.min(100,G.energy/G.rollCost*100)+'%';
+  document.getElementById('cost-val').innerText=G.rollCost;
+  document.getElementById('pity-val').innerText=G.pityCounter;
+  document.getElementById('roll-btn').disabled=G.energy<G.rollCost;
+  document.getElementById('inv-count').innerText=G.inventory.length;
+  document.getElementById('sac-count').innerText=G.sacrifices;
+  document.getElementById('sac-luck').innerText=(G.sacrificeLuck*100).toFixed(1)+'%';
+  document.getElementById('sac-pity').innerText=G.sacrificePityBoost;
+  document.getElementById('sac-charge').innerText=Math.floor(G.sacrificeCharge);
+  document.getElementById('sac-fill').style.width=(G.sacrificeCharge/100*100)+'%';
+  document.getElementById('sac-mode-indicator').innerText=G.sacMode?(G.sacSelected.length+' selected — tap "🩸 Sac" to confirm'):'';
+  document.getElementById('genesis-btn').style.display=G.bestTier>=18?'inline-block':'none';
+
+  // Equipped
+  const eq=G.equippedAura;
+  if(eq){
+    document.getElementById('orb-emoji').innerText=TIER_EMOJIS[eq.tier]||'🔮';
+    document.getElementById('big-orb').style.boxShadow=`0 0 35px ${TIER_COLORS[eq.tier]}99`;
+    document.getElementById('eq-name').innerHTML=`<span style="color:${TIER_COLORS[eq.tier]}">${TIER_EMOJIS[eq.tier]} ${eq.name}</span> <small>T${eq.tier}</small>`;
+    document.getElementById('eq-abilities').innerText='Abilities: '+eq.abilities.map(a=>a.label).join(', ');
+    if(eq.tier>=14)document.getElementById('glitch-overlay').style.display='block';
+    else document.getElementById('glitch-overlay').style.display='none';
+  }else{
+    document.getElementById('orb-emoji').innerText='🔮';
+    document.getElementById('big-orb').style.boxShadow='';
+    document.getElementById('eq-name').innerText='None';
+    document.getElementById('eq-abilities').innerText='';
+    document.getElementById('glitch-overlay').style.display='none';
+  }
+
+  // Inventory
+  const invDiv=document.getElementById('inv-scroll');
+  invDiv.innerHTML='';
+  if(!G.inventory.length){invDiv.innerHTML='<div style="color:var(--muted);font-size:9px;grid-column:span 2;text-align:center;padding:20px;">Empty</div>';}
+  else{
+    G.inventory.forEach(a=>{
+      const d=document.createElement('div');
+      const isEq=G.equippedAura&&G.equippedAura.id===a.id;
+      const isSel=G.sacSelected.includes(a.id);
+      d.className='inv-item'+(isEq?' equipped':'')+(isSel?' selected':'');
+      d.innerHTML=`<span style="color:${TIER_COLORS[a.tier]}">${TIER_EMOJIS[a.tier]} ${a.name.substring(0,15)}</span><span style="font-size:8px;">T${a.tier}</span>`;
+      d.onclick=()=>{
+        if(G.sacMode){toggleSacSelection(a.id);}
+        else{G.equippedAura={...a};applyEquippedAbilities();addLog('⚡ Equipped: '+a.name);updateUI();}
+      };
+      invDiv.appendChild(d);
+    });
+  }
+
+  // Pets
+  const petDisp=document.getElementById('pet-display');
+  const petXp=document.getElementById('pet-xp');
+  const petSel=document.getElementById('pet-select');
+  const petBon=document.getElementById('pet-bonuses');
+  if(G.activePet){
+    petDisp.innerText=`${G.activePet.emoji} ${G.activePet.name} Lv.${G.activePet.level}`;
+    petXp.innerText=`XP: ${G.activePet.xp}/${G.activePet.level*100}`;
+    const bonuses=[];
+    if(G.activePet.effect.energyBoost)bonuses.push(`+${(G.activePet.effect.energyBoost*100*G.activePet.level).toFixed(0)}% energy`);
+    if(G.activePet.effect.luckBoost)bonuses.push(`+${(G.activePet.effect.luckBoost*100*G.activePet.level).toFixed(1)}% luck`);
+    if(G.activePet.effect.bossDamage)bonuses.push(`+${(G.activePet.effect.bossDamage*100*G.activePet.level).toFixed(0)}% boss dmg`);
+    if(G.activePet.effect.pityBoost)bonuses.push(`+${G.activePet.effect.pityBoost*G.activePet.level} pity`);
+    if(G.activePet.effect.duplicateChance)bonuses.push(`${(G.activePet.effect.duplicateChance*100*G.activePet.level).toFixed(1)}% dupe`);
+    petBon.innerText=bonuses.join(' · ')||'No bonuses';
+  }else{petDisp.innerText='No pet';petXp.innerText='—';petBon.innerText='';}
+  petSel.innerHTML='<option value="">— Select —</option>';
+  G.pets.forEach((p,i)=>petSel.innerHTML+=`<option value="${i}" ${G.activePet&&G.activePet.instanceId===p.instanceId?'selected':''}>${p.emoji} ${p.name} Lv${p.level}</option>`);
+
+  // Bosses
+  const bossArea=document.getElementById('boss-area');
+  const bossActive=document.getElementById('boss-active');
+  const bossBtns=document.getElementById('boss-buttons');
+  if(G.currentBoss){
+    bossActive.style.display='block';bossBtns.style.display='none';
+    document.getElementById('boss-name').innerText=G.currentBoss.name;
+    const pct=Math.max(0,G.currentBoss.currentHp/G.currentBoss.hp*100);
+    document.getElementById('boss-hp-fill').style.width=pct+'%';
+    document.getElementById('boss-hp-text').innerText=`${Math.ceil(G.currentBoss.currentHp)}/${G.currentBoss.hp}`;
+  }else{
+    bossActive.style.display='none';bossBtns.style.display='flex';
+    bossBtns.innerHTML='';
+    BOSS_LIST.forEach(b=>{
+      if(!b.unlock())return;
+      const def=G.defeatedBosses.includes(b.id);
+      const btn=document.createElement('button');
+      btn.className='mbtn'+(def?'':' gold');btn.style.fontSize='8px';btn.style.padding='4px 8px';
+      btn.innerText=`${def?'✅':'👾'} ${b.name}`;
+      btn.onclick=()=>startBoss(b);
+      bossBtns.appendChild(btn);
+    });
+  }
+
+  // Biomes
+  const bioSel=document.getElementById('biome-select');
+  bioSel.innerHTML='';
+  for(let key in BIOMES){if(G.unlockedBiomes.includes(key))bioSel.innerHTML+=`<option value="${key}" ${G.biome===key?'selected':''}>${BIOMES[key].emoji} ${BIOMES[key].name}</option>`;}
+
+  // Shop
+  const shop=document.getElementById('shop-list');
+  shop.innerHTML='';
+  UPGRADE_DEFS.forEach(u=>{
+    const lvl=G.upgrades[u.id]||0,maxed=lvl>=u.max,cost=Math.floor(u.baseCost*Math.pow(1.6,lvl));
+    shop.innerHTML+=`<div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+      <div><b>${u.name}</b> Lv${lvl}/${u.max}<br><small style="color:var(--muted);">${u.desc}</small></div>
+      <button class="mbtn gold" onclick="buyUpgrade('${u.id}')" ${maxed||G.energy<cost?'disabled':''} style="font-size:8px;padding:4px 8px;">${maxed?'MAX':cost}</button>
+    </div>`;
+  });
+}
+
+window.buyUpgrade=(id)=>{
+  const u=UPGRADE_DEFS.find(x=>x.id===id);
+  const lvl=G.upgrades[id]||0,cost=Math.floor(u.baseCost*Math.pow(1.6,lvl));
+  if(G.energy>=cost&&lvl<u.max){
+    G.energy-=cost;G.upgrades[id]=lvl+1;
+    if(id==='clickPower')G.clickPower+=2;
+    if(id==='rollCost')G.rollCost=Math.max(20,G.rollCost-5);
+    if(id==='energyMult')G.clickPowerMult+=0.25;
+    if(id==='autoClick')setupAutoClick();
+    updateUI();
+  }
+};
+
+// ═══════════════════════════════════════════
 // AUTO SYSTEMS
 // ═══════════════════════════════════════════
-function setupAutoClick() {
-  if(G.autoClickInterval) clearInterval(G.autoClickInterval);
-  const lvl = G.upgrades.autoClick || 0;
-  if(lvl > 0) {
-    const delay = Math.max(300, 1500 / lvl);
-    G.autoClickInterval = setInterval(() => {
-      const val = calculateDamage();
-      G.energy += val;
-      G.streak = Math.min(20, G.streak + 1);
-      document.getElementById('click-counter').innerText = Math.floor(G.energy);
+function setupAutoClick(){
+  if(G.autoClickInterval)clearInterval(G.autoClickInterval);
+  if(G.upgrades.autoClick>0){
+    G.autoClickInterval=setInterval(()=>{
+      G.energy+=calculateDamage();G.streak=Math.min(20,G.streak+1);
+      document.getElementById('click-counter').innerText=Math.floor(G.energy);
       updateUI();
-    }, delay);
+    },Math.max(300,1500/G.upgrades.autoClick));
   }
 }
 
-// Auto-equip
-setInterval(() => {
-  if(G.upgrades.autoEquip && G.inventory.length > 0) {
-    const best = G.inventory.reduce((a,b) => a.tier > b.tier ? a : b);
-    if(!G.equippedAura || best.tier > G.equippedAura.tier) {
-      G.equippedAura = {...best};
-      applyAllAbilities();
-    }
+setInterval(()=>{if(G.upgrades.autoEquip&&G.inventory.length){const best=G.inventory.reduce((a,b)=>a.tier>b.tier?a:b);if(!G.equippedAura||best.tier>G.equippedAura.tier){G.equippedAura={...best};applyEquippedAbilities();}}},3000);
+setInterval(()=>{if(G.upgrades.autoRoll&&G.energy>=G.rollCost)document.getElementById('roll-btn').click();},1500);
+setInterval(()=>{
+  if(G.upgrades.autoFusion){
+    const groups={};G.inventory.forEach((a,i)=>{groups[a.tier]=groups[a.tier]||[];groups[a.tier].push(i);});
+    for(let t=20;t>=1;t--){if(groups[t]&&groups[t].length>=2){const[i1,i2]=[groups[t][0],groups[t][1]];const nt=Math.min(20,t+1);const pool=AURA_DB.filter(a=>a.tier===nt);if(!pool.length)continue;const fused={...pool[Math.floor(Math.random()*pool.length)]};[i1,i2].sort((a,b)=>b-a).forEach(i=>G.inventory.splice(i,1));G.inventory.push(fused);G.stats.fusions++;addLog('✨ Auto-fused: '+fused.name);updateUI();break;}}
   }
-}, 3000);
-
-// Auto-roll
-setInterval(() => {
-  if(G.upgrades.autoRoll && G.energy >= G.rollCost) {
-    document.getElementById('roll-btn').click();
-  }
-}, 1500);
-
-// Auto-fusion
-setInterval(() => {
-  if(G.upgrades.autoFusion) {
-    const groups = {};
-    G.inventory.forEach((a,i) => { groups[a.tier] = groups[a.tier] || []; groups[a.tier].push(i); });
-    for(let t = 20; t >= 1; t--) {
-      if(groups[t] && groups[t].length >= 2) {
-        const [i1, i2] = [groups[t][0], groups[t][1]];
-        const nt = Math.min(20, t+1);
-        const pool = AURA_DB.filter(a => a.tier === nt);
-        if(!pool.length) continue;
-        const fused = {...pool[Math.floor(Math.random()*pool.length)]};
-        [i1, i2].sort((a,b) => b-a).forEach(i => G.inventory.splice(i,1));
-        G.inventory.push(fused);
-        G.stats.fusions = (G.stats.fusions||0) + 1;
-        addLog('✨ Auto-fused! → ' + fused.name);
-        updateUI();
-        break;
-      }
-    }
-  }
-}, 5000);
-
-// Pet XP gain
-setInterval(() => {
-  if(G.activePet) {
-    G.activePet.xp = (G.activePet.xp || 0) + (G.activePet.xpRate || 1);
-    const needed = G.activePet.level * 100;
-    if(G.activePet.xp >= needed) {
-      G.activePet.xp -= needed;
-      G.activePet.level = (G.activePet.level || 1) + 1;
-      addLog(`🐾 ${G.activePet.name} leveled up to Lv.${G.activePet.level}!`);
-      showToast(`${G.activePet.name} → Lv.${G.activePet.level}!`);
-    }
-    updateUI();
-  }
-}, 5000);
-
-// Offline progress
-window.addEventListener('load', () => {
-  const now = Date.now();
-  const elapsed = Math.floor((now - G.offlineTimestamp) / 1000);
-  if(elapsed > 10) {
-    const earned = Math.floor(elapsed * 0.5 * G.prestigeBonus);
-    G.energy += earned;
-    addLog(`⏰ Offline for ${elapsed}s: +${earned} energy`);
-  }
-  G.offlineTimestamp = now;
-});
+},5000);
+setInterval(()=>{
+  if(G.activePet){G.activePet.xp=(G.activePet.xp||0)+(G.activePet.xpRate||1);if(G.activePet.xp>=G.activePet.level*100){G.activePet.xp-=G.activePet.level*100;G.activePet.level++;addLog(`🐾 ${G.activePet.name} → Lv${G.activePet.level}!`);showToast(`${G.activePet.name} leveled up!`);}updateUI();}
+},5000);
 
 // ═══════════════════════════════════════════
 // EVENT HANDLERS
 // ═══════════════════════════════════════════
-document.getElementById('big-orb').addEventListener('click', (e) => {
-  const val = calculateDamage();
-  G.energy += val;
-  G.streak = Math.min(20, G.streak + 1);
-  document.getElementById('click-counter').innerText = Math.floor(G.energy);
-  document.getElementById('click-rate').innerText = '+' + val + ' / click';
-  const p = document.createElement('div');
-  p.className = 'click-particle';
-  p.innerText = '+' + val;
-  p.style.left = e.clientX + 'px';
-  p.style.top = e.clientY + 'px';
-  p.style.color = G.equippedAura ? TIER_COLORS[G.equippedAura.tier] : '#9b6eff';
-  document.body.appendChild(p);
-  setTimeout(() => p.remove(), 950);
+document.getElementById('big-orb').addEventListener('click',(e)=>{
+  const val=calculateDamage();G.energy+=val;G.streak=Math.min(20,G.streak+1);
+  document.getElementById('click-counter').innerText=Math.floor(G.energy);
+  const p=document.createElement('div');p.className='click-particle';p.innerText='+'+val;
+  p.style.left=e.clientX+'px';p.style.top=e.clientY+'px';
+  p.style.color=G.equippedAura?TIER_COLORS[G.equippedAura.tier]:'#9b6eff';
+  document.body.appendChild(p);setTimeout(()=>p.remove(),800);
   updateUI();
 });
 
-document.getElementById('roll-btn').addEventListener('click', async () => {
-  if(G.energy < G.rollCost) return;
-  G.energy -= G.rollCost;
-  G.totalRolls++;
-  G.manualRolls++;
-  G.streak = 0;
-  const aura = rollAura();
-  G.currentRolled = aura;
-  document.getElementById('result-panel').innerHTML = `
+document.getElementById('roll-btn').addEventListener('click',async()=>{
+  if(G.energy<G.rollCost)return;
+  G.energy-=G.rollCost;G.totalRolls++;G.streak=0;
+  const aura=rollAura();G.currentRolled=aura;
+  document.getElementById('result-panel').innerHTML=`
     <div style="color:${TIER_COLORS[aura.tier]};font-weight:700;">${TIER_EMOJIS[aura.tier]} ${aura.name}</div>
-    <div style="font-size:10px;color:var(--muted);">${TIER_NAMES[aura.tier]} (T${aura.tier})</div>
-    <div style="font-size:10px;color:var(--muted);">${aura.passive}</div>
-    <div style="font-size:10px;color:#57c8ff;">${aura.abilities.map(a=>a.label||a.type).join(', ')}</div>
-    <button class="mbtn gold" style="margin-top:4px;" onclick="window.addToInv()">Add</button>
-    <button class="mbtn" style="margin-top:4px;" onclick="window.equipNow()">Equip</button>
+    <div style="font-size:9px;color:var(--muted);">${TIER_NAMES[aura.tier]} (T${aura.tier})</div>
+    <button class="mbtn gold" style="margin:2px;font-size:9px;" onclick="addToInv()">+Add</button>
+    <button class="mbtn" style="margin:2px;font-size:9px;" onclick="equipNow()">⚡Equip</button>
   `;
-  if(aura.tier > G.bestTier) {
-    G.bestTier = aura.tier;
-    showToast('⭐ New best: ' + aura.name + '!');
-  }
-  if(aura.tier >= 6) await playCutscene(aura.tier, aura.name);
+  if(aura.tier>G.bestTier){G.bestTier=aura.tier;showToast('⭐ New best: '+aura.name+'!');}
+  if(aura.tier>=6)await playCutscene(aura.tier,aura.name);
   addLog(`${TIER_EMOJIS[aura.tier]} Rolled: ${aura.name} (T${aura.tier})`);
-  updateUI();
+  updateUI();saveGame();
 });
 
-window.addToInv = () => {
-  if(!G.currentRolled) return;
-  if(G.inventory.length >= 20) { showToast('Inventory full!'); return; }
-  G.inventory.push({...G.currentRolled});
-  addLog('Added: ' + G.currentRolled.name);
-  updateUI();
-};
+window.addToInv=()=>{if(!G.currentRolled)return;if(G.inventory.length>=20){showToast('Full!');return;}G.inventory.push({...G.currentRolled});addLog('Added: '+G.currentRolled.name);updateUI();saveGame();};
+window.equipNow=()=>{if(!G.currentRolled)return;if(!G.inventory.find(a=>a.id===G.currentRolled.id))G.inventory.push({...G.currentRolled});G.equippedAura={...G.currentRolled};applyEquippedAbilities();addLog('⚡ Equipped: '+G.currentRolled.name);updateUI();saveGame();};
 
-window.equipNow = () => {
-  if(!G.currentRolled) return;
-  if(!G.inventory.find(a => a.id === G.currentRolled.id)) G.inventory.push({...G.currentRolled});
-  G.equippedAura = {...G.currentRolled};
-  applyAllAbilities();
-  addLog('⚡ Equipped: ' + G.currentRolled.name);
-  updateUI();
-};
-
-document.getElementById('equip-best').onclick = () => {
-  if(!G.inventory.length) return;
-  const best = G.inventory.reduce((a,b) => a.tier > b.tier ? a : b);
-  G.equippedAura = {...best};
-  applyAllAbilities();
-  addLog('🏆 Equipped best: ' + best.name);
-  updateUI();
-};
-
-document.getElementById('fusion-btn').onclick = () => {
-  const groups = {};
-  G.inventory.forEach((a,i) => { groups[a.tier] = groups[a.tier] || []; groups[a.tier].push(i); });
-  for(let t = 20; t >= 1; t--) {
-    if(groups[t] && groups[t].length >= 2) {
-      const [i1, i2] = [groups[t][0], groups[t][1]];
-      const nt = Math.min(20, t+1);
-      const pool = AURA_DB.filter(a => a.tier === nt);
-      if(!pool.length) continue;
-      const fused = {...pool[Math.floor(Math.random()*pool.length)]};
-      [i1, i2].sort((a,b) => b-a).forEach(i => G.inventory.splice(i,1));
-      G.inventory.push(fused);
-      G.stats.fusions = (G.stats.fusions||0) + 1;
-      addLog('✨ Fusion! → ' + fused.name + ' (T' + fused.tier + ')');
-      showToast('Fusion: ' + fused.name + '!');
-      updateUI();
-      return;
-    }
-  }
-  showToast('Need 2 auras of same tier!');
-};
-
-document.getElementById('sacrifice-btn').onclick = () => {
-  document.getElementById('inv-scroll').scrollIntoView({behavior:'smooth'});
-  showToast('Shift+click auras in inventory to select for sacrifice');
-};
-
-document.getElementById('sac-confirm').onclick = () => {
-  sacrificeSelected();
-  updateUI();
-};
-
-document.getElementById('sort-btn').onclick = () => {
-  G.inventory.sort((a,b) => b.tier - a.tier);
-  updateUI();
-};
-
-document.getElementById('prestige-btn').onclick = () => {
-  if(G.totalRolls < 500) { showToast('Need 500 rolls! (' + G.totalRolls + '/500)'); return; }
-  if(!confirm('Prestige? Resets run for +0.25x permanent bonus.')) return;
-  G.prestigeBonus += 0.25;
-  G.clickPower = 1; G.clickPowerMult = 1.0; G.rollCost = 100;
-  G.upgrades = { clickPower:0, rollCost:0, energyMult:0, luck:0, autoClick:0, autoEquip:0, autoRoll:0, autoFusion:0 };
-  G.inventory = []; G.equippedAura = null; G.currentRolled = null;
-  G.totalRolls = 0; G.manualRolls = 0; G.energy = 0; G.streak = 0;
-  G.pityCounter = 0; G.sacrificeCharge = 0;
-  G.stats.prestigeCount = (G.stats.prestigeCount||0) + 1;
-  if(G.autoClickInterval) { clearInterval(G.autoClickInterval); G.autoClickInterval = null; }
-  G.selectedForSacrifice = [];
-  addLog('🌀 PRESTIGE! Bonus: ' + G.prestigeBonus.toFixed(2) + 'x');
-  showToast('🌀 Prestige complete!');
-  updateUI();
-};
-
-document.getElementById('genesis-btn').onclick = () => {
-  if(G.bestTier < 18) return;
-  if(!confirm('GENESIS RESET? Resets everything except prestige bonus. Unlocks Infinite Zone.')) return;
-  G.prestigeBonus += 1.0;
-  G.inventory = []; G.equippedAura = null; G.bestTier = 0;
-  G.pets = []; G.activePet = null;
-  G.defeatedBosses = [];
-  G.unlockedBiomes = ['plains'];
-  if(!G.unlockedBiomes.includes('infinite')) G.unlockedBiomes.push('infinite');
-  G.stats.genesisCount = (G.stats.genesisCount||0) + 1;
-  addLog('💠 GENESIS RESET! Infinite Zone unlocked.');
-  showToast('💠 Genesis! Infinite Zone available.');
-  updateUI();
-};
-
-window.buyUpgrade = (id) => {
-  const u = UPGRADE_DEFS.find(x => x.id === id);
-  const lvl = G.upgrades[id] || 0;
-  const cost = Math.floor(u.baseCost * Math.pow(1.6, lvl));
-  if(G.energy >= cost && lvl < u.max) {
-    G.energy -= cost;
-    G.upgrades[id] = lvl + 1;
-    if(id === 'clickPower') G.clickPower += 2;
-    if(id === 'rollCost') G.rollCost = Math.max(20, G.rollCost - 5);
-    if(id === 'energyMult') G.clickPowerMult += 0.25;
-    if(id === 'autoClick') setupAutoClick();
-    addLog('🛒 Bought: ' + u.name + ' Lv' + (lvl+1));
-    updateUI();
-  }
-};
+async function playCutscene(tier,name){
+  const cs=document.getElementById('cutscene'),phase=document.getElementById('cs-phase'),csName=document.getElementById('cs-name'),fill=document.getElementById('cs-bar-fill');
+  cs.classList.add('show');csName.innerText=name;csName.style.color=TIER_COLORS[tier]||'#fff';
+  let phases;
+  if(tier<=9)phases=[['⭐ AWAKENING','#f5c842'],['✨ POWER SURGES','#f5c842']];
+  else if(tier<=14)phases=[['🌌 COSMIC RESONANCE','#00e5ff'],['🪐 DIMENSIONAL SHIFT','#00e5ff'],['🌀 MANIFESTATION','#ff6fd8'],['✨ AWAKENED','#00e5ff']];
+  else if(tier<=19){phases=[['⚠️ REALITY DISTORTION','#ff0000'],['🕳️ VOID FRACTURES','#ff4444'],['💀 SYSTEM BREACH','#ff00ff'],['☠️ SHOULD NOT EXIST','#ff0000']];document.getElementById('game').classList.add('glitching');document.getElementById('glitch-overlay').style.display='block';}
+  else{phases=[['💀 COLLAPSE','#fff'],['🌀 BREAKS DOWN','#ff4444'],['⚡ APEX ETERNAL','#ff0000']];document.getElementById('game').classList.add('glitching');document.getElementById('glitch-overlay').style.display='block';}
+  fill.style.transition='none';fill.style.width='0%';
+  for(let i=0;i<phases.length;i++){phase.innerText=phases[i][0];phase.style.color=phases[i][1];fill.style.transition='width 0.7s ease';fill.style.width=((i+1)/phases.length*100)+'%';await new Promise(r=>setTimeout(r,600));}
+  await new Promise(r=>setTimeout(r,300));cs.classList.remove('show');document.getElementById('game').classList.remove('glitching');
+}
 
 // ═══════════════════════════════════════════
 // BOOT
 // ═══════════════════════════════════════════
-initFX();
-initBG();
-requestAnimationFrame(renderFX);
+initFX();initBG();requestAnimationFrame(renderFX);
+if(loadGame()){addLog('💾 Game loaded!');showToast('Welcome back!');}
+else{addLog('💎 AURA CLICKER RNG V4');addLog('Tap orb → Roll → Equip → Bosses → Prestige');}
 updateUI();
-addLog('💎 AURA CLICKER RNG V4 — EXPANDED UNIVERSE');
-addLog('200 auras · Pets · Bosses · Biomes · Sacrifice');
-addLog('T14+ = glitch effects · T20 = apex event');
+setInterval(saveGame,30000); // Auto-save every 30s
+</script>
+</body>
+</html>
